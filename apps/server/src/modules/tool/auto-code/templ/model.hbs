@@ -1,0 +1,7 @@
+
+model {{modelName}} {
+  {{#each fields}}
+    {{{genField this}}}
+  {{/each}}
+  @@map("{{snakeCase}}")
+}

@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model SysUser {
+  id       String    @id @db.VarChar(36)
+  userName String    @unique @map("user_name") @db.VarChar(30)
+  avatar   String?   @db.VarChar(100)
+  email    String?   @db.VarChar(50)
+  nickName String    @map("nick_name") @db.VarChar(30)
+  password String    @db.VarChar(100)
+  phone    String?   @db.VarChar(11)
+  sex      String?   @default("0") @db.Char(1)
+  status   String?   @default("0") @db.Char(1)
+  userType String?   @map("user_type") @db.VarChar(2)
+  remark   String?   @db.VarChar(255)
+  createBy String?   @map("create_by") @db.VarChar(64)
+  createAt DateTime  @default(now()) @map("create_at")
+  updateBy String?   @map("update_by") @db.VarChar(64)
+  updateAt DateTime  @updatedAt @map("update_at")
+  roles    SysRole[]
+
+  @@map("sys_user")
+}
+
+model SysRole {
+  id       String       @id @db.VarChar(36)
+  name     String       @db.VarChar(30)
+  key      String       @unique @db.VarChar(30)
+  sort     Int          @default(0)
+  status   String       @db.Char(1)
+  remark   String?      @db.VarChar(255)
+  createBy String?      @map("create_by") @db.VarChar(64)
+  createAt DateTime     @default(now()) @map("create_at")
+  updateBy String?      @map("update_by") @db.VarChar(64)
+  updateAt DateTime     @updatedAt @map("update_at")
+  users    SysUser[]
+  menus    SysMenu[]
+  menuBtns SysMenuBtn[]
+
+  @@map("sys_role")
+}
+
+model SysMenu {
+  id        Int     @id @default(autoincrement())
+  parentId  Int?    @map("parent_id")
+  path      String  @db.VarChar(50)
+  name      String  @unique @db.VarChar(30)
+  auth      String  @db.VarChar(30)
+  hidden    Boolean @default(false)
+  component String? @db.VarChar(50)
+  status    String  @default("0") @db.Char(1)
+  sort      Int     @default(0)
+  remark    String? @db.VarChar(255)
+
+  createBy   String?            @map("create_by") @db.VarChar(64)
+  createAt   DateTime           @default(now()) @map("create_at")
+  updateBy   String?            @map("update_by") @db.VarChar(64)
+  updateAt   DateTime           @updatedAt @map("update_at")
+  // Meta字段直接展开
+  meta       SysMenuMeta?
+  // 关系定义
+  parent     SysMenu?           @relation("MenuTree", fields: [parentId], references: [id])
+  children   SysMenu[]          @relation("MenuTree")
+  parameters SysMenuParameter[]
+  menuBtns   SysMenuBtn[]
+  roles      SysRole[]
+
+  @@map("sys_menu")
+}
+
+model SysMenuMeta {
+  id          Int      @id @default(autoincrement())
+  activeName  String?  @map("active_name")
+  keepAlive   Boolean  @default(false) @map("keep_alive")
+  defaultMenu Boolean  @default(false) @map("default_menu")
+  title       String   @map("title")
+  icon        String?  @map("icon")
+  closeTab    Boolean  @default(true) @map("close_tab")
+  sysMenuId   Int?     @unique @map("sys_menu_id")
+  sysMenu     SysMenu? @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
+
+  @@map("sys_menu_meta")
+}
+
+model SysMenuParameter {
+  id        Int      @id @default(autoincrement())
+  /// query 或者 params
+  type      String?  @db.VarChar(50)
+  key       String?  @db.VarChar(100)
+  value     String?  @db.Text
+  sysMenuId Int?     @map("sys_menu_id")
+  sysMenu   SysMenu? @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
+
+  @@map("sys_menu_parameter")
+}
+
+model SysMenuBtn {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.Char(30)
+  auth      String    @db.Char(30)
+  sysMenuId Int?      @map("sys_menu_id")
+  createAt  DateTime  @default(now()) @map("create_at")
+  updateAt  DateTime  @updatedAt @map("update_at")
+  sysMenu   SysMenu?  @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
+  roles     SysRole[]
+
+  @@map("sys_menu_btn")
+}
+
+model SysDict {
+  id       Int             @id @default(autoincrement())
+  name     String          @db.VarChar(30)
+  code     String          @unique @db.VarChar(30)
+  sort     Int
+  status   String          @db.Char(1)
+  remark   String?         @db.VarChar(255)
+  createBy String?         @map("create_by") @db.VarChar(64)
+  createAt DateTime        @default(now()) @map("create_at")
+  updateBy String?         @map("update_by") @db.VarChar(64)
+  updateAt DateTime        @updatedAt @map("update_at")
+  details  SysDictDetail[]
+
+  @@map("sys_dict")
+}
+
+model SysDictDetail {
+  id          Int      @id @default(autoincrement())
+  label       String   @db.VarChar(30)
+  value       String   @db.VarChar(30)
+  sort        Int
+  status      String   @db.Char(1)
+  remark      String?  @db.VarChar(255)
+  sysDictCode String   @map("sys_dict_code") @db.VarChar(30)
+  sysDict     SysDict? @relation(fields: [sysDictCode], references: [code], onDelete: Cascade)
+  createBy    String?  @map("create_by") @db.VarChar(64)
+  createAt    DateTime @default(now()) @map("create_at")
+  updateBy    String?  @map("update_by") @db.VarChar(64)
+  updateAt    DateTime @updatedAt @map("update_at")
+
+  @@unique([value, sysDictCode])
+  @@map("sys_dict_detail")
+}
+
+model Temp {
+  id         String    @id @map("id") @db.VarChar(36)
+  name       String    @map("name") @db.VarChar(20)
+  code       String    @map("code") @db.VarChar(20)
+  tempPath   String    @map("temp_path") @db.VarChar(30)
+  createBy   String?   @map("create_by") @db.VarChar(30)
+  createTime DateTime? @map("create_time") @db.DateTime
+  updateBy   String?   @map("update_by") @db.VarChar(30)
+  updateTime DateTime? @map("update_time") @db.DateTime
+
+  @@map("temp")
+}
+
+model SysDept {
+  /// id
+  id         String    @id @map("id") @db.VarChar(36)
+  /// 部门名称
+  deptName   String    @unique @map("dept_name") @db.VarChar(30)
+  /// 部门编码
+  deptCode   String    @unique @map("dept_code") @db.VarChar(20)
+  /// 启用状态
+  status     String    @map("status") @db.VarChar(191)
+  /// 创建人
+  createBy   String?   @map("create_by") @db.VarChar(30)
+  /// 创建时间
+  createTime DateTime? @default(now()) @map("create_time")
+  /// 修改人
+  updateBy   String?   @map("update_by") @db.VarChar(30)
+  /// 修改时间
+  updateTime DateTime? @updatedAt @map("update_time")
+
+  @@map("sys_dept")
+}
+
+model SysActionLog {
+  /// id
+  id         Int       @id @default(autoincrement())
+  /// 标题
+  title      String?   @db.VarChar(50)
+  /// 操作类型
+  action     String?   @db.VarChar(2)
+  /// 请求方式
+  method     String?   @db.VarChar(20)
+  /// IP
+  ip         String?   @db.VarChar(20)
+  /// 地址
+  address    String?   @db.VarChar(100)
+  /// 用户ID
+  userId     String?   @map("user_id") @db.VarChar(36)
+  /// 姓名
+  userName   String?   @map("user_name") @db.VarChar(30)
+  /// 请求参数
+  params     String?   @db.Text
+  /// 响应结果
+  result     String?   @db.Text
+  /// 错误信息
+  errorInfo  String?   @map("error_info") @db.Text
+  /// 状态
+  status     String?   @db.VarChar(1)
+  /// 创建时间
+  createTime DateTime? @default(now()) @map("create_time")
+
+  @@map("sys_action_log")
+}
+
+model AutoCode {
+  /// id
+  id         Int       @id @default(autoincrement())
+  /// 模块code
+  name       String    @map("name") @db.VarChar(50)
+  /// 模块中文名称
+  nameZh     String    @map("name_zh") @db.VarChar(50)
+  /// Prisma 表名
+  modelName  String    @default("") @map("model_name") @db.VarChar(50)
+  /// Web目录
+  webPath    String    @map("web_path") @db.VarChar(50)
+  /// 模板目录
+  tempId     String    @map("temp_id") @db.VarChar(36)
+  /// 路由地址
+  routePath  String    @map("route_path") @db.VarChar(50)
+  /// 字段列表
+  fields     String    @map("fields") @db.Text
+  /// 创建人
+  createBy   String?   @map("create_by") @db.VarChar(30)
+  /// 创建时间
+  createTime DateTime? @default(now()) @map("create_time")
+  /// 修改人
+  updateBy   String?   @map("update_by") @db.VarChar(30)
+  /// 修改时间
+  updateTime DateTime? @updatedAt @map("update_time")
+
+  @@map("auto_code")
+}
+
+model FileUpload {
+  /// id
+  id         String    @id @map("id") @db.VarChar(36)
+  /// 文件名
+  name       String    @map("name") @db.VarChar(100)
+  /// 文件地址
+  url        String    @map("url") @db.VarChar(191)
+  /// 文件标签
+  tag        String    @map("tag") @db.VarChar(20)
+  /// 编号
+  key        String    @map("key") @db.VarChar(191)
+  /// 文件大小
+  size       Int       @map("size") @db.Int
+  /// MIME类型
+  mime       String    @map("mime") @db.VarChar(100)
+  /// 创建人
+  createBy   String?   @map("create_by") @db.VarChar(30)
+  /// 创建时间
+  createTime DateTime? @default(now()) @map("create_time")
+  /// 修改人
+  updateBy   String?   @map("update_by") @db.VarChar(30)
+  /// 修改时间
+  updateTime DateTime? @updatedAt @map("update_time")
+
+  @@map("file_upload")
+}

@@ -1,0 +1,34 @@
+export interface QueryDictDetailType {
+  sysDictCode: string
+  label?: string
+  value?: string
+  status?: string
+  page?: number
+  size?: number
+}
+
+export interface DictDetailListType {
+  id: string
+  label: string
+  value: string
+  sort: number
+  status: string
+  remark: string | null
+  createBy: string
+  createAt: Date
+  updateBy: string | null
+  updateAt: Date
+}
+
+export interface CreateDictDetailType {
+  label: string
+  value: string
+  sort: number
+  status: string
+  remark: string | null
+  sysDictCode: string
+}
+
+export interface UpdateDictDetailType extends Partial<CreateDictDetailType> {
+  id: string
+}

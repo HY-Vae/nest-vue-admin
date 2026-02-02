@@ -1,0 +1,72 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginReqDto, ReqAuthDto } from './dto/req-auth.dto';
+import { UpdateAuthDto } from './dto/update-auth.dto';
+import { LocalAuthGuard } from '@/common/guards/localAuth.guard';
+import { User } from '@/common/decorators/user.decorator';
+import type { CurrentUserType } from '@/common/types/auth.type';
+import { Public } from '@/common/decorators/public.decorator';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('权限接口')
+@ApiBearerAuth()
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
+  @Public()
+  @Get('captcha')
+  generateCaptcha(@Query('id') id: string) {
+    return this.authService.generateCaptcha(id);
+  }
+
+  @Public()
+  @Get('testToken')
+  @ApiOperation({
+    summary: '获取token',
+  })
+  generateToken() {
+    return this.authService.login({ id: '1' } as CurrentUserType);
+  }
+
+  @Public()
+  @ApiOperation({
+    summary: '登录',
+  })
+  @Post('login')
+  @UseGuards(LocalAuthGuard)
+  login(@Body() body: LoginReqDto, @User() user: CurrentUserType) {
+    return this.authService.login(user);
+  }
+
+  @ApiOperation({
+    summary: '获取菜单信息',
+  })
+  @Get('routes')
+  async getMenu(@User() user: CurrentUserType) {
+    return await this.authService.getRoutes(user);
+  }
+
+  @ApiOperation({
+    summary: '获取权限树',
+  })
+  @Get('allPermissions')
+  async getPermissions() {
+    return await this.authService.getAllPermissions();
+  }
+
+  @Get('userInfo')
+  findOne(@User() user: CurrentUserType) {
+    return user;
+  }
+}

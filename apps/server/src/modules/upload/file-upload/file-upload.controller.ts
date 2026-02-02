@@ -1,0 +1,112 @@
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileUploadService } from './file-upload.service';
+import {
+  CreateFileUploadDto,
+  GetFileUploadListDto,
+  UpdateFileUploadDto,
+} from './dto/req-fileUpload.dto';
+import { Permission } from '@/common/decorators/permission.decorator';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+
+import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from '@/common/decorators/user.decorator';
+import type { CurrentUserType } from '@/common/types/auth.type';
+
+@ApiTags('附件上传')
+@ApiBearerAuth()
+@Controller('upload/file')
+export class FileUploadController {
+  constructor(private readonly fileUploadService: FileUploadService) {}
+  /* 新增 */
+  @Post()
+  @ApiOperation({
+    summary: '附件上传',
+  })
+  @Permission('upload:file:create')
+  @UseInterceptors(FileInterceptor('file'))
+  async create(
+    @UploadedFile() file: Express.Multer.File,
+    @User() user: CurrentUserType,
+  ) {
+    if (!/[^\u0000-\u00ff]/.test(file.originalname)) {
+      file.originalname = Buffer.from(file.originalname, 'latin1').toString(
+        'utf8',
+      );
+    }
+    return this.fileUploadService.create(file, user);
+  }
+
+  /* 列表查询 */
+  @Get()
+  @ApiOperation({
+    summary: '查询附件上传列表',
+  })
+  @Permission('upload:file:list')
+  async findAll(@Query() getFileUploadListDto: GetFileUploadListDto) {
+    return this.fileUploadService.findAll(getFileUploadListDto);
+  }
+
+  /* 通过id查询 */
+  @Get(':id')
+  @ApiOperation({
+    summary: '查询附件上传详情',
+  })
+  @ApiParam({ name: 'id', description: '附件上传id' })
+  @Permission('upload:file:detail')
+  async findOne(@Param('id') id: string) {
+    return await this.fileUploadService.findOne(id);
+  }
+
+  /* 更新 */
+  @Put(':id')
+  @ApiOperation({
+    summary: '更新附件上传',
+  })
+  @ApiParam({ name: 'id', description: '附件上传id' })
+  @Permission('upload:file:update')
+  async update(
+    @Param('id') id: string,
+    @Body(UpdateDtoPipe) updateFileUploadDto: UpdateFileUploadDto,
+  ) {
+    return this.fileUploadService.update(id, updateFileUploadDto);
+  }
+
+  /* 单个删除 */
+  @Delete(':id')
+  @ApiOperation({
+    summary: '删除附件上传',
+  })
+  @ApiParam({ name: 'id', description: '附件上传id' })
+  @Permission('upload:file:remove')
+  async remove(@Param('id') id: string) {
+    return this.fileUploadService.remove(id);
+  }
+
+  /* 批量删除 */
+  @Delete()
+  @ApiOperation({
+    summary: '批量删除附件上传',
+  })
+  @Permission('upload:file:removes')
+  async removes(@Body('ids') ids: string[]) {
+    return this.fileUploadService.removes(ids);
+  }
+}
