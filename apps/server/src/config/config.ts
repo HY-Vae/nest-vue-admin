@@ -1,5 +1,5 @@
-import { ConfigType } from '@/common/types/config.type';
 import { CacheModeEnum, UploadModeEnum } from '@/common/enums/config.enum';
+import { ConfigType } from '@/common/types/config.type';
 
 const config: ConfigType = {
   port: 3333,

@@ -1,3 +1,12 @@
+import { CommonBaseDto } from '@/common/dtos/common.dto';
+import { PaginationDto } from '@/common/dtos/pagination.dto';
+import {
+  FieldTypeEnum,
+  GenTypeEnum,
+  SearchTypeEnum,
+} from '@/common/enums/gen.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -8,16 +17,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import {
-  FieldTypeEnum,
-  GenTypeEnum,
-  SearchTypeEnum,
-} from '@/common/enums/gen.enum';
-import { PartialType } from '@nestjs/mapped-types';
-import { CommonBaseDto } from '@/common/dtos/common.dto';
-import { PaginationDto } from '@/common/dtos/pagination.dto';
-import { ApiProperty } from '@nestjs/swagger';
 
 export class DecimalDto {
   @IsNumber()

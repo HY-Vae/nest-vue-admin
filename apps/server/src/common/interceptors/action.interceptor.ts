@@ -1,19 +1,19 @@
+import { ACTION_KEY } from '@/common/constants/decorator.constant';
+import { ActionMetaType } from '@/common/types/action.type';
+import { CurrentUserType } from '@/common/types/auth.type';
+import { getRequestIp } from '@/utils/util';
 import {
-  Injectable,
-  NestInterceptor,
-  ExecutionContext,
   CallHandler,
+  ExecutionContext,
+  Injectable,
   Logger,
+  NestInterceptor,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable, throwError } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
-import { PrismaService } from 'nestjs-prisma';
-import { ActionMetaType } from '@/common/types/action.type';
-import { ACTION_KEY } from '@/common/constants/decorator.constant';
 import { Request } from 'express';
-import { getRequestIp } from '@/utils/util';
-import { CurrentUserType } from '@/common/types/auth.type';
+import { PrismaService } from 'nestjs-prisma';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 @Injectable()
 export class ActionInterceptor implements NestInterceptor {

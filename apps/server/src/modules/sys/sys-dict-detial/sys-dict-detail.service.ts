@@ -6,13 +6,13 @@ import {
   UpdateSysDictDetailDto,
 } from './dto/req-sys-dict-detail.dto';
 
-import { PrismaService } from 'nestjs-prisma';
 import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 
-import { ApiException } from '@/common/exceptions/api.exception';
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ApiException } from '@/common/exceptions/api.exception';
 import { generateRedisKey } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SysDictDetailService {

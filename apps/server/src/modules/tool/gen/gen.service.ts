@@ -1,12 +1,12 @@
+import { GenCodeType } from '@/common/types/config.type';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GenCodeType } from '@/common/types/config.type';
-import path from 'node:path';
-import fs from 'node:fs';
 import { dotCase, pascalCase } from 'change-case';
-import { Node, Project, SyntaxKind } from 'ts-morph';
-import * as process from 'node:process';
 import child_process from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import * as process from 'node:process';
+import { Node, Project, SyntaxKind } from 'ts-morph';
 
 @Injectable()
 export class GenService {

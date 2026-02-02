@@ -1,28 +1,22 @@
-import * as path from 'node:path';
-import * as fs from 'node:fs';
-import * as child_process from 'node:child_process';
-import * as Handlebars from 'handlebars';
 import { camelCase, pascalCase, snakeCase } from 'change-case';
-import { generateField } from './helper/model.helper';
-import { CreateDtoHelper, QueryDtoHelper } from './helper/dto.helper';
-import { validateTypeMap } from './constant';
-import { createQueryHelper } from './helper/service.helper';
 import * as ejs from 'ejs';
+import * as Handlebars from 'handlebars';
+import * as child_process from 'node:child_process';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as process from 'node:process';
-import { CreateAutoCodeDto, FieldDto } from '../dto/req-auto-code.dto';
-import { checkModelNmaeExist } from './model';
 import * as prettier from 'prettier';
+import { CreateAutoCodeDto, FieldDto } from '../dto/req-auto-code.dto';
+import { validateTypeMap } from './constant';
+import { CreateDtoHelper, QueryDtoHelper } from './helper/dto.helper';
+import { generateField } from './helper/model.helper';
+import { createQueryHelper } from './helper/service.helper';
+import { checkModelNmaeExist } from './model';
 
-import {
-  Node,
-  ClassDeclaration,
-  SourceFile,
-  SyntaxKind,
-  Project,
-} from 'ts-morph';
-import { ModuleMetadata } from '@nestjs/common';
-import { Temp } from '@prisma/client';
 import { getRelativePath } from '@/utils/util';
+import { Temp } from '@prisma/client';
+import { exec } from 'node:child_process';
+import { Node, Project, SourceFile, SyntaxKind } from 'ts-morph';
 
 interface TransNameResult {
   camelCase: string;
@@ -159,10 +153,21 @@ export async function createWebTemp(options: GenerateConfig) {
       const webPath = path.resolve(process.cwd(), '../web/src');
       // 获取生成的两个文件路径
       const viewPath = path.join(webPath, 'views', options.webPath, fName);
-      const code = await formatWebCode(result);
-      writeFileSync(viewPath, code);
+      const ext = path.parse(viewPath).ext;
+      const parser = ext === '.ts' ? 'typescript' : 'vue';
+      writeFileSync(viewPath, result);
     }
   }
+}
+
+export function runProjectFormat(): Promise<void> {
+  return new Promise((resolve) => {
+    const webRootDir = path.resolve(process.cwd(), '../web');
+    const serverRootDir = path.resolve(process.cwd());
+
+    exec('npm run format', { cwd: webRootDir });
+    exec('npm run format', { cwd: serverRootDir });
+  });
 }
 
 function createServerDir(name: string, serverPath: string) {
@@ -255,7 +260,9 @@ export async function checkAllRules(config: GenerateConfig) {
 }
 
 async function formatCode(content: string): Promise<string> {
-  const options = (await prettier.resolveConfig(process.cwd())) || {};
+  const options =
+    (await prettier.resolveConfig(path.join(process.cwd(), '.prettierrc'))) ||
+    {};
   console.log('options', options);
   return prettier.format(content, {
     ...options,
@@ -263,13 +270,19 @@ async function formatCode(content: string): Promise<string> {
   });
 }
 
-async function formatWebCode(content: string): Promise<string> {
+async function formatWebCode(
+  content: string,
+  parser: prettier.ParserOptions['parser'],
+): Promise<string> {
   const webConfigPath = path.resolve(process.cwd(), '../web');
-  const options = (await prettier.resolveConfig(webConfigPath)) || {};
+  const options =
+    (await prettier.resolveConfig(
+      path.join(webConfigPath, '.prettierrc.json'),
+    )) || {};
   console.log('web options', options);
   return prettier.format(content, {
     ...options,
-    parser: 'vue',
+    parser,
   });
 }
 
@@ -296,16 +309,14 @@ export async function generateServerFiles(config: GenerateConfig, temp: Temp) {
     if (typeof content === 'string') {
       const fileName = `${config.name}.${type}.ts`;
       const filePath = path.join(config.serverDir, fileName);
-      const formatted = await formatCode(content);
-      fs.writeFileSync(filePath, formatted);
+      fs.writeFileSync(filePath, content);
       console.log(`生成文件: ${fileName}`);
     } else {
       createDirIfNotExists(path.resolve(config.serverDir, type));
       for (const [dType, dContent] of Object.entries(content)) {
         const fileName = `${type}/${dType}-${config.camelCase}.${type}.ts`;
         const filePath = path.resolve(config.serverDir, fileName);
-        const formatted = await formatCode(dContent);
-        fs.writeFileSync(filePath, formatted);
+        fs.writeFileSync(filePath, dContent);
         console.log(`生成文件: ${fileName}`);
       }
     }

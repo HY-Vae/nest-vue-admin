@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common'
 import type { FormInstance } from 'element-plus'
-import type { SelectOptionItem } from '@/types/global'
+import { computed, ref, watch, type PropType } from 'vue'
 import type { CreateTempType, TempListType } from './temp.type'
 const props = defineProps({
   action: {

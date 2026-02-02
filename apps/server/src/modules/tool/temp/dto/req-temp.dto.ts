@@ -1,16 +1,6 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
-import {
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  MaxLength,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class GetTempListDto extends PaginationDto {
   @IsString()

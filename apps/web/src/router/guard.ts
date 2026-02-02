@@ -1,7 +1,6 @@
 import router from '@/router/index.ts'
-import { getToken } from '@/utils/auth.ts'
 import { useUserStore } from '@/stores/modules/user'
-import { transMenuRouter } from '@/utils/route.ts'
+import { getToken } from '@/utils/auth.ts'
 
 const noTokenPath = ['/auth/login']
 

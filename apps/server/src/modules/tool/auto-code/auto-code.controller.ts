@@ -1,4 +1,12 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { User } from '@/common/decorators/user.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import type { CurrentUserType } from '@/common/types/auth.type';
 import { AutoCodeService } from '@/modules/tool/auto-code/auto-code.service';
+import {
+  CreateAutoCodeDto,
+  GetAutoCodeListDto,
+} from '@/modules/tool/auto-code/dto/req-auto-code.dto';
 import {
   Body,
   Controller,
@@ -6,21 +14,9 @@ import {
   Get,
   Param,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
-import { Permission } from '@/common/decorators/permission.decorator';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { CreateTempDto } from '@/modules/tool/temp/dto/req-temp.dto';
-import { User } from '@/common/decorators/user.decorator';
-import type { CurrentUserType } from '@/common/types/auth.type';
-import { getRelativePath } from '@/utils/util';
-import {
-  CreateAutoCodeDto,
-  GetAutoCodeListDto,
-} from '@/modules/tool/auto-code/dto/req-auto-code.dto';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 
 @Controller('tool/auto-code')
 export class AutoCodeController {

@@ -1,5 +1,5 @@
-import { ConfigObject } from 'svg-captcha';
 import { CacheModeEnum, UploadModeEnum } from '@/common/enums/config.enum';
+import { ConfigObject } from 'svg-captcha';
 
 export type RedisConfigType = {
   host: string;

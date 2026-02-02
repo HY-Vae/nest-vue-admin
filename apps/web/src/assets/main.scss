@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   height: 100%;
   width: 100%;
 }
@@ -41,7 +42,7 @@ html, body {
   flex-direction: column;
   .el-card {
     border: none;
-    --el-card-border-radius: 10px
+    --el-card-border-radius: 10px;
   }
   .search-bar {
     margin-bottom: 10px;
@@ -70,8 +71,3 @@ html, body {
     }
   }
 }
-
-
-
-
-

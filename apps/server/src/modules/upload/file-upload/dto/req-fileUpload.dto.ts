@@ -1,15 +1,8 @@
-import { PaginationDto } from '@/common/dtos/pagination.dto';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  MaxLength,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 import { Trim } from '@/common/decorators/trim';
+import { PaginationDto } from '@/common/dtos/pagination.dto';
+import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsOptional, IsString } from 'class-validator';
 
 /* 分页查询 */
 export class GetFileUploadListDto extends PaginationDto {

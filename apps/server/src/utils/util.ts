@@ -1,6 +1,6 @@
+import { Request } from 'express';
 import path from 'node:path';
 import { v4 as uuidv4 } from 'uuid';
-import { Request } from 'express';
 export function buildMenuTree(menus: any[], rootValue?: number): any[] {
   const menuMap = new Map();
   const rootMenus: any[] = [];

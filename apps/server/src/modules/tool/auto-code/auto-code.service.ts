@@ -1,8 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { ApiException } from '@/common/exceptions/api.exception';
+import { CurrentUserType } from '@/common/types/auth.type';
 import {
   CreateAutoCodeDto,
   GetAutoCodeListDto,
 } from '@/modules/tool/auto-code/dto/req-auto-code.dto';
+import {
+  createBtnAuthMap,
+  createBtnAuths,
+  createMenuBody,
+} from '@/modules/tool/auto-code/utils/auth';
 import {
   checkAllRules,
   createGenerateConfig,
@@ -10,18 +16,12 @@ import {
   GenerateBaseConfig,
   GenerateConfig,
   generateServerFiles,
+  runProjectFormat,
 } from '@/modules/tool/auto-code/utils/generate';
-import {
-  createBtnAuthMap,
-  createBtnAuths,
-  createBtns,
-  createMenuBody,
-} from '@/modules/tool/auto-code/utils/auth';
-import { ApiException } from '@/common/exceptions/api.exception';
 import { createPrismaModel } from '@/modules/tool/auto-code/utils/model';
-import { PrismaService } from 'nestjs-prisma';
-import { CurrentUserType } from '@/common/types/auth.type';
+import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 import { posix } from 'path';
 
 @Injectable()
@@ -82,7 +82,8 @@ export class AutoCodeService {
     // 4.生成prisma model
     await createPrismaModel(config);
     // 5.生成前端代码
-    createWebTemp(config);
+    await createWebTemp(config);
+    await runProjectFormat();
     // 6.生成权限 - 得先生成
     const menuBody = createMenuBody(config);
     const parentMenu = await this.prisma.sysMenu.findFirst({

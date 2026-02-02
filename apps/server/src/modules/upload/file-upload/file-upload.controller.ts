@@ -1,3 +1,5 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
   Body,
   Controller,
@@ -10,25 +12,21 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileUploadService } from './file-upload.service';
-import {
-  CreateFileUploadDto,
-  GetFileUploadListDto,
-  UpdateFileUploadDto,
-} from './dto/req-fileUpload.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import {
+  GetFileUploadListDto,
+  UpdateFileUploadDto,
+} from './dto/req-fileUpload.dto';
+import { FileUploadService } from './file-upload.service';
 
-import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '@/common/decorators/user.decorator';
 import type { CurrentUserType } from '@/common/types/auth.type';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('附件上传')
 @ApiBearerAuth()

@@ -1,22 +1,22 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { SysUserService } from './sys-user.service';
 import {
   CreateSysUserDto,
   GetSysUserListDto,
   UpdateSysUserDto,
 } from './dto/req-sys-user.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { SysUserService } from './sys-user.service';
 
 @Controller('sys/user')
 export class SysUserController {

@@ -1,6 +1,5 @@
-import { GenerateConfig } from './generate';
 import { CreateSysMenuDto } from '@/modules/sys/sys-menu/dto/req-sys-menu.dto';
-import { factory } from 'ts-jest/dist/transformers/hoist-jest';
+import { GenerateConfig } from './generate';
 
 export function createMenuBody(config: GenerateConfig): CreateSysMenuDto {
   const paths = config.routePath.split('/');

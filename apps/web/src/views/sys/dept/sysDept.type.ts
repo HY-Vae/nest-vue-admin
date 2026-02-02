@@ -1,91 +1,38 @@
 export interface QuerySysDeptType {
-  
-    
-  
-    
-      deptName?: string
-    
-  
-    
-      deptCode?: string
-    
-  
-    
-      status?: string
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
+  deptName?: string
+
+  deptCode?: string
+
+  status?: string
+
   current?: number
   pageSize?: number
 }
 
 export interface SysDeptListType {
-  
-    
-      id: string
-    
+  id: string
 
-    
-      deptName: string
-    
+  deptName: string
 
-    
-      deptCode: string
-    
+  deptCode: string
 
-    
-      status: string
-    
+  status: string
 
-    
-      createBy?: string
-    
+  createBy?: string
 
-    
-      createTime?: Date
-    
+  createTime?: Date
 
-    
-      updateBy?: string
-    
+  updateBy?: string
 
-    
-      updateTime?: Date
-    
-
+  updateTime?: Date
 }
 
 export interface CreateSysDeptType {
+  deptName: string
 
-  
+  deptCode: string
 
-  
-    deptName: string
-  
-
-  
-    deptCode: string
-  
-
-  
-    status: string
-  
-
-  
-
-  
-
-  
-
-  
-
+  status: string
 }
 
 export interface UpdateSysDeptType extends Partial<CreateSysDeptType> {

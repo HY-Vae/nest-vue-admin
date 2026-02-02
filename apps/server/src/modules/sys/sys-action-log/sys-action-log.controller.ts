@@ -1,33 +1,13 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-} from '@nestjs/common';
-import { SysActionLogService } from './sys-action-log.service';
-import {
-  CreateSysActionLogDto,
-  GetSysActionLogListDto,
-  UpdateSysActionLogDto,
-} from './dto/req-sysActionLog.dto';
 import { Permission } from '@/common/decorators/permission.decorator';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
-
-import {
-  DelCommonNumberDto,
-  DelCommonNumbersDto,
-} from '@/common/dtos/common.dto';
+import { GetSysActionLogListDto } from './dto/req-sysActionLog.dto';
+import { SysActionLogService } from './sys-action-log.service';
 
 @ApiTags('操作日志')
 @ApiBearerAuth()

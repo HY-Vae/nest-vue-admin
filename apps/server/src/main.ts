@@ -1,14 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcryptjs';
-import { FileUploadType } from '@/common/types/config.type';
 import { UploadModeEnum } from '@/common/enums/config.enum';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import path, { join } from 'path';
-import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule } from 'nest-winston';
 import { winstonConfig } from '@/common/logger/logger';
+import { FileUploadType } from '@/common/types/config.type';
+import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as bcrypt from 'bcryptjs';
+import { WinstonModule } from 'nest-winston';
+import path, { join } from 'path';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {

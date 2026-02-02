@@ -1,15 +1,14 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
+import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsNumber,
   IsOptional,
   IsString,
-  Max,
   MaxLength,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 
 export class GetSysRoleListDto extends PaginationDto {
   @ApiProperty({ description: '角色名称', required: false })

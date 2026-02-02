@@ -116,19 +116,19 @@
 </template>
 
 <script lang="ts" setup>
-import { paramCase, pascalCase } from 'change-case'
-import FieldTable from './FieldTable.vue'
-import { baseFieldsTable } from '@/views/tool/gen/constant'
+import type { SelectOptionItem } from '@/types/global.ts'
 import { getDictOptionsApi } from '@/views/sys/dict/service'
-import { getTempOptionsApi } from '@/views/tool/temp/service'
-import { reactive, ref, watch, onMounted } from 'vue'
-import { Plus, QuestionFilled } from '@element-plus/icons-vue'
+import { baseFieldsTable } from '@/views/tool/gen/constant'
+import type { BaseFieldType } from '@/views/tool/gen/gen.type'
 import GenForm from '@/views/tool/gen/genForm.vue'
 import { insertCode, insertCodeWeb } from '@/views/tool/gen/service.ts'
-import type { SelectOptionItem } from '@/types/global.ts'
-import type { BaseFieldType } from '@/views/tool/gen/gen.type'
-import type { FormInstance } from 'element-plus'
+import { getTempOptionsApi } from '@/views/tool/temp/service'
 import type { TempListType } from '@/views/tool/temp/temp.type'
+import { Plus, QuestionFilled } from '@element-plus/icons-vue'
+import { paramCase, pascalCase } from 'change-case'
+import type { FormInstance } from 'element-plus'
+import { onMounted, reactive, ref, watch } from 'vue'
+import FieldTable from './FieldTable.vue'
 
 const fieldDialogVisible = ref<boolean>(false)
 

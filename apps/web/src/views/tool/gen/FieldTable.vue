@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { fieldTypeOptions, formItemTypeOptions, searchTypeOptions } from '@/views/tool/gen/constant'
-import { nextTick, type PropType } from 'vue'
-import Sortable from 'sortablejs'
-import { Grid } from '@element-plus/icons-vue'
 import type { SelectOptionItem } from '@/types/global.ts'
+import { fieldTypeOptions, formItemTypeOptions, searchTypeOptions } from '@/views/tool/gen/constant'
 import type { BaseFieldType } from '@/views/tool/gen/gen.type'
+import { Grid } from '@element-plus/icons-vue'
+import Sortable from 'sortablejs'
+import { nextTick, type PropType } from 'vue'
 
 const props = defineProps({
   fieldsTableData: {

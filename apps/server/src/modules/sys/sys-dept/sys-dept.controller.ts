@@ -1,3 +1,6 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
   Body,
   Controller,
@@ -8,21 +11,18 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { SysDeptService } from './sys-dept.service';
-import {
-  CreateSysDeptDto,
-  GetSysDeptListDto,
-  UpdateSysDeptDto,
-} from './dto/req-sysDept.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import {
+  CreateSysDeptDto,
+  GetSysDeptListDto,
+  UpdateSysDeptDto,
+} from './dto/req-sysDept.dto';
+import { SysDeptService } from './sys-dept.service';
 
 @ApiTags('部门')
 @ApiBearerAuth()

@@ -1,5 +1,3 @@
-import { baseFieldsTable } from '@/views/tool/gen/constant.ts'
-
 export enum GenTypeEnum {
   INPUT = 'input',
   TEXTAREA = 'textarea',

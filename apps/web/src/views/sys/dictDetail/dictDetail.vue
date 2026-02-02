@@ -111,8 +111,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
 import {
   addDictDetailApi,
   deleteDictDetailApi,
@@ -120,18 +118,20 @@ import {
   getDictDetailOneApi,
   updateDictDetailApi,
 } from '@/api/dictDetail.ts'
-import DictDetailDialog from '@/views/sys/dictDetail/DictDetailDialog.vue'
-import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { useDict } from '@/hooks/dict.hook.ts'
+import type { SelectOptionItem } from '@/types/global.ts'
+import { transTime } from '@/utils/util.ts'
 import type {
   CreateDictDetailType,
   DictDetailListType,
   UpdateDictDetailType,
 } from '@/views/sys/dictDetail/dictDetail.type'
-import { transTime } from '@/utils/util.ts'
+import DictDetailDialog from '@/views/sys/dictDetail/DictDetailDialog.vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
 import { useRoute } from 'vue-router'
-import { useDict } from '@/hooks/dict.hook.ts'
-import type { SelectOptionItem } from '@/types/global.ts'
 
 const { getDictOptions, getDictLabel } = useDict()
 

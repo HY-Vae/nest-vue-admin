@@ -1,10 +1,10 @@
-import request from '@/utils/request.ts'
 import type { ListResult, Result } from '@/types/global.ts'
+import request from '@/utils/request.ts'
 import type {
   CreateUserType,
   QueryUserType,
-  UserListType,
   UpdateUserType,
+  UserListType,
 } from '@/views/sys/user/user.type'
 
 export function getUserApi(params: QueryUserType): Promise<ListResult<UserListType>> {

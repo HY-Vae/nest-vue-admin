@@ -1,27 +1,27 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { TempService } from './temp.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateTempDto,
   GetTempListDto,
   UpdateTempDto,
 } from './dto/req-temp.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { TempService } from './temp.service';
 
-import { getRelativePath } from '@/utils/util';
 import { User } from '@/common/decorators/user.decorator';
 import type { CurrentUserType } from '@/common/types/auth.type';
+import { getRelativePath } from '@/utils/util';
 
 @ApiTags('模板')
 @ApiBearerAuth()

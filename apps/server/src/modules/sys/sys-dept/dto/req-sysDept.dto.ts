@@ -1,15 +1,7 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsNotEmpty,
-  Max,
-  MaxLength,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 /* 分页查询 */
 export class GetSysDeptListDto extends PaginationDto {

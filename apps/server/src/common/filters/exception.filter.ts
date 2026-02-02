@@ -1,15 +1,15 @@
+import { Result } from '@/common/class/result.class';
+import { NoAuthException } from '@/common/exceptions/noAuth.exception';
+import { NoPermissionException } from '@/common/exceptions/noPermission.exception';
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Result } from '@/common/class/result.class';
-import { NoAuthException } from '@/common/exceptions/noAuth.exception';
-import { NoPermissionException } from '@/common/exceptions/noPermission.exception';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

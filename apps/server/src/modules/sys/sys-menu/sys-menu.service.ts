@@ -5,9 +5,9 @@ import {
   UpdateSysMenuDto,
 } from './dto/req-sys-menu.dto';
 
-import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
 import { buildMenuTree } from '@/utils/util';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
 export class SysMenuService {

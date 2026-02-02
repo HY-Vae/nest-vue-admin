@@ -1,22 +1,22 @@
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import * as svgCaptcha from 'svg-captcha';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { ApiException } from '@/common/exceptions/api.exception';
-import { PrismaService } from 'nestjs-prisma';
-import * as bcrypt from 'bcryptjs';
 import { CurrentUserType, JwtPayloadType } from '@/common/types/auth.type';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
+import { PrismaService } from 'nestjs-prisma';
 
-import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { SUPER_ADMIN } from '@/common/constants/base.constant';
-import { Prisma } from '@prisma/client';
-import { buildMenuTree, generateRedisKey, generateUUid } from '@/utils/util';
-import { simplifyMenuTree } from '@/utils/menu.util';
-import { JwtConfigType } from '@/common/types/config.type';
 import { EnableStatusEnum } from '@/common/enums/common.enum';
+import { NoAuthException } from '@/common/exceptions/noAuth.exception';
+import { JwtConfigType } from '@/common/types/config.type';
+import { simplifyMenuTree } from '@/utils/menu.util';
+import { buildMenuTree, generateRedisKey, generateUUid } from '@/utils/util';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {

@@ -1,7 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
 import { SortEnum } from '@/common/enums/sort.enum';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({

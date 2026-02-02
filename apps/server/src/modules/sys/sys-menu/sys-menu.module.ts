@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SysMenuService } from './sys-menu.service';
 import { SysMenuController } from './sys-menu.controller';
+import { SysMenuService } from './sys-menu.service';
 
 @Module({
   controllers: [SysMenuController],

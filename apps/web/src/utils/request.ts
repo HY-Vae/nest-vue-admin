@@ -1,6 +1,6 @@
-import axios from 'axios'
-import router from '@/router'
 import { BASE_API } from '@/constants/constant.ts'
+import router from '@/router'
+import axios from 'axios'
 
 const request = axios.create({
   baseURL: BASE_API,

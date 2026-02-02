@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
-import { SysUserModule } from '@/modules/sys/sys-user/sys-user.module';
-import { SysRoleModule } from '@/modules/sys/sys-role/sys-role.module';
-import { SysMenuModule } from '@/modules/sys/sys-menu/sys-menu.module';
-import { SysDictModule } from '@/modules/sys/sys-dict/sys-dict.module';
 import { SysDictDetailModule } from '@/modules/sys/sys-dict-detial/sys-dict-detail.module';
-import { SysDeptModule } from './sys-dept/sys-dept.module';
+import { SysDictModule } from '@/modules/sys/sys-dict/sys-dict.module';
+import { SysMenuModule } from '@/modules/sys/sys-menu/sys-menu.module';
+import { SysRoleModule } from '@/modules/sys/sys-role/sys-role.module';
+import { SysUserModule } from '@/modules/sys/sys-user/sys-user.module';
+import { Module } from '@nestjs/common';
 import { SysActionLogModule } from './sys-action-log/sys-action-log.module';
+import { SysDeptModule } from './sys-dept/sys-dept.module';
 
 @Module({
   imports: [

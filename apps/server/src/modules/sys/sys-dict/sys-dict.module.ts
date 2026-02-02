@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SysDictService } from './sys-dict.service';
 import { SysDictController } from './sys-dict.controller';
+import { SysDictService } from './sys-dict.service';
 
 @Module({
   controllers: [SysDictController],

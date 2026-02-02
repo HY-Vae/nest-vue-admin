@@ -1,7 +1,7 @@
 // src/common/configs/logger.config.ts
+import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
 import 'winston-daily-rotate-file';
-import { utilities as nestWinstonModuleUtilities } from 'nest-winston';
 
 export const winstonConfig = {
   transports: [

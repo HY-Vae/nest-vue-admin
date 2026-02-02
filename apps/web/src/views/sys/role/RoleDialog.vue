@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
-import { ActionEnum } from '@/enums/common.ts'
-import type { FormInstance } from 'element-plus'
-import type { CreateRoleType, RoleListType } from '@/views/sys/role/role.type'
 import { getAllPermissionsApi } from '@/api/auth.ts'
-import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
+import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
+import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
+import type { CreateRoleType, RoleListType } from '@/views/sys/role/role.type'
+import type { FormInstance } from 'element-plus'
+import { computed, ref, watch, type PropType } from 'vue'
 const props = defineProps({
   action: {
     type: String as PropType<ActionEnum>,

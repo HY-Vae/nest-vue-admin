@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common.ts'
 import type { FormInstance } from 'element-plus'
+import { computed, ref, watch, type PropType } from 'vue'
 import type { CreateSysDeptType, SysDeptListType } from './sysDept.type.ts'
 
 import { useDict } from '@/hooks/dict.hook.ts'

@@ -1,4 +1,8 @@
+import { CommonBaseDto } from '@/common/dtos/common.dto';
 import { PaginationDto } from '@/common/dtos/pagination.dto';
+import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -9,10 +13,6 @@ import {
   MaxLength,
   ValidateNested,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
-import { CommonBaseDto } from '@/common/dtos/common.dto';
 
 export class CreateSysMenuMetaDto {
   @ApiProperty({ description: '激活菜单', required: false })

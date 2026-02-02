@@ -1,14 +1,8 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
-import {
-  IsNumber,
-  IsOptional,
-  IsString,
-  Max,
-  MaxLength,
-} from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
+import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class GetSysDictListDto extends PaginationDto {
   @ApiProperty({ description: '字典名称', required: false })

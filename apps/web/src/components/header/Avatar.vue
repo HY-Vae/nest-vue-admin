@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useUserStore } from '@/stores/modules/user.ts'
+import { ArrowDown } from '@element-plus/icons-vue'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
-import { ArrowDown } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const { currentUser } = storeToRefs(userStore)

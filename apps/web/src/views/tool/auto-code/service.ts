@@ -1,9 +1,9 @@
-import request from '@/utils/request.ts'
 import type { ListResult, Result } from '@/types/global.ts'
+import request from '@/utils/request.ts'
 import type {
+  AutoCodeListType,
   CreateAutoCodeType,
   QueryAutoCodeType,
-  AutoCodeListType,
   UpdateAutoCodeType,
 } from './autoCode.type'
 

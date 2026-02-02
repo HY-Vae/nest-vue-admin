@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, type PropType, ref } from 'vue'
 import Icon from '@/components/icon/icon.vue'
+import { computed, type PropType, ref } from 'vue'
 
 const props = defineProps({
   icons: {

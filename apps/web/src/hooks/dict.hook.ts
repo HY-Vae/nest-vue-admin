@@ -1,5 +1,5 @@
-import type { SelectOptionItem } from '@/types/global'
 import { getDictOneApi } from '@/api/dict'
+import type { SelectOptionItem } from '@/types/global'
 
 export const useDict = () => {
   //   1.根据code获取字典

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common.ts'
-import type { FormInstance } from 'element-plus'
 import type {
   CreateDictDetailType,
   DictDetailListType,
 } from '@/views/sys/dictDetail/dictDetail.type'
+import type { FormInstance } from 'element-plus'
+import { computed, ref, watch, type PropType } from 'vue'
 
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'

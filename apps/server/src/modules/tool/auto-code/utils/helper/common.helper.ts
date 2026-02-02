@@ -1,5 +1,3 @@
-import { FieldType } from '../enum';
-
 // export function getClassValidateType(fieldType: FieldType) {
 //   switch (fieldType) {
 //     case FieldType.Boolean:

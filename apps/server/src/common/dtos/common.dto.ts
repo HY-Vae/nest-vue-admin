@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsNotEmpty,
@@ -6,7 +7,6 @@ import {
   IsString,
   Min,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CommonBaseDto {
   @IsOptional()

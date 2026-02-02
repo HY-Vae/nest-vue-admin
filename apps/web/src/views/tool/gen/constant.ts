@@ -1,6 +1,6 @@
-import type { BaseFieldType, FieldDeaultOptionType } from '@/views/tool/gen/gen.type'
-import type { SelectOptionItem } from '@/types/global.ts'
 import { FieldTypeEnum, GenTypeEnum, SearchTypeEnum } from '@/enums/gen.enum.ts'
+import type { SelectOptionItem } from '@/types/global.ts'
+import type { BaseFieldType, FieldDeaultOptionType } from '@/views/tool/gen/gen.type'
 
 export const BASE_STRING_LENGTH = 191
 export const fieldTypeOptions = [

@@ -1,16 +1,16 @@
+import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
+import { ApiException } from '@/common/exceptions/api.exception';
+import { generateRedisKey, generateUUid } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import * as bcrypt from 'bcryptjs';
+import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysUserDto,
   GetSysUserListDto,
   UpdateSysUserDto,
 } from './dto/req-sys-user.dto';
-import { PrismaService } from 'nestjs-prisma';
-import { ApiException } from '@/common/exceptions/api.exception';
-import * as bcrypt from 'bcryptjs';
-import { Prisma } from '@prisma/client';
-import { generateRedisKey, generateUUid } from '@/utils/util';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 
 @Injectable()
 export class SysUserService {

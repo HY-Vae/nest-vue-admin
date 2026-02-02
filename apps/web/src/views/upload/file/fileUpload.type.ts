@@ -1,110 +1,39 @@
 export interface QueryFileUploadType {
-  
-    
-  
-    
-      name?: string
-    
-  
-    
-  
-    
-      tag?: string
-    
-  
-    
-  
-    
-  
-    
-      mime?: string
-    
-  
-    
-  
-    
-  
-    
-  
-    
-  
+  name?: string
+
+  tag?: string
+
+  mime?: string
+
   current?: number
   pageSize?: number
 }
 
 export interface FileUploadListType {
-  
-    
-      id: string
-    
+  id: string
 
-    
-      name: string
-    
+  name: string
 
-    
-      url: string
-    
+  url: string
 
-    
-      tag: string
-    
+  tag: string
 
-    
-      key: string
-    
+  key: string
 
-    
-      size: number
-    
+  size: number
 
-    
-      mime: string
-    
+  mime: string
 
-    
-      createBy?: string
-    
+  createBy?: string
 
-    
-      createTime?: Date
-    
+  createTime?: Date
 
-    
-      updateBy?: string
-    
+  updateBy?: string
 
-    
-      updateTime?: Date
-    
-
+  updateTime?: Date
 }
 
-export interface CreateFileUploadType {
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-}
+export interface CreateFileUploadType {}
 
 export interface UpdateFileUploadType extends Partial<CreateFileUploadType> {
   id: string

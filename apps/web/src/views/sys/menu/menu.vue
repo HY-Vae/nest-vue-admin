@@ -102,21 +102,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
 import { addMenuApi, deleteMenuApi, getMenuApi, getMenuOneApi, updateMenuApi } from '@/api/menu.ts'
-import MenuDialog from '@/views/sys/menu/MenuDialog.vue'
-import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type {
-  CreateMenuType,
-  MenuListType,
-  MenuTreeSelectType,
-  UpdateMenuType,
-} from '@/views/sys/menu/menu.type'
-import { transTime } from '@/utils/util.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
+import { transTime } from '@/utils/util.ts'
+import type { CreateMenuType, MenuListType, UpdateMenuType } from '@/views/sys/menu/menu.type'
+import MenuDialog from '@/views/sys/menu/MenuDialog.vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import { computed, ref } from 'vue'
+import { useRequest } from 'vue-request'
 
 const { getDictOptions, getDictLabel } = useDict()
 

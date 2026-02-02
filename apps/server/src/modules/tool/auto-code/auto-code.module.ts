@@ -1,7 +1,6 @@
-import { Module } from '@nestjs/common';
 import { AutoCodeController } from '@/modules/tool/auto-code/auto-code.controller';
 import { AutoCodeService } from '@/modules/tool/auto-code/auto-code.service';
-import { createWebTempNew } from '@/modules/tool/auto-code/utils/generate';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [],

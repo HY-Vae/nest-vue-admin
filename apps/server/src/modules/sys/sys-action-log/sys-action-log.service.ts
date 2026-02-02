@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
-import {
-  CreateSysActionLogDto,
-  GetSysActionLogListDto,
-  UpdateSysActionLogDto,
-} from './dto/req-sysActionLog.dto';
 import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
+import { GetSysActionLogListDto } from './dto/req-sysActionLog.dto';
 
 @Injectable()
 export class SysActionLogService {

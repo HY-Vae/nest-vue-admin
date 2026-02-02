@@ -5,14 +5,14 @@ import {
   UpdateSysDictDto,
 } from './dto/req-sys-dict.dto';
 
-import { PrismaService } from 'nestjs-prisma';
 import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 
-import { ApiException } from '@/common/exceptions/api.exception';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { EnableStatusEnum } from '@/common/enums/common.enum';
+import { ApiException } from '@/common/exceptions/api.exception';
 import { generateRedisKey } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class SysDictService {

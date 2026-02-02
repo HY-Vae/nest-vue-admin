@@ -1,15 +1,14 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
+import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  Max,
   MaxLength,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { PartialType } from '@nestjs/mapped-types';
 
 export class GetSysDictDetailListDto extends PaginationDto {
   @ApiProperty({ description: '字典Code', required: true })

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Location } from '@element-plus/icons-vue'
 import Icon from '@/components/icon/icon.vue'
 const props = defineProps({
   menu: {

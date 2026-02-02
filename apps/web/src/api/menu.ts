@@ -1,9 +1,9 @@
-import request from '@/utils/request.ts'
 import type { ListResult, Result } from '@/types/global.ts'
+import request from '@/utils/request.ts'
 import type {
   CreateMenuType,
-  QueryMenuType,
   MenuListType,
+  QueryMenuType,
   UpdateMenuType,
 } from '@/views/sys/menu/menu.type'
 

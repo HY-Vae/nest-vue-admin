@@ -1,12 +1,12 @@
+import { generateUUid } from '@/utils/util';
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysDeptDto,
   GetSysDeptListDto,
   UpdateSysDeptDto,
 } from './dto/req-sysDept.dto';
-import { generateUUid } from '@/utils/util';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SysDeptService {

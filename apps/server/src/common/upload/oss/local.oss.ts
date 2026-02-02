@@ -1,9 +1,9 @@
+import { LocalFileConfig } from '@/common/types/config.type';
 import { IUploadResult, IUploadService } from '@/common/types/upload.type';
 import OSS from 'ali-oss';
-import { LocalFileConfig } from '@/common/types/config.type';
+import dayjs from 'dayjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import dayjs from 'dayjs';
 
 export class LocalOssService implements IUploadService {
   private client: OSS;

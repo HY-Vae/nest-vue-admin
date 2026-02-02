@@ -1,23 +1,23 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { SysDictService } from './sys-dict.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysDictDto,
   GetSysDictListDto,
   UpdateSysDictDto,
 } from './dto/req-sys-dict.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { SysDictService } from './sys-dict.service';
 
 @ApiTags('用户字典')
 @ApiBearerAuth()

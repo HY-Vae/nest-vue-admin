@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
-import { ActionEnum } from '@/enums/common'
-import type { FormInstance, UploadInstance } from 'element-plus'
-import type { CreateFileUploadType, FileUploadListType } from './fileUpload.type'
-import { UploadFilled } from '@element-plus/icons-vue'
 import { UPLOAD_API } from '@/constants/constant.ts'
+import { ActionEnum } from '@/enums/common'
+import { UploadFilled } from '@element-plus/icons-vue'
+import type { UploadInstance } from 'element-plus'
+import { computed, ref, type PropType } from 'vue'
+import type { FileUploadListType } from './fileUpload.type'
 
 const props = defineProps({
   action: {

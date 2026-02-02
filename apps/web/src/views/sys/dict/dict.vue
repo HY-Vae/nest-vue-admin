@@ -110,17 +110,17 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
-import { addDictApi, deleteDictApi, getDictApi, getDictOneApi, updateDictApi } from './service.ts'
-import DictDialog from '@/views/sys/dict/DictDialog.vue'
-import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type { CreateDictType, DictListType, UpdateDictType } from '@/views/sys/dict/dict.type'
-import { transTime } from '@/utils/util.ts'
-import router from '@/router'
 import { useDict } from '@/hooks/dict.hook.ts'
+import router from '@/router'
 import type { SelectOptionItem } from '@/types/global.ts'
+import { transTime } from '@/utils/util.ts'
+import type { CreateDictType, DictListType, UpdateDictType } from '@/views/sys/dict/dict.type'
+import DictDialog from '@/views/sys/dict/DictDialog.vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
+import { addDictApi, deleteDictApi, getDictApi, getDictOneApi, updateDictApi } from './service.ts'
 const { getDictOptions, getDictLabel } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])

@@ -1,4 +1,3 @@
-import { SysMenu } from '@prisma/client';
 import { SelectTreeItem } from '@/common/types/common.type';
 export function simplifyMenuTree(
   originalTree: any[],

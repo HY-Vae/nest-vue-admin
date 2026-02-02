@@ -1,3 +1,8 @@
+import { Action } from '@/common/decorators/action.decorator';
+import { Permission } from '@/common/decorators/permission.decorator';
+import { ActionEnum } from '@/common/enums/action.enum';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
   Body,
   Controller,
@@ -8,18 +13,13 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { SysRoleService } from './sys-role.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysRoleDto,
   GetSysRoleListDto,
   UpdateSysRoleDto,
 } from './dto/req-sys-role.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
-import { Action } from '@/common/decorators/action.decorator';
-import { ActionEnum } from '@/common/enums/action.enum';
+import { SysRoleService } from './sys-role.service';
 
 @ApiTags('用户角色')
 @ApiBearerAuth()

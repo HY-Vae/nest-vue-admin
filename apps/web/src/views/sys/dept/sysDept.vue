@@ -140,22 +140,20 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { transTime } from '@/utils/util.ts'
 import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
 import {
   addSysDeptApi,
-  deleteSysDeptApi,
   deleteSysDeptsApi,
   getSysDeptApi,
   getSysDeptOneApi,
   updateSysDeptApi,
 } from './service.ts'
-import SysDeptDialog from './SysDeptDialog.vue'
-import { useRequest } from 'vue-request'
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import type { CreateSysDeptType, SysDeptListType, UpdateSysDeptType } from './sysDept.type.ts'
-import { transTime } from '@/utils/util.ts'
-import router from '@/router'
+import SysDeptDialog from './SysDeptDialog.vue'
 
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'

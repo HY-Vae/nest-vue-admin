@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { camelCase, cloneDeep, snakeCase } from 'lodash-es'
-import { computed, type PropType, reactive, ref } from 'vue'
+import { FieldTypeEnum, GenTypeEnum } from '@/enums/gen.enum.ts'
+import type { SelectOptionItem } from '@/types/global.ts'
 import {
   baseFieldForm,
   fieldBasic,
   fieldTypeOptions,
   searchTypeOptions,
 } from '@/views/tool/gen/constant.ts'
-import type { SelectOptionItem } from '@/types/global.ts'
 import type { BaseFieldType } from '@/views/tool/gen/gen.type'
-import { FieldTypeEnum, GenTypeEnum } from '@/enums/gen.enum.ts'
-import type { CheckboxValueType } from 'element-plus'
 import { filterShowType } from '@/views/tool/gen/util.ts'
+import type { CheckboxValueType } from 'element-plus'
+import { camelCase, cloneDeep, snakeCase } from 'lodash-es'
+import { computed, type PropType, ref } from 'vue'
 
 const visible = defineModel<boolean>({ required: true })
 const props = defineProps({

@@ -1,23 +1,23 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
+import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { SysMenuService } from './sys-menu.service';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysMenuDto,
   GetSysMenuListDto,
   UpdateSysMenuDto,
 } from './dto/req-sys-menu.dto';
-import { Permission } from '@/common/decorators/permission.decorator';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
-import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { SysMenuService } from './sys-menu.service';
 
 @ApiTags('系统菜单')
 @ApiBearerAuth()

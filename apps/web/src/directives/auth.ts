@@ -1,5 +1,5 @@
-import type { AuthDirective } from '@/types/vue'
 import { useUserStore } from '@/stores/modules/user.ts'
+import type { AuthDirective } from '@/types/vue'
 
 export default {
   // 帮我搞个自定义的指令

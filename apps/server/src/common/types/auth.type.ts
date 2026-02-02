@@ -1,4 +1,4 @@
-import { SysUser, SysMenu, SysMenuBtn } from '@prisma/client';
+import { SysUser } from '@prisma/client';
 
 export type CustoemUserType = {
   permissions: string[];

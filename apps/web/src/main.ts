@@ -2,14 +2,14 @@ import './assets/base.css'
 import './assets/main.scss'
 import './assets/tailwind.css'
 
-import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 import { setGlobalOptions } from 'vue-request'
 
+import { initDirectives } from '@/directives'
 import App from './App.vue'
 import router from './router'
 import './router/guard'
-import { initDirectives } from '@/directives'
 
 setGlobalOptions({
   manual: true,

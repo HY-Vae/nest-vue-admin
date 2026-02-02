@@ -145,22 +145,20 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { transTime } from '@/utils/util.ts'
 import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
+import type { AutoCodeListType, CreateAutoCodeType, UpdateAutoCodeType } from './autoCode.type'
+import AutoCodeDialog from './AutoCodeDialog.vue'
 import {
   addAutoCodeApi,
-  deleteAutoCodeApi,
   deleteAutoCodesApi,
   getAutoCodeApi,
   getAutoCodeOneApi,
   updateAutoCodeApi,
 } from './service'
-import AutoCodeDialog from './AutoCodeDialog.vue'
-import { useRequest } from 'vue-request'
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type { CreateAutoCodeType, AutoCodeListType, UpdateAutoCodeType } from './autoCode.type'
-import { transTime } from '@/utils/util.ts'
-import router from '@/router'
 
 const searchSpan = ref({
   xs: 24,

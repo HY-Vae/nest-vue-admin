@@ -162,26 +162,19 @@
   </div>
 </template>
 <script setup lang="ts">
+import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { transTime } from '@/utils/util.ts'
+import { Delete, UploadFilled } from '@element-plus/icons-vue'
 import { ref } from 'vue'
-import { Delete, Plus, UploadFilled } from '@element-plus/icons-vue'
+import { useRequest } from 'vue-request'
+import type { FileUploadListType } from './fileUpload.type'
+import FileUploadDialog from './FileUploadDialog.vue'
 import {
-  addFileUploadApi,
   deleteFileUploadApi,
   deleteFileUploadsApi,
   getFileUploadApi,
   getFileUploadOneApi,
-  updateFileUploadApi,
 } from './service'
-import FileUploadDialog from './FileUploadDialog.vue'
-import { useRequest } from 'vue-request'
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type {
-  CreateFileUploadType,
-  FileUploadListType,
-  UpdateFileUploadType,
-} from './fileUpload.type'
-import { transTime } from '@/utils/util.ts'
-import router from '@/router'
 
 const searchSpan = ref({
   xs: 24,

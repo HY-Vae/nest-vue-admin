@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
 import { UploadCommonService } from '@/common/upload/upload.service';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [],

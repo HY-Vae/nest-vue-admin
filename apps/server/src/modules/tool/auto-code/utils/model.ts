@@ -1,18 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import {
-  createAuthPrefix,
-  createFolderUrl,
-  GenerateBaseConfig,
-  GenerateConfig,
-  getPrimaryKey,
-  getPrimaryKeyType,
-  pimaryKeyTypeEnum,
-  renderTemplate,
-  transName,
-} from './generate';
 import { getDMMF } from '@prisma/internals';
 import { readFile } from 'fs/promises';
+import fs from 'node:fs';
+import path from 'node:path';
+import { GenerateConfig, renderTemplate } from './generate';
 
 const schemaPath = path.join(process.cwd(), 'prisma', 'schema.prisma');
 

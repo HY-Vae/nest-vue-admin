@@ -1,22 +1,21 @@
 import { Global, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { PrismaModule } from 'nestjs-prisma';
-import { PrismaConfigService } from './prismaService/prismaConfigService';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
-import { PermissionGuard } from './guards/permission.guard';
+import { CacheModeEnum } from '@/common/enums/config.enum';
 import { HttpExceptionFilter } from '@/common/filters/exception.filter';
-import { CacheModule } from '@nestjs/cache-manager';
-import KeyvRedis, { createKeyv } from '@keyv/redis';
-import Keyv, { KeyvStoreAdapter } from 'keyv';
-import { CacheableMemory } from 'cacheable';
 import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
-import { getConfig } from '@/config/config';
-import { CacheConfigType, RedisConfigType } from '@/common/types/config.type';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { CacheModeEnum, UploadModeEnum } from '@/common/enums/config.enum';
 import { ActionInterceptor } from '@/common/interceptors/action.interceptor';
+import { CacheConfigType, RedisConfigType } from '@/common/types/config.type';
+import { getConfig } from '@/config/config';
+import KeyvRedis from '@keyv/redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { CacheableMemory } from 'cacheable';
+import Keyv, { KeyvStoreAdapter } from 'keyv';
+import { PrismaModule } from 'nestjs-prisma';
+import { PermissionGuard } from './guards/permission.guard';
+import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { PrismaConfigService } from './prismaService/prismaConfigService';
 
 @Global()
 @Module({

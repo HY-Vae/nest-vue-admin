@@ -1,22 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginReqDto, ReqAuthDto } from './dto/req-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LocalAuthGuard } from '@/common/guards/localAuth.guard';
-import { User } from '@/common/decorators/user.decorator';
-import type { CurrentUserType } from '@/common/types/auth.type';
 import { Public } from '@/common/decorators/public.decorator';
+import { User } from '@/common/decorators/user.decorator';
+import { LocalAuthGuard } from '@/common/guards/localAuth.guard';
+import type { CurrentUserType } from '@/common/types/auth.type';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { LoginReqDto } from './dto/req-auth.dto';
 
 @ApiTags('权限接口')
 @ApiBearerAuth()

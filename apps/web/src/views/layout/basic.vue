@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue'
-import SideMenu from '@/components/sideMenu/index.vue'
 import TheHeader from '@/components/header/TheHeader.vue'
+import SideMenu from '@/components/sideMenu/index.vue'
 </script>
 
 <template>

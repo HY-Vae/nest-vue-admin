@@ -7,12 +7,12 @@ import {
 
 import { PrismaService } from 'nestjs-prisma';
 
+import { EnableStatusEnum } from '@/common/enums/common.enum';
 import { ApiException } from '@/common/exceptions/api.exception';
+import type { CurrentUserType } from '@/common/types/auth.type';
+import { GenService } from '@/modules/tool/gen/gen.service';
 import { generateUUid } from '@/utils/util';
 import { Prisma } from '@prisma/client';
-import { EnableStatusEnum } from '@/common/enums/common.enum';
-import { GenService } from '@/modules/tool/gen/gen.service';
-import type { CurrentUserType } from '@/common/types/auth.type';
 
 @Injectable()
 export class TempService {

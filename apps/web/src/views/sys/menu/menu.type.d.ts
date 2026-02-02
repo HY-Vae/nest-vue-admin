@@ -1,5 +1,3 @@
-import type { SelectTreeItem } from '@/types/global.ts'
-
 export interface QueryMenuType {
   name?: string
   key?: string

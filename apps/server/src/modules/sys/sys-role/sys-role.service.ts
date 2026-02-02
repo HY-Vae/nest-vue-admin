@@ -1,16 +1,16 @@
+import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
+import { EnableStatusEnum } from '@/common/enums/common.enum';
+import { ApiException } from '@/common/exceptions/api.exception';
+import { generateRedisKey, generateUUid } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysRoleDto,
   GetSysRoleListDto,
   UpdateSysRoleDto,
 } from './dto/req-sys-role.dto';
-import { PrismaService } from 'nestjs-prisma';
-import { Prisma } from '@prisma/client';
-import { ApiException } from '@/common/exceptions/api.exception';
-import { generateRedisKey, generateUUid } from '@/utils/util';
-import { EnableStatusEnum } from '@/common/enums/common.enum';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 
 @Injectable()
 export class SysRoleService {

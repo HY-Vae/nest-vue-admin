@@ -1,9 +1,9 @@
-import request from '@/utils/request.ts'
 import type { ListResult, Result } from '@/types/global.ts'
+import request from '@/utils/request.ts'
 import type {
   CreateDictType,
-  QueryDictType,
   DictListType,
+  QueryDictType,
   UpdateDictType,
 } from '@/views/sys/dict/dict.type'
 

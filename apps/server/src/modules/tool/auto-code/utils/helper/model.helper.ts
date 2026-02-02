@@ -1,6 +1,5 @@
-import { FieldType } from '../enum';
-import { FieldDto } from '../../dto/req-auto-code.dto';
 import { FieldTypeEnum } from '@/common/enums/gen.enum';
+import { FieldDto } from '../../dto/req-auto-code.dto';
 
 function createFieldName(field: FieldDto): string {
   return field.name;

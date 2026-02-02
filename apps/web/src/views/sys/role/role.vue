@@ -103,16 +103,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
 import { addRoleApi, deleteRoleApi, getRoleApi, getRoleOneApi, updateRoleApi } from '@/api/role.ts'
-import RoleDialog from '@/views/sys/role/RoleDialog.vue'
-import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
-import { transTime } from '@/utils/util.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
+import { transTime } from '@/utils/util.ts'
+import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
+import RoleDialog from '@/views/sys/role/RoleDialog.vue'
+import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
 
 const { getDictOptions, getDictLabel } = useDict()
 

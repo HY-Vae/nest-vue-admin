@@ -1,10 +1,10 @@
+import { getRoutesApi, getUserInfoApi } from '@/api/auth.ts'
+import router from '@/router'
+import type { CurrentUserType } from '@/types/user.ts'
+import { transMenuRouter } from '@/utils/route.ts'
+import type { MenuListType } from '@/views/sys/menu/menu.type'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getRoutesApi, getUserInfoApi } from '@/api/auth.ts'
-import type { CurrentUserType } from '@/types/user.ts'
-import type { MenuListType } from '@/views/sys/menu/menu.type'
-import router from '@/router'
-import { transMenuRouter } from '@/utils/route.ts'
 
 export const useUserStore = defineStore('user', () => {
   const currentUser = ref<CurrentUserType | undefined>(undefined)

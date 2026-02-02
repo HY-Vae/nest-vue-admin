@@ -1,10 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { Reflector } from '@nestjs/core';
-import { PERMISSION_KEY } from '../constants/decorator.constant';
-import { SUPER_ADMIN } from '../constants/base.constant';
-import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { NoPermissionException } from '@/common/exceptions/noPermission.exception';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
+import { SUPER_ADMIN } from '../constants/base.constant';
+import { PERMISSION_KEY } from '../constants/decorator.constant';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {

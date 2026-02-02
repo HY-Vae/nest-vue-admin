@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import SideMenuItem from '@/components/sideMenu/sideMenuItem.vue'
+import router from '@/router'
 import { useUserStore } from '@/stores/modules/user.ts'
 import { storeToRefs } from 'pinia'
-import SideMenuItem from '@/components/sideMenu/sideMenuItem.vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import router from '@/router'
 
 const userStore = useUserStore()
 const { menus } = storeToRefs(userStore)

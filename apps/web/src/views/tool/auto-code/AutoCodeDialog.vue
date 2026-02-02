@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common'
 import type { FormInstance } from 'element-plus'
-import type { CreateAutoCodeType, AutoCodeListType } from './autoCode.type'
+import { computed, ref, watch, type PropType } from 'vue'
+import type { AutoCodeListType, CreateAutoCodeType } from './autoCode.type'
 
 const props = defineProps({
   action: {

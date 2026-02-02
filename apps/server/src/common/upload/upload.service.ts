@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { UploadModeEnum } from '@/common/enums/config.enum';
 import { FileUploadType } from '@/common/types/config.type';
 import { IUploadService } from '@/common/types/upload.type';
-import { LocalOssService } from '@/common/upload/oss/local.oss';
 import { AliyunOssService } from '@/common/upload/oss/aliyun.oss';
+import { LocalOssService } from '@/common/upload/oss/local.oss';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UploadCommonService {

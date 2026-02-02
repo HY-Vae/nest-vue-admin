@@ -1,13 +1,15 @@
-import request from '@/utils/request.ts'
 import type { ListResult, Result } from '@/types/global.ts'
+import request from '@/utils/request.ts'
 import type {
   CreateFileUploadType,
-  QueryFileUploadType,
   FileUploadListType,
+  QueryFileUploadType,
   UpdateFileUploadType,
 } from './fileUpload.type'
 
-export function getFileUploadApi(params: QueryFileUploadType): Promise<ListResult<FileUploadListType>> {
+export function getFileUploadApi(
+  params: QueryFileUploadType,
+): Promise<ListResult<FileUploadListType>> {
   return request('/upload/file', {
     method: 'GET',
     params,

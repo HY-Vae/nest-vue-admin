@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, type PropType, computed, watch } from 'vue'
+import Icon from '@/components/icon/icon.vue'
 import { ActionEnum } from '@/enums/common.ts'
-import type { FormInstance, TreeInstance } from 'element-plus'
-import type { CreateMenuType, IconResult, MenuListType } from '@/views/sys/menu/menu.type'
-import { Plus } from '@element-plus/icons-vue'
 import type { SelectTreeItem } from '@/types/global.ts'
 import { fetchIconsFromCollection } from '@/views/sys/menu/fetchIcons.ts'
 import IconPicker from '@/views/sys/menu/IconPicker.vue'
-import Icon from '@/components/icon/icon.vue'
+import type { CreateMenuType, IconResult, MenuListType } from '@/views/sys/menu/menu.type'
+import { Plus } from '@element-plus/icons-vue'
+import type { FormInstance, TreeInstance } from 'element-plus'
+import { computed, ref, watch, type PropType } from 'vue'
 const props = defineProps({
   action: {
     type: String as PropType<ActionEnum>,

@@ -1,5 +1,5 @@
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { UserKeyEnum } from '@/common/enums/user.enum';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 export const User = createParamDecorator(
   (userKey: UserKeyEnum, ctx: ExecutionContext) => {

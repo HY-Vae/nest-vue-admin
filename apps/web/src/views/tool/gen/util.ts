@@ -1,6 +1,6 @@
 import { FieldTypeEnum, GenTypeEnum } from '@/enums/gen.enum.ts'
-import { fieldTypeShowMap, formItemTypeOptions } from '@/views/tool/gen/constant.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
+import { fieldTypeShowMap, formItemTypeOptions } from '@/views/tool/gen/constant.ts'
 
 export function filterShowType(key: FieldTypeEnum) {
   let options: SelectOptionItem<GenTypeEnum>[] = []

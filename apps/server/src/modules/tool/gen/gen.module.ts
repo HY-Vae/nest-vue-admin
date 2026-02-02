@@ -1,5 +1,5 @@
-import { Module } from '@nestjs/common';
 import { GenService } from '@/modules/tool/gen/gen.service';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [],

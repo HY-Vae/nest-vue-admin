@@ -1,7 +1,7 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
-import { IsArray, IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class GetSysUserListDto extends PaginationDto {
   @ApiProperty({ description: '用户名', required: false })

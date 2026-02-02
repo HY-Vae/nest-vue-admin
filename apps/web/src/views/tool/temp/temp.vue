@@ -104,8 +104,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { transTime } from '@/utils/util.ts'
 import { Delete, Plus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { useRequest } from 'vue-request'
 import {
   addTempApi,
   deleteTempApi,
@@ -114,12 +117,8 @@ import {
   getTempOneApi,
   updateTempApi,
 } from './service'
-import TempDialog from './TempDialog.vue'
-import { useRequest } from 'vue-request'
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import type { CreateTempType, TempListType, UpdateTempType } from './temp.type'
-import { transTime } from '@/utils/util.ts'
-import router from '@/router'
+import TempDialog from './TempDialog.vue'
 
 const searchSpan = ref({
   xs: 24,

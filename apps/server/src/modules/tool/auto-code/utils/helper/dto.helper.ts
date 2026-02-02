@@ -1,7 +1,6 @@
-import { BASE_STRING_LENGTH, validateTypeMap } from '../constant';
-import { FieldType } from '../enum';
-import { FieldDto } from '../../dto/req-auto-code.dto';
 import { FieldTypeEnum } from '@/common/enums/gen.enum';
+import { FieldDto } from '../../dto/req-auto-code.dto';
+import { BASE_STRING_LENGTH, validateTypeMap } from '../constant';
 
 function getClassValidateType(type: FieldTypeEnum) {
   switch (type) {

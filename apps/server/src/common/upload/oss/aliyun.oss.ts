@@ -1,7 +1,6 @@
-import { ConfigService } from '@nestjs/config';
-import OSS, { PutObjectResult } from 'ali-oss';
 import { AliyunConfig } from '@/common/types/config.type';
 import { IUploadResult, IUploadService } from '@/common/types/upload.type';
+import OSS from 'ali-oss';
 import path from 'node:path';
 
 export class AliyunOssService implements IUploadService {

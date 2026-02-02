@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { debounce } from 'lodash-es'
 import { getCaptchaApi, loginApi } from '@/api/auth.ts'
 import router from '@/router'
+import type { FormInstance, FormRules } from 'element-plus'
+import { debounce } from 'lodash-es'
+import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const ruleFormRef = ref<FormInstance>()
