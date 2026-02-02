@@ -36,7 +36,6 @@ export class ActionInterceptor implements NestInterceptor {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
     const { method, originalUrl, body, query, params: routeParams } = request;
-    debugger;
     // 获取用户信息 (假设经由 AuthGuard 注入)
     const user = request.user as CurrentUserType;
 

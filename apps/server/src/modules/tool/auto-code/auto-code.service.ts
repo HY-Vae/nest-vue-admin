@@ -83,7 +83,7 @@ export class AutoCodeService {
     await createPrismaModel(config);
     // 5.生成前端代码
     await createWebTemp(config);
-    await runProjectFormat();
+
     // 6.生成权限 - 得先生成
     const menuBody = createMenuBody(config);
     const parentMenu = await this.prisma.sysMenu.findFirst({
@@ -122,7 +122,7 @@ export class AutoCodeService {
         },
       });
     });
-
+    runProjectFormat();
     return {
       data: config,
     };

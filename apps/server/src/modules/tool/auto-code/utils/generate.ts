@@ -160,14 +160,11 @@ export async function createWebTemp(options: GenerateConfig) {
   }
 }
 
-export function runProjectFormat(): Promise<void> {
-  return new Promise((resolve) => {
-    const webRootDir = path.resolve(process.cwd(), '../web');
-    const serverRootDir = path.resolve(process.cwd());
-
-    exec('npm run format', { cwd: webRootDir });
-    exec('npm run format', { cwd: serverRootDir });
-  });
+export function runProjectFormat() {
+  const webRootDir = path.resolve(process.cwd(), '../web');
+  const serverRootDir = path.resolve(process.cwd());
+  exec('npm run format', { cwd: webRootDir });
+  exec('npm run format', { cwd: serverRootDir });
 }
 
 function createServerDir(name: string, serverPath: string) {

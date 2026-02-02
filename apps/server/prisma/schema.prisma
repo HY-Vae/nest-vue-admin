@@ -274,39 +274,3 @@ model FileUpload {
 
   @@map("file_upload")
 }
-
-model SysActionLog2 {
-    /// id
-  id Int   @id  @default(autoincrement())  
-    /// 标题
-  title String?      @db.VarChar(50) 
-    /// 操作类型
-  action String?      @db.VarChar(2) 
-    /// 请求方式
-  method String?      @db.VarChar(20) 
-    /// IP
-  ip String?      @db.VarChar(20) 
-    /// 地址
-  address String?      @db.VarChar(100) 
-    /// 用户ID
-  userId String?    @map("user_id")  @db.VarChar(36) 
-    /// 姓名
-  userName String?    @map("user_name")  @db.VarChar(30) 
-    /// 请求参数
-  params String?      @db.Text 
-    /// 响应结果
-  result String?      @db.Text 
-    /// 错误信息
-  errorInfo String?    @map("error_info")  @db.Text 
-    /// 状态
-  status String?      @db.VarChar(1) 
-    /// 创建人
-  createBy String?    @map("create_by")  @db.VarChar(30) 
-    /// 创建时间
-  createTime DateTime?    @map("create_time")   
-    /// 修改人
-  updateBy String?    @map("update_by")  @db.VarChar(30) 
-    /// 修改时间
-  updateTime DateTime?    @map("update_time")   
-  @@map("sys_action_log2")
-}
