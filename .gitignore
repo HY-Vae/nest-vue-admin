@@ -59,3 +59,5 @@ generated/prisma
 .DS_Store
 
 prisma/migrations
+
+server/uploads
