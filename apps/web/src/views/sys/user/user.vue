@@ -1,24 +1,16 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchDictDetailForm" class="demo-form-inline">
+      <el-form :model="searchUserForm" class="demo-form-inline">
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
-            <el-form-item label="字典名称">
-              <el-input
-                v-model="searchDictDetailForm.label"
-                placeholder="请输入字典名称"
-                clearable
-              />
+            <el-form-item label="用户名称">
+              <el-input v-model="searchUserForm.name" placeholder="请输入用户名称" clearable />
             </el-form-item>
           </el-col>
           <el-col v-bind="searchSpan">
-            <el-form-item label="字典状态">
-              <el-select
-                v-model="searchDictDetailForm.status"
-                placeholder="请选择字典状态"
-                clearable
-              >
+            <el-form-item label="用户状态">
+              <el-select v-model="searchUserForm.status" placeholder="请选择用户状态" clearable>
                 <el-option
                   v-for="item in enableStatusOptions"
                   :label="item.label"
@@ -29,8 +21,8 @@
           </el-col>
           <el-col v-bind="searchSpan">
             <el-form-item>
-              <el-button type="primary" plain @click="onDictDetailSearch">搜索</el-button>
-              <el-button plain @click="onDictDetailReset">重置</el-button>
+              <el-button type="primary" plain @click="onUserSearch">搜索</el-button>
+              <el-button plain @click="onUserReset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -38,12 +30,12 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addDictDetail">新增</el-button>
+        <el-button type="primary" :icon="Plus" @click="addUser">新增</el-button>
         <el-button
           type="danger"
           :icon="Delete"
-          :disabled="!selectedDictDetailIds.length"
-          @click="delDictDetails(DeleteEnum.Multiple)"
+          :disabled="!selectedUserIds.length"
+          @click="delUsers(DeleteEnum.Multiple)"
         >
           批量删除
         </el-button>
@@ -54,31 +46,29 @@
           v-loading="queryLoading"
           border
           row-key="id"
-          @selection-change="dictDetailSelectionChange"
+          @selection-change="userSelectionChange"
         >
           <el-table-column type="selection" width="55" />
-          <el-table-column type="index" label="序号" />
-          <el-table-column prop="label" label="字典名称" />
-          <el-table-column prop="value" label="字典值" />
-          <el-table-column label="字典状态">
+          <el-table-column type="index" label="序号" width="80" />
+          <el-table-column prop="userName" label="用户名" />
+          <el-table-column prop="nickName" label="昵称" />
+          <el-table-column prop="avatar" label="头像" />
+          <el-table-column prop="status" label="用户状态">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
-          <el-table-column prop="sort" label="排序" />
-          <el-table-column prop="createBy" label="创建人" />
-          <el-table-column prop="createAt" label="创建时间">
+          <el-table-column prop="createAt" label="创建时间" width="160" align="center">
             <template #default="scope">
               {{ transTime(scope.row.createAt) }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" />
           <el-table-column label="操作" width="110">
             <template #default="scope">
-              <el-button type="primary" link @click="updateDictDetail(scope.row)">修改</el-button>
-              <el-button type="danger" link @click="delDictDetails(DeleteEnum.Single, scope.row)"
-                >删除</el-button
-              >
+              <el-button type="primary" link @click="updateUser(scope.row)">修改</el-button>
+              <el-button type="danger" link @click="delUsers(DeleteEnum.Single, scope.row)">
+                删除
+              </el-button>
             </template>
           </el-table-column>
           <template #empty>
@@ -89,8 +79,8 @@
       <el-row justify="end">
         <el-pagination
           class="table-pagination"
-          v-model:current-page="searchDictDetailForm.current"
-          v-model:page-size="searchDictDetailForm.pageSize"
+          v-model:current-page="searchUserForm.current"
+          v-model:page-size="searchUserForm.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
@@ -99,37 +89,26 @@
         />
       </el-row>
     </el-card>
-    <dictDetail-dialog
+    <user-dialog
       :action="action"
       :loading="actionLoading"
       :detailLoading="detailLoading"
-      :current="currentDictDetail"
+      :current="currentUser"
       v-model="visible"
       @cancel="cancelDialog"
-      @confirm="runActionDictDetail"
+      @confirm="runActionUser"
     />
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import {
-  addDictDetailApi,
-  deleteDictDetailApi,
-  getDictDetailApi,
-  getDictDetailOneApi,
-  updateDictDetailApi,
-} from '@/api/dictDetail'
-import DictDetailDialog from '@/views/system/dictDetail/DictDetailDialog.vue'
+import { addUserApi, deleteUserApi, getUserApi, getUserOneApi, updateUserApi } from './service.ts'
+import UserDialog from '@/views/sys/user/UserDialog.vue'
 import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type {
-  CreateDictDetailType,
-  DictDetailListType,
-  UpdateDictDetailType,
-} from '@/views/system/dictDetail/dictDetail.type'
+import type { CreateUserType, UserListType, UpdateUserType } from '@/views/sys/user/user.type'
 import { transTime } from '@/utils/util.ts'
-import { useRoute } from 'vue-router'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
 
@@ -140,8 +119,6 @@ getDictOptions('enableStatus').then((res) => {
   enableStatusOptions.value = res
 })
 
-const route = useRoute()
-
 const searchSpan = ref({
   xs: 24,
   sm: 12,
@@ -150,36 +127,35 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchDictDetailForm = ref({
-  label: '',
+const searchUserForm = ref({
+  name: '',
   status: '',
   current: 1,
   pageSize: 20,
 })
 
-const onDictDetailSearch = () => {
-  searchDictDetailForm.value.current = 1
-  runGetDictDetail()
+const onUserSearch = () => {
+  searchUserForm.value.current = 1
+  runGetUser()
 }
 
-const onDictDetailReset = () => {
-  searchDictDetailForm.value = {
-    label: '',
+const onUserReset = () => {
+  searchUserForm.value = {
+    name: '',
     status: '',
     current: 1,
     pageSize: 20,
   }
-  runGetDictDetail()
+  runGetUser()
 }
 
-const tableData = ref<DictDetailListType[]>([])
+const tableData = ref<UserListType[]>([])
 const total = ref(0)
 
-const { loading: queryLoading, run: runGetDictDetail } = useRequest(
+const { loading: queryLoading, run: runGetUser } = useRequest(
   () => {
-    return getDictDetailApi({
-      ...searchDictDetailForm.value,
-      sysDictCode: route.params.code as string,
+    return getUserApi({
+      ...searchUserForm.value,
     })
   },
   {
@@ -193,69 +169,68 @@ const { loading: queryLoading, run: runGetDictDetail } = useRequest(
 )
 
 const handleSizeChange = () => {
-  runGetDictDetail()
+  runGetUser()
 }
 
 const handleCurrentChange = () => {
-  runGetDictDetail()
+  runGetUser()
 }
 
 const visible = ref<boolean>(false)
 const action = ref<ActionEnum>(ActionEnum.Add)
 
-const addDictDetail = () => {
+const addUser = () => {
   action.value = ActionEnum.Add
-  currentDictDetail.value = undefined
+  currentUser.value = undefined
   visible.value = true
 }
 
 const cancelDialog = () => {}
 
-const { loading: actionLoading, run: runActionDictDetail } = useRequest(
-  (values: CreateDictDetailType | UpdateDictDetailType) => {
+const { loading: actionLoading, run: runActionUser } = useRequest(
+  (values: CreateUserType | UpdateUserType) => {
     if (action.value === ActionEnum.Add) {
-      values.sysDictCode = route.params.code as string
-      return addDictDetailApi(values as CreateDictDetailType)
+      return addUserApi(values as CreateUserType)
     }
-    return updateDictDetailApi(values as UpdateDictDetailType)
+    return updateUserApi(values as UpdateUserType)
   },
   {
     loadingKeep: 500,
     onSuccess: (res) => {
       visible.value = false
-      const message = action.value === ActionEnum.Add ? '新增字典成功' : '修改字典成功'
+      const message = action.value === ActionEnum.Add ? '新增用户成功' : '修改用户成功'
       ElMessage.success(message)
-      runGetDictDetail()
+      runGetUser()
     },
   },
 )
-const currentDictDetail = ref<DictDetailListType | undefined>(undefined)
-const { loading: detailLoading, run: runGetDictDetailOne } = useRequest(getDictDetailOneApi, {
+const currentUser = ref<UserListType | undefined>(undefined)
+const { loading: detailLoading, run: runGetUserOne } = useRequest(getUserOneApi, {
   loadingKeep: 500,
   onSuccess: (res) => {
-    currentDictDetail.value = res.data
+    currentUser.value = res.data
   },
 })
 
-const updateDictDetail = (row: DictDetailListType) => {
+const updateUser = (row: UserListType) => {
   action.value = ActionEnum.Edit
   visible.value = true
-  runGetDictDetailOne(row.id)
+  runGetUserOne(row.id)
 }
 
-const { runAsync: runDeleteDictDetail } = useRequest(deleteDictDetailApi, {
+const { runAsync: runDeleteUser } = useRequest(deleteUserApi, {
   loadingKeep: 500,
 })
 
-const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
-  let message = '此操作将永久删除该字典, 是否继续?'
+const delUsers = (action: DeleteEnum, row?: UserListType) => {
+  let message = '此操作将永久删除该用户, 是否继续?'
   let ids: string[] = []
   if (action === DeleteEnum.Single && row != undefined) {
     ids = [row.id]
   }
   if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedDictDetailIds.value.length}个字典, 是否继续?`
-    ids = selectedDictDetailIds.value
+    message = `此操作将永久批量删除当前${selectedUserIds.value.length}个用户, 是否继续?`
+    ids = selectedUserIds.value
   }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
@@ -265,9 +240,9 @@ const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteDictDetail(ids)
+        runDeleteUser(ids)
           .then(() => {
-            selectedDictDetailIds.value = []
+            selectedUserIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -282,13 +257,13 @@ const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
     },
   }).then(() => {
     ElMessage.success('删除成功')
-    runGetDictDetail()
+    runGetUser()
   })
 }
 
-const selectedDictDetailIds = ref<string[]>([])
-const dictDetailSelectionChange = (dictDetails: DictDetailListType[]) => {
-  selectedDictDetailIds.value = dictDetails.map((dictDetail) => dictDetail.id)
+const selectedUserIds = ref<string[]>([])
+const userSelectionChange = (users: UserListType[]) => {
+  selectedUserIds.value = users.map((user) => user.id)
 }
 </script>
 <style scoped lang="scss">

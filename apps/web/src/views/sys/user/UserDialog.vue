@@ -2,7 +2,7 @@
 import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common.ts'
 import type { FormInstance } from 'element-plus'
-import type { CreateUserType, UserListType } from '@/views/system/user/user.type'
+import type { CreateUserType, UserListType } from '@/views/sys/user/user.type'
 import { getAllPermissionsApi } from '@/api/auth.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import { useDict } from '@/hooks/dict.hook.ts'

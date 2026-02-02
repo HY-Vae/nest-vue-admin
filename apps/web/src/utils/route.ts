@@ -1,4 +1,4 @@
-import type { MenuListType } from '@/views/system/menu/menu.type'
+import type { MenuListType } from '@/views/sys/menu/menu.type'
 const modules = import.meta.glob('../views/**/*.vue')
 
 export const transMenuRouter = (menus: MenuListType[]) => {

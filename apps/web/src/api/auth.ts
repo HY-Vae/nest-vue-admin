@@ -1,8 +1,8 @@
 import request from '@/utils/request.ts'
 import type { CurrentUserType } from '@/types/user.ts'
 import type { Result } from '@/types/global.ts'
-import type { MenuListType } from '@/views/system/menu/menu.type'
-import type { PermissionType } from '@/views/system/role/role.type'
+import type { MenuListType } from '@/views/sys/menu/menu.type'
+import type { PermissionType } from '@/views/sys/role/role.type'
 
 export function loginApi(data) {
   return request('/auth/login', {

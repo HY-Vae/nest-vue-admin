@@ -5,7 +5,7 @@ import type {
   QueryDictDetailType,
   DictDetailListType,
   UpdateDictDetailType,
-} from '@/views/system/dictDetail/dictDetail.type'
+} from '@/views/sys/dictDetail/dictDetail.type'
 
 export function getDictDetailApi(
   params: QueryDictDetailType,

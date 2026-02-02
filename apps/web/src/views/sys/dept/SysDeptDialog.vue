@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, type PropType, computed, watch } from 'vue'
-import { ActionEnum } from '@/enums/common'
+import { ActionEnum } from '@/enums/common.ts'
 import type { FormInstance } from 'element-plus'
-import type { CreateSysDeptType, SysDeptListType } from './sysDept.type'
+import type { CreateSysDeptType, SysDeptListType } from './sysDept.type.ts'
 
-import { useDict } from '@/hooks/dict.hook'
-import type { SelectOptionItem } from '@/types/global'
+import { useDict } from '@/hooks/dict.hook.ts'
+import type { SelectOptionItem } from '@/types/global.ts'
 
 const props = defineProps({
   action: {

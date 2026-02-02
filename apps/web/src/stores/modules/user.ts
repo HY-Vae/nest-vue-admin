@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getRoutesApi, getUserInfoApi } from '@/api/auth.ts'
 import type { CurrentUserType } from '@/types/user.ts'
-import type { MenuListType } from '@/views/system/menu/menu.type'
+import type { MenuListType } from '@/views/sys/menu/menu.type'
 import router from '@/router'
 import { transMenuRouter } from '@/utils/route.ts'
 

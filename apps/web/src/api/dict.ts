@@ -5,7 +5,7 @@ import type {
   QueryDictType,
   DictListType,
   UpdateDictType,
-} from '@/views/system/dict/dict.type'
+} from '@/views/sys/dict/dict.type'
 
 export function getDictApi(params: QueryDictType): Promise<ListResult<DictListType>> {
   return request('/sys/dict', {

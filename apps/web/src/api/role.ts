@@ -5,7 +5,7 @@ import type {
   QueryRoleType,
   RoleListType,
   UpdateRoleType,
-} from '@/views/system/role/role.type'
+} from '@/views/sys/role/role.type'
 
 export function getRoleApi(params: QueryRoleType): Promise<ListResult<RoleListType>> {
   return request('/sys/role', {

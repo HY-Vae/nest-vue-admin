@@ -18,6 +18,7 @@ import { Permission } from '@/common/decorators/permission.decorator';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { ActionEnum } from '@/common/enums/action.enum';
 
 {{#if primaryKeyIsNumber}}
   import {
@@ -41,6 +42,7 @@ export class {{pascalCase}}Controller {
   @ApiOperation({
     summary: '新增{{nameZh}}',
   })
+@Action({ action: ActionEnum.CREATE, title: '新增{{nameZh}}' })
   @Permission('{{authPrefix}}:create')
   async create(@Body(CreateDtoPipe) create{{pascalCase}}Dto: Create{{pascalCase}}Dto) {
     return this.{{camelCase}}Service.create(create{{pascalCase}}Dto);
@@ -76,6 +78,7 @@ export class {{pascalCase}}Controller {
   })
   @ApiParam({ name: 'id', description: '{{nameZh}}id' })
   @Permission('{{authPrefix}}:update')
+  @Action({ action: ActionEnum.UPDATE, title: '更新{{nameZh}}' })
   async update(@Param('id') id: {{pimaryKeyType}}, @Body(UpdateDtoPipe) update{{pascalCase}}Dto: Update{{pascalCase}}Dto) {
     return this.{{camelCase}}Service.update(id, update{{pascalCase}}Dto);
   }
@@ -85,6 +88,7 @@ export class {{pascalCase}}Controller {
   @ApiOperation({
     summary: '删除{{nameZh}}',
   })
+  @Action({ action: ActionEnum.REMOVE, title: '删除{{nameZh}}' })
   @ApiParam({ name: 'id', description: '{{nameZh}}id' })
   @Permission('{{authPrefix}}:remove')
 
@@ -103,6 +107,7 @@ export class {{pascalCase}}Controller {
   @ApiOperation({
     summary: '批量删除{{nameZh}}',
   })
+@Action({ action: ActionEnum.REMOVES, title: '批量删除{{nameZh}}' })
   @Permission('{{authPrefix}}:removes')
   {{#if primaryKeyIsNumber}}
     async removes(@Body() body: DelCommonNumbersDto) {

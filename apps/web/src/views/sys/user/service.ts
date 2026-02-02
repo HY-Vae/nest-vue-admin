@@ -5,7 +5,7 @@ import type {
   QueryUserType,
   UserListType,
   UpdateUserType,
-} from '@/views/system/user/user.type'
+} from '@/views/sys/user/user.type'
 
 export function getUserApi(params: QueryUserType): Promise<ListResult<UserListType>> {
   return request('/sys/user', {

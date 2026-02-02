@@ -2,9 +2,14 @@
 import { ref, type PropType, computed, watch } from 'vue'
 import { ActionEnum } from '@/enums/common.ts'
 import type { FormInstance } from 'element-plus'
-import type { CreateDictType, DictListType } from '@/views/system/dict/dict.type'
+import type {
+  CreateDictDetailType,
+  DictDetailListType,
+} from '@/views/sys/dictDetail/dictDetail.type'
+
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
+
 const props = defineProps({
   action: {
     type: String as PropType<ActionEnum>,
@@ -20,32 +25,36 @@ const props = defineProps({
   },
   current: {
     required: false,
-    type: Object as PropType<DictListType>,
+    type: Object as PropType<DictDetailListType>,
   },
 })
-const visible = defineModel<boolean>({ required: true })
-const emits = defineEmits(['cancel', 'confirm'])
-const dictFormRef = ref<FormInstance>()
-
 const { getDictOptions } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
+getDictOptions('enableStatus').then((res) => {
+  enableStatusOptions.value = res
+})
+
+const visible = defineModel<boolean>({ required: true })
+const emits = defineEmits(['cancel', 'confirm'])
+const dictDetailFormRef = ref<FormInstance>()
 
 const formLabelWidth = '100px'
-const dictForm = ref<CreateDictType>({
-  name: '',
-  code: '',
+const dictDetailForm = ref<CreateDictDetailType>({
+  label: '',
+  value: '',
   sort: 0,
-  status: '',
+  status: '0',
   remark: '',
+  sysDictCode: '',
 })
 
 const rules = {
-  name: [
+  label: [
     { required: true, message: '请输入字典名称', trigger: 'blur' },
     { max: 30, message: '长度不能超过30个字符', trigger: 'change' },
   ],
-  code: [
+  value: [
     { required: true, message: '请输入字典值', trigger: 'blur' },
     { max: 30, message: '长度不能超过30个字符', trigger: 'change' },
   ],
@@ -57,28 +66,23 @@ const cancel = () => {
   emits('cancel')
 }
 const confirm = () => {
-  dictFormRef.value?.validate((valid) => {
+  dictDetailFormRef.value?.validate((valid) => {
     if (valid) {
-      emits('confirm', dictForm.value)
+      emits('confirm', dictDetailForm.value)
     }
   })
 }
 
 const closeDialog = () => {
-  dictFormRef.value?.resetFields()
-  dictForm.value = {
-    name: '',
-    code: '',
+  dictDetailFormRef.value?.resetFields()
+  dictDetailForm.value = {
+    label: '',
+    value: '',
     sort: 0,
-    status: '',
+    status: '0',
     remark: '',
+    sysDictCode: '',
   }
-}
-
-const openDialog = () => {
-  getDictOptions('enableStatus').then((res) => {
-    enableStatusOptions.value = res
-  })
 }
 
 const title = computed(() => {
@@ -89,7 +93,7 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      dictForm.value = val
+      dictDetailForm.value = val
     }
   },
 )
@@ -103,28 +107,33 @@ watch(
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     @closed="closeDialog"
-    @open="openDialog"
   >
-    <el-form :model="dictForm" ref="dictFormRef" v-loading="detailLoading" :rules="rules">
-      <el-form-item label="字典名称" :label-width="formLabelWidth" prop="name">
-        <el-input v-model="dictForm.name" autocomplete="off" />
+    <el-form
+      :model="dictDetailForm"
+      ref="dictDetailFormRef"
+      v-loading="detailLoading"
+      :rules="rules"
+    >
+      <el-form-item label="字典名称" :label-width="formLabelWidth" prop="label">
+        <el-input v-model="dictDetailForm.label" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="字典值" :label-width="formLabelWidth" prop="code">
-        <el-input v-model="dictForm.code" autocomplete="off" />
+      <el-form-item label="字典值" :label-width="formLabelWidth" prop="value">
+        <el-input v-model="dictDetailForm.value" autocomplete="off" />
       </el-form-item>
       <el-form-item label="字典状态" :label-width="formLabelWidth" prop="status">
-        <el-select v-model="dictForm.status" placeholder="请选择字典状态">
+        <el-select v-model="dictDetailForm.status" placeholder="请选择字典状态">
           <el-option
             v-for="item in enableStatusOptions"
+            :key="item.value"
             :label="item.label"
             :value="item.value"
-            :key="item.value"
-          />
+          >
+          </el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="排序" :label-width="formLabelWidth" prop="sort">
         <el-input-number
-          v-model="dictForm.sort"
+          v-model="dictDetailForm.sort"
           :min="0"
           controls-position="right"
           autocomplete="off"
@@ -136,7 +145,7 @@ watch(
           maxlength="255"
           show-word-limit
           :autosize="{ minRows: 3, maxRows: 5 }"
-          v-model="dictForm.remark"
+          v-model="dictDetailForm.remark"
           autocomplete="off"
           word-limit-position="outside"
         />

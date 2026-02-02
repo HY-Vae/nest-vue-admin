@@ -1,4 +1,4 @@
-import type { DictDetailListType } from '@/views/system/dictDetail/dictDetail.type'
+import type { DictDetailListType } from '@/views/sys/dictDetail/dictDetail.type'
 
 export interface QueryDictType {
   name?: string

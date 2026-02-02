@@ -11,6 +11,7 @@ import * as ejs from 'ejs';
 import * as process from 'node:process';
 import { CreateAutoCodeDto, FieldDto } from '../dto/req-auto-code.dto';
 import { checkModelNmaeExist } from './model';
+import * as prettier from 'prettier';
 
 import {
   Node,
@@ -252,6 +253,15 @@ export async function checkAllRules(config: GenerateConfig) {
   return null;
 }
 
+async function formatCode(content: string): Promise<string> {
+  const options = (await prettier.resolveConfig(process.cwd())) || {};
+
+  return prettier.format(content, {
+    ...options,
+    parser: 'typescript',
+  });
+}
+
 export async function generateServerFiles(config: GenerateConfig, temp: Temp) {
   const moduleTemp = await renderTemplate('module.hbs', config);
   const controller = await renderTemplate('controller.hbs', config);
@@ -271,18 +281,24 @@ export async function generateServerFiles(config: GenerateConfig, temp: Temp) {
   // 如果没有文件夹，则进行创建
   createDirIfNotExists(config.serverDir);
   // 4. 写入文件
-  Object.entries(files).forEach(([type, content]) => {
+  for (const [type, content] of Object.entries(files)) {
     if (typeof content === 'string') {
       const fileName = `${config.name}.${type}.ts`;
-      fs.writeFileSync(path.join(config.serverDir, fileName), content);
+      const filePath = path.join(config.serverDir, fileName);
+      const formatted = await formatCode(content);
+      fs.writeFileSync(filePath, formatted);
+      console.log(`生成文件: ${fileName}`);
     } else {
       createDirIfNotExists(path.resolve(config.serverDir, type));
-      Object.entries(content).forEach(([dType, dContent]) => {
+      for (const [dType, dContent] of Object.entries(content)) {
         const fileName = `${type}/${dType}-${config.camelCase}.${type}.ts`;
-        fs.writeFileSync(path.resolve(config.serverDir, fileName), dContent);
-      });
+        const filePath = path.resolve(config.serverDir, fileName);
+        const formatted = await formatCode(dContent);
+        fs.writeFileSync(filePath, formatted);
+        console.log(`生成文件: ${fileName}`);
+      }
     }
-  });
+  }
   //   5.写入import
   const temps = temp.tempPath.split('/');
   const parentName = temps[temps.length - 1] || '';

@@ -1,5 +1,5 @@
 // 获取特定图标集的所有图标
-import type { IconifyResult, IconResult } from '@/views/system/menu/menu.type'
+import type { IconifyResult, IconResult } from '@/views/sys/menu/menu.type'
 
 const iconsMap = new Map<string, IconResult>()
 

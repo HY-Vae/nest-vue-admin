@@ -119,7 +119,7 @@
 import { paramCase, pascalCase } from 'change-case'
 import FieldTable from './FieldTable.vue'
 import { baseFieldsTable } from '@/views/tool/gen/constant'
-import { getDictOptionsApi } from '@/views/system/dict/service'
+import { getDictOptionsApi } from '@/views/sys/dict/service'
 import { getTempOptionsApi } from '@/views/tool/temp/service'
 import { reactive, ref, watch, onMounted } from 'vue'
 import { Plus, QuestionFilled } from '@element-plus/icons-vue'

@@ -1,29 +1,28 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchDictForm" class="demo-form-inline">
+      <el-form :model="searchRoleForm" class="demo-form-inline">
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
-            <el-form-item label="字典名称">
-              <el-input v-model="searchDictForm.name" placeholder="请输入字典名称" clearable />
+            <el-form-item label="角色名称">
+              <el-input v-model="searchRoleForm.name" placeholder="请输入角色名称" clearable />
             </el-form-item>
           </el-col>
           <el-col v-bind="searchSpan">
-            <el-form-item label="字典状态">
-              <el-select v-model="searchDictForm.status" placeholder="请选择字典状态" clearable>
+            <el-form-item label="角色状态">
+              <el-select v-model="searchRoleForm.status" placeholder="请选择角色状态" clearable>
                 <el-option
                   v-for="item in enableStatusOptions"
                   :label="item.label"
                   :value="item.value"
-                  :key="item.value"
                 />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col v-bind="searchSpan">
             <el-form-item>
-              <el-button type="primary" plain @click="onDictSearch">搜索</el-button>
-              <el-button plain @click="onDictReset">重置</el-button>
+              <el-button type="primary" plain @click="onRoleSearch">搜索</el-button>
+              <el-button plain @click="onRoleReset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -31,12 +30,12 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addDict">新增</el-button>
+        <el-button type="primary" :icon="Plus" @click="addRole">新增</el-button>
         <el-button
           type="danger"
           :icon="Delete"
-          :disabled="!selectedDictIds.length"
-          @click="delDicts(DeleteEnum.Multiple)"
+          :disabled="!selectedRoleIds.length"
+          @click="delRoles(DeleteEnum.Multiple)"
         >
           批量删除
         </el-button>
@@ -47,19 +46,13 @@
           v-loading="queryLoading"
           border
           row-key="id"
-          @selection-change="dictSelectionChange"
+          @selection-change="roleSelectionChange"
         >
           <el-table-column type="selection" width="55" />
           <el-table-column type="index" label="序号" />
-          <el-table-column prop="name" label="字典名称" />
-          <el-table-column prop="code" label="字典值">
-            <template #default="scope">
-              <el-button type="primary" link @click="gotoDetail(scope.row)">{{
-                scope.row.code
-              }}</el-button>
-            </template>
-          </el-table-column>
-          <el-table-column label="字典状态">
+          <el-table-column prop="name" label="角色名称" />
+          <el-table-column prop="key" label="角色值" />
+          <el-table-column prop="status" label="角色状态">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
@@ -74,8 +67,8 @@
           <el-table-column prop="remark" label="备注" />
           <el-table-column label="操作" width="110">
             <template #default="scope">
-              <el-button type="primary" link @click="updateDict(scope.row)">修改</el-button>
-              <el-button type="danger" link @click="delDicts(DeleteEnum.Single, scope.row)"
+              <el-button type="primary" link @click="updateRole(scope.row)">修改</el-button>
+              <el-button type="danger" link @click="delRoles(DeleteEnum.Single, scope.row)"
                 >删除</el-button
               >
             </template>
@@ -88,8 +81,8 @@
       <el-row justify="end">
         <el-pagination
           class="table-pagination"
-          v-model:current-page="searchDictForm.current"
-          v-model:page-size="searchDictForm.pageSize"
+          v-model:current-page="searchRoleForm.current"
+          v-model:page-size="searchRoleForm.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total"
@@ -98,35 +91,36 @@
         />
       </el-row>
     </el-card>
-    <dict-dialog
+    <role-dialog
       :action="action"
       :loading="actionLoading"
       :detailLoading="detailLoading"
-      :current="currentDict"
+      :current="currentRole"
       v-model="visible"
       @cancel="cancelDialog"
-      @confirm="runActionDict"
+      @confirm="runActionRole"
     />
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import { addDictApi, deleteDictApi, getDictApi, getDictOneApi, updateDictApi } from './service'
-import DictDialog from '@/views/system/dict/DictDialog.vue'
+import { addRoleApi, deleteRoleApi, getRoleApi, getRoleOneApi, updateRoleApi } from '@/api/role.ts'
+import RoleDialog from '@/views/sys/role/RoleDialog.vue'
 import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type { CreateDictType, DictListType, UpdateDictType } from '@/views/system/dict/dict.type'
+import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
 import { transTime } from '@/utils/util.ts'
-import router from '@/router'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
+
 const { getDictOptions, getDictLabel } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
 getDictOptions('enableStatus').then((res) => {
   enableStatusOptions.value = res
 })
+
 const searchSpan = ref({
   xs: 24,
   sm: 12,
@@ -135,35 +129,35 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchDictForm = ref({
+const searchRoleForm = ref({
   name: '',
   status: '',
   current: 1,
   pageSize: 20,
 })
 
-const onDictSearch = () => {
-  searchDictForm.value.current = 1
-  runGetDict()
+const onRoleSearch = () => {
+  searchRoleForm.value.current = 1
+  runGetRole()
 }
 
-const onDictReset = () => {
-  searchDictForm.value = {
+const onRoleReset = () => {
+  searchRoleForm.value = {
     name: '',
     status: '',
     current: 1,
     pageSize: 20,
   }
-  runGetDict()
+  runGetRole()
 }
 
-const tableData = ref<DictListType[]>([])
+const tableData = ref<RoleListType[]>([])
 const total = ref(0)
 
-const { loading: queryLoading, run: runGetDict } = useRequest(
+const { loading: queryLoading, run: runGetRole } = useRequest(
   () => {
-    return getDictApi({
-      ...searchDictForm.value,
+    return getRoleApi({
+      ...searchRoleForm.value,
     })
   },
   {
@@ -177,68 +171,68 @@ const { loading: queryLoading, run: runGetDict } = useRequest(
 )
 
 const handleSizeChange = () => {
-  runGetDict()
+  runGetRole()
 }
 
 const handleCurrentChange = () => {
-  runGetDict()
+  runGetRole()
 }
 
 const visible = ref<boolean>(false)
 const action = ref<ActionEnum>(ActionEnum.Add)
 
-const addDict = () => {
+const addRole = () => {
   action.value = ActionEnum.Add
-  currentDict.value = undefined
+  currentRole.value = undefined
   visible.value = true
 }
 
 const cancelDialog = () => {}
 
-const { loading: actionLoading, run: runActionDict } = useRequest(
-  (values: CreateDictType | UpdateDictType) => {
+const { loading: actionLoading, run: runActionRole } = useRequest(
+  (values: CreateRoleType | UpdateRoleType) => {
     if (action.value === ActionEnum.Add) {
-      return addDictApi(values as CreateDictType)
+      return addRoleApi(values as CreateRoleType)
     }
-    return updateDictApi(values as UpdateDictType)
+    return updateRoleApi(values as UpdateRoleType)
   },
   {
     loadingKeep: 500,
     onSuccess: (res) => {
       visible.value = false
-      const message = action.value === ActionEnum.Add ? '新增字典成功' : '修改字典成功'
+      const message = action.value === ActionEnum.Add ? '新增角色成功' : '修改角色成功'
       ElMessage.success(message)
-      runGetDict()
+      runGetRole()
     },
   },
 )
-const currentDict = ref<DictListType | undefined>(undefined)
-const { loading: detailLoading, run: runGetDictOne } = useRequest(getDictOneApi, {
+const currentRole = ref<RoleListType | undefined>(undefined)
+const { loading: detailLoading, run: runGetRoleOne } = useRequest(getRoleOneApi, {
   loadingKeep: 500,
   onSuccess: (res) => {
-    currentDict.value = res.data
+    currentRole.value = res.data
   },
 })
 
-const updateDict = (row: DictListType) => {
+const updateRole = (row: RoleListType) => {
   action.value = ActionEnum.Edit
   visible.value = true
-  runGetDictOne(row.code)
+  runGetRoleOne(row.id)
 }
 
-const { runAsync: runDeleteDict } = useRequest(deleteDictApi, {
+const { runAsync: runDeleteRole } = useRequest(deleteRoleApi, {
   loadingKeep: 500,
 })
 
-const delDicts = (action: DeleteEnum, row?: DictListType) => {
-  let message = '此操作将永久删除该字典, 是否继续?'
+const delRoles = (action: DeleteEnum, row?: RoleListType) => {
+  let message = '此操作将永久删除该角色, 是否继续?'
   let ids: string[] = []
   if (action === DeleteEnum.Single && row != undefined) {
     ids = [row.id]
   }
   if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedDictIds.value.length}个字典, 是否继续?`
-    ids = selectedDictIds.value
+    message = `此操作将永久批量删除当前${selectedRoleIds.value.length}个角色, 是否继续?`
+    ids = selectedRoleIds.value
   }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
@@ -248,9 +242,9 @@ const delDicts = (action: DeleteEnum, row?: DictListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteDict(ids)
+        runDeleteRole(ids)
           .then(() => {
-            selectedDictIds.value = []
+            selectedRoleIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -265,22 +259,13 @@ const delDicts = (action: DeleteEnum, row?: DictListType) => {
     },
   }).then(() => {
     ElMessage.success('删除成功')
-    runGetDict()
+    runGetRole()
   })
 }
 
-const selectedDictIds = ref<string[]>([])
-const dictSelectionChange = (dicts: DictListType[]) => {
-  selectedDictIds.value = dicts.map((dict) => dict.id)
-}
-
-const gotoDetail = (row: DictListType) => {
-  router.push({
-    name: 'dict-detail',
-    params: {
-      code: row.code,
-    },
-  })
+const selectedRoleIds = ref<string[]>([])
+const roleSelectionChange = (roles: RoleListType[]) => {
+  selectedRoleIds.value = roles.map((role) => role.id)
 }
 </script>
 <style scoped lang="scss">

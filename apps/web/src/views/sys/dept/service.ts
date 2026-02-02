@@ -5,7 +5,7 @@ import type {
   QuerySysDeptType,
   SysDeptListType,
   UpdateSysDeptType,
-} from './sysDept.type'
+} from './sysDept.type.ts'
 
 export function getSysDeptApi(params: QuerySysDeptType): Promise<ListResult<SysDeptListType>> {
   return request('/sys/dept', {

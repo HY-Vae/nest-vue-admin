@@ -149,16 +149,16 @@ import {
   getSysDeptApi,
   getSysDeptOneApi,
   updateSysDeptApi,
-} from './service'
+} from './service.ts'
 import SysDeptDialog from './SysDeptDialog.vue'
 import { useRequest } from 'vue-request'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
-import type { CreateSysDeptType, SysDeptListType, UpdateSysDeptType } from './sysDept.type'
+import type { CreateSysDeptType, SysDeptListType, UpdateSysDeptType } from './sysDept.type.ts'
 import { transTime } from '@/utils/util.ts'
 import router from '@/router'
 
-import { useDict } from '@/hooks/dict.hook'
-import type { SelectOptionItem } from '@/types/global'
+import { useDict } from '@/hooks/dict.hook.ts'
+import type { SelectOptionItem } from '@/types/global.ts'
 
 const { getDictOptions, getDictLabel } = useDict()
 
