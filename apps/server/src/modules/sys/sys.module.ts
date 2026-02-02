@@ -5,7 +5,7 @@ import { SysMenuModule } from '@/modules/sys/sys-menu/sys-menu.module';
 import { SysDictModule } from '@/modules/sys/sys-dict/sys-dict.module';
 import { SysDictDetailModule } from '@/modules/sys/sys-dict-detial/sys-dict-detail.module';
 import { SysDeptModule } from './sys-dept/sys-dept.module';
-import { SysActionLogModule } from "./sys-action-log/sys-action-log.module";
+import { SysActionLogModule } from './sys-action-log/sys-action-log.module';
 
 @Module({
   imports: [
@@ -15,7 +15,7 @@ import { SysActionLogModule } from "./sys-action-log/sys-action-log.module";
     SysDictModule,
     SysDictDetailModule,
     SysDeptModule,
-        SysActionLogModule
-    ],
+    SysActionLogModule,
+  ],
 })
 export class SysModule {}

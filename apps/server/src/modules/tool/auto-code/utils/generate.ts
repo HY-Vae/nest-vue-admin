@@ -138,14 +138,15 @@ export function createWebTempNew(options: GenerateConfig) {
   });
 }
 
-export function createWebTemp(options: GenerateConfig) {
+export async function createWebTemp(options: GenerateConfig) {
   const tempPath = path.resolve(
     process.cwd(),
     'src/modules/tool/auto-code/templ/web',
   );
   //   1.读取当前路径下面的所有模板
   const files = fs.readdirSync(tempPath);
-  files.forEach((file) => {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const filePath = path.resolve(tempPath, file);
     const stat = fs.statSync(filePath);
     if (stat.isFile()) {
@@ -158,10 +159,10 @@ export function createWebTemp(options: GenerateConfig) {
       const webPath = path.resolve(process.cwd(), '../web/src');
       // 获取生成的两个文件路径
       const viewPath = path.join(webPath, 'views', options.webPath, fName);
-      console.log('viewPath', viewPath);
-      writeFileSync(viewPath, result);
+      const code = await formatWebCode(result);
+      writeFileSync(viewPath, code);
     }
-  });
+  }
 }
 
 function createServerDir(name: string, serverPath: string) {
@@ -255,10 +256,20 @@ export async function checkAllRules(config: GenerateConfig) {
 
 async function formatCode(content: string): Promise<string> {
   const options = (await prettier.resolveConfig(process.cwd())) || {};
-
+  console.log('options', options);
   return prettier.format(content, {
     ...options,
     parser: 'typescript',
+  });
+}
+
+async function formatWebCode(content: string): Promise<string> {
+  const webConfigPath = path.resolve(process.cwd(), '../web');
+  const options = (await prettier.resolveConfig(webConfigPath)) || {};
+  console.log('web options', options);
+  return prettier.format(content, {
+    ...options,
+    parser: 'vue',
   });
 }
 

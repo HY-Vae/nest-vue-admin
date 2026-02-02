@@ -18,6 +18,7 @@ import { Permission } from '@/common/decorators/permission.decorator';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import { Action } from '@/common/decorators/action.decorator';
 import { ActionEnum } from '@/common/enums/action.enum';
 
 {{#if primaryKeyIsNumber}}
