@@ -59,8 +59,19 @@
           </el-table-column>
           <el-table-column label="操作" width="110">
             <template #default="scope">
-              <el-button type="primary" link @click="updateUser(scope.row)">修改</el-button>
-              <el-button type="danger" link @click="delUsers(DeleteEnum.Single, scope.row)">
+              <el-button
+                type="primary"
+                v-if="scope.row.userName !== 'admin'"
+                link
+                @click="updateUser(scope.row)"
+                >修改</el-button
+              >
+              <el-button
+                type="danger"
+                v-if="scope.row.userName !== 'admin'"
+                link
+                @click="delUsers(DeleteEnum.Single, scope.row)"
+              >
                 删除
               </el-button>
             </template>
