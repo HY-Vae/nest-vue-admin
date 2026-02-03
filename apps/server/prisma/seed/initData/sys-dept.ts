@@ -7,6 +7,7 @@ const depts = [
 ];
 
 export async function initDepts(prisma: PrismaClient) {
+  console.log('开始初始化部门数据...');
   for (let i = 0; i < depts.length; i++) {
     const dept = depts[i];
     const isExist = await prisma.sysDept.findFirst({

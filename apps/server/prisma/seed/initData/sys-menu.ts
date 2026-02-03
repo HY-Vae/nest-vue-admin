@@ -3,15 +3,7 @@ import { PrismaClient } from '@prisma/client';
 const menuTree = [];
 
 export async function initMenus(prisma: PrismaClient) {
-  // prisma/seed.ts (菜单部分)
-
-  // ... 前面的清理和用户/角色创建代码保持不变 ...
-
-  console.log('🚀 正在全量构建菜单树 (1:1 还原 SQL)...');
-
-  // ===========================================
-  // 1. 系统管理 (System) - ID 7
-  // ===========================================
+  console.log('开始初始化菜单数据...');
   const sysRoot = await prisma.sysMenu.create({
     data: {
       path: '/sys',
@@ -30,7 +22,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.1 菜单配置 - ID 8
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -56,7 +47,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.2 字典表 - ID 10
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -86,7 +76,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.3 字典详情 (Hidden) - ID 11
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -113,7 +102,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.4 角色管理 - ID 12
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -143,7 +131,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.5 部门管理 - ID 22
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -173,7 +160,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.6 用户管理 - ID 24
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -203,7 +189,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 1.7 操作日志 - ID 37
   await prisma.sysMenu.create({
     data: {
       parentId: sysRoot.id,
@@ -225,9 +210,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // ===========================================
-  // 2. 工具 (Tool) - ID 13
-  // ===========================================
   const toolRoot = await prisma.sysMenu.create({
     data: {
       path: '/tool',
@@ -240,7 +222,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 2.1 模板管理 - ID 14
   await prisma.sysMenu.create({
     data: {
       parentId: toolRoot.id,
@@ -264,7 +245,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 2.2 生成代码 - ID 15
   await prisma.sysMenu.create({
     data: {
       parentId: toolRoot.id,
@@ -288,7 +268,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 2.3 生成列表 - ID 23
   await prisma.sysMenu.create({
     data: {
       parentId: toolRoot.id,
@@ -312,9 +291,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // ===========================================
-  // 3. 上传 (Upload) - ID 25
-  // ===========================================
   const uploadRoot = await prisma.sysMenu.create({
     data: {
       path: '/upload',
@@ -329,7 +305,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // 3.1 附件上传 - ID 26
   await prisma.sysMenu.create({
     data: {
       parentId: uploadRoot.id,
@@ -359,9 +334,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // ===========================================
-  // 4. 欢迎页面 (Welcome) - ID 27
-  // ===========================================
   await prisma.sysMenu.create({
     data: {
       path: '/welcome',
@@ -381,9 +353,6 @@ export async function initMenus(prisma: PrismaClient) {
     },
   });
 
-  // ===========================================
-  // 5. 外链 (Link) - ID 36
-  // ===========================================
   await prisma.sysMenu.create({
     data: {
       path: 'https://jsutil.cn',

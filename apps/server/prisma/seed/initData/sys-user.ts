@@ -17,6 +17,7 @@ const users = [
 ];
 
 export async function initUser(prisma: PrismaClient) {
+  console.log('开始初始化用户...');
   // 查询是否存在如果存在就跳过
   for (let i = 0; i < users.length; i++) {
     const user = users[i];

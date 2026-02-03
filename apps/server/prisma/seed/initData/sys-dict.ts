@@ -84,6 +84,7 @@ const dicts = [
 ];
 
 export async function initDicts(prisma: PrismaClient) {
+  console.log('开始初始化字典数据...');
   for (let i = 0; i < dicts.length; i++) {
     const dict = dicts[i];
     const isExist = await prisma.sysDict.findFirst({

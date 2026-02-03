@@ -13,6 +13,7 @@ const temps = [
 ];
 
 export async function initTemps(prisma: PrismaClient) {
+  console.log('开始初始化模板数据...');
   for (let i = 0; i < temps.length; i++) {
     const temp = temps[i];
     const isExist = await prisma.temp.findFirst({
