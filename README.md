@@ -17,13 +17,6 @@ cd nest-vue-admin
 pnpm i
 ```
 
-## 2. 数据库部署指引
-
-::: info 涉及文件清单
-- **环境变量配置文件**：`apps/server/.env`
-- **初始数据脚本**：`apps/server/nest-vue-admin.sql`
-  :::
-
 ### 2.1 配置数据库连接
 首先，你需要让服务端程序能够访问到你的 MySQL 数据库。
 
