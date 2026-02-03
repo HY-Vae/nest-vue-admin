@@ -40,14 +40,8 @@
           批量删除
         </el-button>
       </el-row>
-      <div class="table-main">
-        <el-table
-          :data="tableData"
-          v-loading="queryLoading"
-          border
-          row-key="id"
-          @selection-change="userSelectionChange"
-        >
+      <div class="table-main" v-loading="queryLoading">
+        <el-table :data="tableData" border row-key="id" @selection-change="userSelectionChange">
           <el-table-column type="selection" width="55" />
           <el-table-column type="index" label="序号" width="80" />
           <el-table-column prop="userName" label="用户名" />
@@ -58,7 +52,7 @@
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
-          <el-table-column prop="createAt" label="创建时间" width="160" align="center">
+          <el-table-column prop="createAt" label="创建时间" width="180" align="center">
             <template #default="scope">
               {{ transTime(scope.row.createAt) }}
             </template>

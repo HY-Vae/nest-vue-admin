@@ -44,14 +44,8 @@
           批量删除
         </el-button>
       </el-row>
-      <div class="table-main">
-        <el-table
-          :data="tableData"
-          v-loading="queryLoading"
-          border
-          row-key="id"
-          @selection-change="tempSelectionChange"
-        >
+      <div class="table-main" v-loading="queryLoading">
+        <el-table :data="tableData" border row-key="id" @selection-change="tempSelectionChange">
           <el-table-column type="selection" width="55" align="center" />
 
           <el-table-column label="模板名称" align="center" prop="name" />

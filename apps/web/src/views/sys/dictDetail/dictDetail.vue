@@ -48,10 +48,9 @@
           批量删除
         </el-button>
       </el-row>
-      <div class="table-main">
+      <div class="table-main" v-loading="queryLoading">
         <el-table
           :data="tableData"
-          v-loading="queryLoading"
           border
           row-key="id"
           @selection-change="dictDetailSelectionChange"

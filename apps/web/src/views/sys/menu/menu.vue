@@ -37,14 +37,8 @@
           批量删除
         </el-button>
       </el-row>
-      <div class="table-main">
-        <el-table
-          :data="tableData"
-          v-loading="queryLoading"
-          border
-          row-key="id"
-          @selection-change="menuSelectionChange"
-        >
+      <div class="table-main" v-loading="queryLoading">
+        <el-table :data="tableData" border row-key="id" @selection-change="menuSelectionChange">
           <el-table-column label="菜单名称">
             <template #default="scope">
               {{ scope.row.meta?.title }}

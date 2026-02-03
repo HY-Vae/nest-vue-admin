@@ -40,14 +40,8 @@
           批量删除
         </el-button>
       </el-row>
-      <div class="table-main">
-        <el-table
-          :data="tableData"
-          v-loading="queryLoading"
-          border
-          row-key="id"
-          @selection-change="roleSelectionChange"
-        >
+      <div class="table-main" v-loading="queryLoading">
+        <el-table :data="tableData" border row-key="id" @selection-change="roleSelectionChange">
           <el-table-column type="selection" width="55" />
           <el-table-column type="index" label="序号" />
           <el-table-column prop="name" label="角色名称" />
