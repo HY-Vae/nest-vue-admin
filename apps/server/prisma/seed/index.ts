@@ -1,15 +1,20 @@
 import { PrismaClient } from '@prisma/client';
-import { initUser } from './initData/sys-user';
-import { initMenus } from './initData/sys-menu';
-import { initMenuBtns } from './initData/sys-menu-btn';
+import { v4 as uuidv4 } from 'uuid';
+import { initDepts } from './initData/sys-dept';
 import { initDicts } from './initData/sys-dict';
+import { initMenus } from './initData/sys-menu';
+import { initUser } from './initData/sys-user';
+import { initTemps } from './initData/temp';
 const prisma = new PrismaClient();
-
+export function generateUUid(): string {
+  return uuidv4().replaceAll('-', '');
+}
 async function main() {
   await initUser(prisma);
   await initMenus(prisma);
-  await initMenuBtns(prisma);
   await initDicts(prisma);
+  await initDepts(prisma);
+  await initTemps(prisma);
 }
 
 main()

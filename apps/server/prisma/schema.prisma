@@ -160,9 +160,9 @@ model Temp {
   code       String    @map("code") @db.VarChar(20)
   tempPath   String    @map("temp_path") @db.VarChar(30)
   createBy   String?   @map("create_by") @db.VarChar(30)
-  createTime DateTime? @map("create_time") @db.DateTime
+  createTime DateTime? @default(now()) @map("create_time")
   updateBy   String?   @map("update_by") @db.VarChar(30)
-  updateTime DateTime? @map("update_time") @db.DateTime
+  updateTime DateTime? @updatedAt @map("update_time")
 
   @@map("temp")
 }

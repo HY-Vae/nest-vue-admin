@@ -1,261 +1,400 @@
 import { PrismaClient } from '@prisma/client';
 
-const menuTree = [
-  {
-    id: 7,
-    parentId: null,
-    path: '/sys',
-    name: 'sys',
-    auth: 'sys',
-    hidden: false,
-    component: 'views/layout/basic.vue',
-    status: '0',
-    sort: 0,
-    remark: '',
-    createBy: 'nva',
-    createAt: '2025-11-03T06:52:00.686Z',
-    updateBy: 'nva',
-    updateAt: '2025-11-11T05:10:45.031Z',
-    meta: {
-      id: 3,
-      activeName: '',
-      keepAlive: false,
-      defaultMenu: false,
-      title: '系统管理',
-      icon: '',
-      closeTab: true,
-      sysMenuId: 7,
-    },
-    children: [
-      {
-        id: 8,
-        parentId: 7,
-        path: 'menu',
-        name: 'menu',
-        auth: 'sys:menu:page',
-        hidden: false,
-        component: 'views/sys/menu/menu.vue',
-        status: '0',
-        sort: 0,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-03T06:54:29.901Z',
-        updateBy: 'nva',
-        updateAt: '2025-11-06T09:49:36.755Z',
-        meta: {
-          id: 4,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '菜单配置',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 8,
-        },
-        children: [],
-      },
-      {
-        id: 12,
-        parentId: 7,
-        path: 'role',
-        name: 'role',
-        auth: 'sys:role',
-        hidden: false,
-        component: 'views/sys/role/role.vue',
-        status: '0',
-        sort: 1,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-06T03:19:44.642Z',
-        updateBy: null,
-        updateAt: '2025-11-06T03:19:44.642Z',
-        meta: {
-          id: 8,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '角色管理',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 12,
-        },
-        children: [],
-      },
-      {
-        id: 10,
-        parentId: 7,
-        path: 'dict',
-        name: 'dict',
-        auth: 'sys:dict:page',
-        hidden: false,
-        component: 'views/sys/dict/dict.vue',
-        status: '0',
-        sort: 2,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-06T00:31:54.110Z',
-        updateBy: 'nva',
-        updateAt: '2025-11-06T03:20:34.979Z',
-        meta: {
-          id: 6,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '字典表',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 10,
-        },
-        children: [],
-      },
-      {
-        id: 11,
-        parentId: 7,
-        path: 'dict-detail/:code',
-        name: 'dict-detail',
-        auth: 'sys:dictDetail:page',
-        hidden: true,
-        component: 'views/sys/dictDetail/dictDetail.vue',
-        status: '0',
-        sort: 2,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-06T00:33:39.482Z',
-        updateBy: 'nva',
-        updateAt: '2025-11-06T03:20:41.722Z',
-        meta: {
-          id: 7,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '字典表详情',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 11,
-        },
-        children: [],
-      },
-    ],
-  },
-  {
-    id: 13,
-    parentId: null,
-    path: '/tool',
-    name: 'tool',
-    auth: 'tool',
-    hidden: false,
-    component: 'views/layout/basic.vue',
-    status: '0',
-    sort: 1,
-    remark: '',
-    createBy: 'nva',
-    createAt: '2025-11-07T09:28:40.428Z',
-    updateBy: null,
-    updateAt: '2025-11-07T09:28:40.428Z',
-    meta: {
-      id: 9,
-      activeName: '',
-      keepAlive: false,
-      defaultMenu: false,
-      title: '代码生成',
-      icon: '',
-      closeTab: true,
-      sysMenuId: 13,
-    },
-    children: [
-      {
-        id: 14,
-        parentId: 13,
-        path: 'temp',
-        name: 'temp',
-        auth: 'tool:temp:page',
-        hidden: false,
-        component: 'views/tool/temp/temp.vue',
-        status: '0',
-        sort: 0,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-07T09:29:57.743Z',
-        updateBy: null,
-        updateAt: '2025-11-07T09:29:57.743Z',
-        meta: {
-          id: 10,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '模板管理',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 14,
-        },
-        children: [],
-      },
-      {
-        id: 15,
-        parentId: 13,
-        path: 'gen',
-        name: 'gen',
-        auth: 'tool:gen',
-        hidden: false,
-        component: 'views/tool/gen/gen.vue',
-        status: '0',
-        sort: 1,
-        remark: '',
-        createBy: 'nva',
-        createAt: '2025-11-11T00:21:51.822Z',
-        updateBy: 'nva',
-        updateAt: '2025-11-11T00:23:25.808Z',
-        meta: {
-          id: 11,
-          activeName: '',
-          keepAlive: false,
-          defaultMenu: false,
-          title: '生成代码',
-          icon: '',
-          closeTab: true,
-          sysMenuId: 15,
-        },
-        children: [],
-      },
-    ],
-  },
-];
+const menuTree = [];
 
-const menus: any[] = [];
-const transMenusTree = (menuTree: any[]) => {
-  for (let i = 0; i < menuTree.length; i++) {
-    const menu = menuTree[i];
-    const { children, ...other } = menu;
-    menus.push(other);
-    if (children?.length) {
-      transMenusTree(children);
-    }
-  }
-};
 export async function initMenus(prisma: PrismaClient) {
-  //   查询是否存在
-  transMenusTree(menuTree);
-  for (let i = 0; i < menus.length; i++) {
-    const menu = menus[i];
-    const isExist = await prisma.sysMenu.findFirst({
-      where: {
-        name: menu.name,
-        path: menu.path,
-        auth: menu.auth,
+  // prisma/seed.ts (菜单部分)
+
+  // ... 前面的清理和用户/角色创建代码保持不变 ...
+
+  console.log('🚀 正在全量构建菜单树 (1:1 还原 SQL)...');
+
+  // ===========================================
+  // 1. 系统管理 (System) - ID 7
+  // ===========================================
+  const sysRoot = await prisma.sysMenu.create({
+    data: {
+      path: '/sys',
+      name: 'sys',
+      auth: 'sys',
+      component: 'views/layout/basic.vue',
+      sort: 1,
+      status: '0',
+      meta: {
+        create: {
+          title: '系统管理',
+          icon: 'ri:settings-5-line',
+          closeTab: true,
+        },
       },
-    });
-    if (!isExist) {
-      const { meta, ...other } = menu;
-      await prisma.sysMenu.create({
-        data: {
-          ...other,
+    },
+  });
+
+  // 1.1 菜单配置 - ID 8
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/menu',
+      name: 'menu',
+      auth: 'sys:menu',
+      component: 'views/sys/menu/menu.vue',
+      sort: 0,
+      status: '0',
+      meta: {
+        create: { title: '菜单配置', icon: 'ri:menu-line', closeTab: true },
+      },
+      menuBtns: {
+        create: [
+          { name: '新增', auth: 'system:menu:create' },
+          { name: '单个删除', auth: 'system:menu:remove' },
+          { name: '批量删除', auth: 'system:menu:removes' }, // SQL ID 155
+          { name: '编辑', auth: 'system:menu:update' },
+          { name: '查询列表', auth: 'system:menu:list' },
+          { name: '查询详情', auth: 'sys:menu:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.2 字典表 - ID 10
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/dict',
+      name: 'dict',
+      auth: 'sys:dict',
+      component: 'views/sys/dict/dict.vue',
+      sort: 2,
+      status: '0',
+      meta: {
+        create: {
+          title: '字典表',
+          icon: 'material-symbols:dictionary-rounded',
+          closeTab: true,
         },
-      });
-      await prisma.sysMenuMeta.create({
-        data: {
-          ...meta,
+      },
+      menuBtns: {
+        create: [
+          { name: '新增字典表', auth: 'sys:dict:create' },
+          { name: '删除单个字典表', auth: 'sys:dict:remove' },
+          { name: '批量删除字典表', auth: 'sys:dict:removes' }, // SQL ID 173
+          { name: '编辑字典表', auth: 'sys:dict:update' },
+          { name: '查询字典表列表', auth: 'sys:dict:list' },
+          { name: '查询字典表详情', auth: 'sys:dict:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.3 字典详情 (Hidden) - ID 11
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/dict-detail/:code',
+      name: 'dict-detail',
+      auth: 'sys:dictDetail',
+      hidden: true, // SQL中 hidden 为 1
+      component: 'views/sys/dictDetail/dictDetail.vue',
+      sort: 2,
+      status: '0',
+      meta: {
+        create: { title: '字典表详情', activeName: 'dict', closeTab: true },
+      },
+      menuBtns: {
+        create: [
+          { name: '新增字典表详情', auth: 'sys:dictDetail:create' },
+          { name: '删除单个字典表详情', auth: 'sys:dictDetail:remove' },
+          { name: '批量删除字典表详情', auth: 'sys:dictDetail:removes' },
+          { name: '编辑字典表详情', auth: 'sys:dictDetail:update' },
+          { name: '查询字典表详情列表', auth: 'sys:dictDetail:list' },
+          { name: '查询字典表详情', auth: 'sys:dictDetail:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.4 角色管理 - ID 12
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/role',
+      name: 'role',
+      auth: 'sys:role',
+      component: 'views/sys/role/role.vue',
+      sort: 1,
+      status: '0',
+      meta: {
+        create: {
+          title: '角色管理',
+          icon: 'material-symbols:shield-person-rounded',
+          closeTab: true,
         },
-      });
-    }
-  }
+      },
+      menuBtns: {
+        create: [
+          { name: '新增角色管理', auth: 'sys:role:create' },
+          { name: '删除单个角色管理', auth: 'sys:role:remove' },
+          { name: '批量删除角色管理', auth: 'sys:role:removes' },
+          { name: '编辑角色管理', auth: 'sys:role:update' },
+          { name: '查询角色管理列表', auth: 'sys:role:list' },
+          { name: '查询角色管理详情', auth: 'sys:role:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.5 部门管理 - ID 22
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/dept',
+      name: 'sys-dept',
+      auth: 'sys:dept',
+      component: 'views/sys/dept/sysDept.vue',
+      sort: 5,
+      status: '0',
+      meta: {
+        create: {
+          title: '部门',
+          icon: 'mingcute:department-line',
+          closeTab: true,
+        },
+      },
+      menuBtns: {
+        create: [
+          { name: '新增部门', auth: 'sys:dept:create' },
+          { name: '单个删除部门', auth: 'sys:dept:remove' },
+          { name: '批量删除部门', auth: 'sys:dept:removes' },
+          { name: '编辑部门', auth: 'sys:dept:update' },
+          { name: '查询部门列表', auth: 'sys:dept:list' },
+          { name: '查询部门详情', auth: 'sys:dept:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.6 用户管理 - ID 24
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/user',
+      name: 'user',
+      auth: 'sys:user',
+      component: 'views/sys/user/user.vue',
+      sort: 0,
+      status: '0',
+      meta: {
+        create: {
+          title: '用户管理',
+          icon: 'ri:user-settings-line',
+          closeTab: true,
+        },
+      },
+      menuBtns: {
+        create: [
+          { name: '新增用户管理', auth: 'sys:user:create' },
+          { name: '删除单个用户管理', auth: 'sys:user:remove' },
+          { name: '批量删除用户管理', auth: 'sys:user:removes' },
+          { name: '编辑用户管理', auth: 'sys:user:update' },
+          { name: '查询用户管理列表', auth: 'sys:user:list' },
+          { name: '查询用户管理详情', auth: 'sys:user:detail' },
+        ],
+      },
+    },
+  });
+
+  // 1.7 操作日志 - ID 37
+  await prisma.sysMenu.create({
+    data: {
+      parentId: sysRoot.id,
+      path: '/sys/sys-action-log',
+      name: 'sys-action-log',
+      auth: 'sys:sys-action-log:list',
+      component: 'views/sys/sys-action-log/sysActionLog.vue',
+      sort: 5,
+      status: '0',
+      meta: {
+        create: { title: '操作日志', icon: 'ri:blogger-line', closeTab: true },
+      },
+      menuBtns: {
+        create: [
+          { name: '查询操作日志列表', auth: 'sys:sys-action-log:list' },
+          { name: '查询操作日志详情', auth: 'sys:sys-action-log:detail' },
+        ],
+      },
+    },
+  });
+
+  // ===========================================
+  // 2. 工具 (Tool) - ID 13
+  // ===========================================
+  const toolRoot = await prisma.sysMenu.create({
+    data: {
+      path: '/tool',
+      name: 'tool',
+      auth: 'tool',
+      component: 'views/layout/basic.vue',
+      sort: 2,
+      status: '0',
+      meta: { create: { title: '代码生成', icon: '', closeTab: true } }, // SQL Meta ID 9
+    },
+  });
+
+  // 2.1 模板管理 - ID 14
+  await prisma.sysMenu.create({
+    data: {
+      parentId: toolRoot.id,
+      path: '/tool/temp',
+      name: 'temp',
+      auth: 'tool:temp',
+      component: 'views/tool/temp/temp.vue',
+      sort: 0,
+      status: '0',
+      meta: { create: { title: '模板管理', icon: '', closeTab: true } },
+      menuBtns: {
+        create: [
+          { name: '新增模板管理', auth: 'tool:temp:create' },
+          { name: '删除单个模板管理', auth: 'tool:temp:remove' },
+          { name: '批量删除模板管理', auth: 'tool:temp:removes' },
+          { name: '编辑模板管理', auth: 'tool:temp:update' },
+          { name: '查询模板管理列表', auth: 'tool:temp:list' },
+          { name: '查询模板管理详情', auth: 'tool:temp:detail' },
+        ],
+      },
+    },
+  });
+
+  // 2.2 生成代码 - ID 15
+  await prisma.sysMenu.create({
+    data: {
+      parentId: toolRoot.id,
+      path: '/tool/gen',
+      name: 'gen',
+      auth: 'tool:gen',
+      component: 'views/tool/gen/gen.vue',
+      sort: 1,
+      status: '0',
+      meta: { create: { title: '生成代码', icon: '', closeTab: true } },
+      menuBtns: {
+        create: [
+          { name: '新增生成代码', auth: 'tool:gen:create' },
+          { name: '删除单个生成代码', auth: 'tool:gen:remove' },
+          { name: '批量删除生成代码', auth: 'tool:gen:removes' },
+          { name: '编辑生成代码', auth: 'tool:gen:update' },
+          { name: '查询生成代码列表', auth: 'tool:gen:list' },
+          { name: '查询生成代码详情', auth: 'tool:gen:detail' },
+        ],
+      },
+    },
+  });
+
+  // 2.3 生成列表 - ID 23
+  await prisma.sysMenu.create({
+    data: {
+      parentId: toolRoot.id,
+      path: '/tool/auto-code',
+      name: 'auto-code',
+      auth: 'tool:auto-code',
+      component: 'views/tool/auto-code/autoCode.vue',
+      sort: 5,
+      status: '0',
+      meta: { create: { title: '生成列表', icon: '', closeTab: true } },
+      menuBtns: {
+        create: [
+          { name: '新增生成列表', auth: 'tool:auto-code:create' },
+          { name: '单个删除生成列表', auth: 'tool:auto-code:remove' },
+          { name: '批量删除生成列表', auth: 'tool:auto-code:removes' },
+          { name: '编辑生成列表', auth: 'tool:auto-code:update' },
+          { name: '查询生成列表列表', auth: 'tool:auto-code:list' },
+          { name: '查询生成列表详情', auth: 'tool:auto-code:detail' },
+        ],
+      },
+    },
+  });
+
+  // ===========================================
+  // 3. 上传 (Upload) - ID 25
+  // ===========================================
+  const uploadRoot = await prisma.sysMenu.create({
+    data: {
+      path: '/upload',
+      name: 'upload',
+      auth: 'upload',
+      component: 'views/layout/basic.vue',
+      sort: 3,
+      status: '0',
+      meta: {
+        create: { title: '附件', icon: 'mingcute:file-line', closeTab: true },
+      },
+    },
+  });
+
+  // 3.1 附件上传 - ID 26
+  await prisma.sysMenu.create({
+    data: {
+      parentId: uploadRoot.id,
+      path: '/upload/file',
+      name: 'file-upload',
+      auth: 'upload:file:list',
+      component: 'views/upload/file/fileUpload.vue',
+      sort: 5,
+      status: '0',
+      meta: {
+        create: {
+          title: '附件上传',
+          icon: 'mingcute:folder-upload-line',
+          closeTab: true,
+        },
+      },
+      menuBtns: {
+        create: [
+          { name: '新增附件上传', auth: 'upload:file:create' },
+          { name: '单个删除附件上传', auth: 'upload:file:remove' },
+          { name: '批量删除附件上传', auth: 'upload:file:removes' },
+          { name: '编辑附件上传', auth: 'upload:file:update' },
+          { name: '查询附件上传列表', auth: 'upload:file:list' },
+          { name: '查询附件上传详情', auth: 'upload:file:detail' },
+        ],
+      },
+    },
+  });
+
+  // ===========================================
+  // 4. 欢迎页面 (Welcome) - ID 27
+  // ===========================================
+  await prisma.sysMenu.create({
+    data: {
+      path: '/welcome',
+      name: 'welcome',
+      auth: 'welcome',
+      component: 'views/welcome/welcome.vue',
+      sort: 0,
+      status: '0',
+      meta: {
+        create: {
+          title: '欢迎页面',
+          icon: 'material-symbols:digital-wellbeing-outline',
+          closeTab: true,
+          defaultMenu: true,
+        },
+      },
+    },
+  });
+
+  // ===========================================
+  // 5. 外链 (Link) - ID 36
+  // ===========================================
+  await prisma.sysMenu.create({
+    data: {
+      path: 'https://jsutil.cn',
+      name: 'https://jsutil.cn',
+      auth: 'js-util',
+      component: '/',
+      sort: 0,
+      status: '0',
+      meta: {
+        create: { title: 'js工具库', icon: 'ri:tools-fill', closeTab: true },
+      },
+    },
+  });
 }

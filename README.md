@@ -44,7 +44,7 @@ DATABASE_URL="mysql://root:Aa123456@127.0.0.1:3306/nest-vue-admin?connection_lim
 > **✅ 如何验证：**
 > 使用 Navicat、TablePlus 或 DBeaver 尝试连接该配置。如果能成功连接到 MySQL 并看到对应的空库（即使没有表），说明连接链条已通。
 
-### 2.2 同步数据库表结构
+### 2.2 同步数据库表结构并初始化数据
 
 本项目使用 **Prisma ORM**。我们将通过代码中定义的 Schema 自动生成数据库表，无需手动执行建表语句。
 
@@ -56,27 +56,13 @@ cd apps/server
 
 # 2. 执行模型同步（生成物理表）
 pnpm run db:m
+
+# 3. 初始化数据
+pnpm run seed
 ```
 > **✅ 如何验证：**
 > - 数据库查验：刷新你的数据库工具，确认库中已自动生成 SysUser、SysRole、Temp 等数十张业务表。
-> - 可视化验证：在该目录下执行 pnpm run db:s，在弹出的浏览器页面中能看到表结构即表示成功。
-
-### 2.3 初始化业务数据
-表结构同步后是“空壳”，需要导入系统预设的菜单、权限及超级管理员账号。
-
-**操作步骤：**
-
-1.打开数据库管理工具(Navicat)，选中 nest-vue-admin 数据库。
-
-2.找到工具栏的 “运行 SQL 文件” (Execute SQL File) 功能。
-
-3.选择 apps/server/nest-vue-admin.sql 文件并执行。
-
-> **✅ 如何验证：** 导入完成后，在 SQL 控制台执行以下查询：
-```bash
-SELECT COUNT(*) FROM sys_user;
-```
-如果返回结果 大于 0（通常能看到 admin 等预设账号），说明数据导入成功！
+> - sys_user、temp、sys_dict、sys_dict_detail、sys_menu 等表中均有数据
 
 ## 3. 项目启动
 

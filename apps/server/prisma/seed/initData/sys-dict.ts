@@ -8,9 +8,6 @@ const dicts = [
     status: '0',
     remark: '',
     createBy: 'nva',
-    createAt: '2025-11-05T07:28:00.275Z',
-    updateBy: null,
-    updateAt: '2025-11-05T07:28:00.275Z',
     details: [
       {
         label: '已启用',
@@ -20,9 +17,7 @@ const dicts = [
         remark: '',
         sysDictCode: 'enableStatus',
         createBy: 'nva',
-        createAt: '2025-11-05T07:28:21.648Z',
         updateBy: null,
-        updateAt: '2025-11-05T07:28:21.648Z',
       },
       {
         label: '已停用',
@@ -32,9 +27,57 @@ const dicts = [
         remark: '',
         sysDictCode: 'enableStatus',
         createBy: 'nva',
-        createAt: '2025-11-05T07:28:36.039Z',
         updateBy: null,
-        updateAt: '2025-11-05T07:28:36.039Z',
+      },
+    ],
+  },
+  {
+    name: '性别',
+    code: 'sexStatus',
+    sort: 1,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      {
+        label: '男',
+        value: '0',
+        sort: 0,
+        status: '0',
+        sysDictCode: 'sexStatus',
+        createBy: 'nva',
+      },
+      {
+        label: '女',
+        value: '1',
+        sort: 1,
+        status: '0',
+        sysDictCode: 'sexStatus',
+        createBy: 'nva',
+      },
+    ],
+  },
+  {
+    name: '请求结果',
+    code: 'requestStatus',
+    sort: 3,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      {
+        label: '请求成功',
+        value: '0',
+        sort: 0,
+        status: '0',
+        sysDictCode: 'requestStatus',
+        createBy: 'nva',
+      },
+      {
+        label: '请求失败',
+        value: '1',
+        sort: 1,
+        status: '0',
+        sysDictCode: 'requestStatus',
+        createBy: 'nva',
       },
     ],
   },
@@ -60,6 +103,7 @@ export async function initDicts(prisma: PrismaClient) {
         const isExist = await prisma.sysDictDetail.findFirst({
           where: {
             value: detail.value,
+            sysDictCode: dict.code,
           },
         });
         if (!isExist) {
