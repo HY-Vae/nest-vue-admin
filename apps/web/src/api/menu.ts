@@ -2,6 +2,7 @@ import type { ListResult, Result } from '@/types/global.ts'
 import request from '@/utils/request.ts'
 import type {
   CreateMenuType,
+  MenuDetailType,
   MenuListType,
   QueryMenuType,
   UpdateMenuType,
@@ -14,7 +15,7 @@ export function getMenuApi(params: QueryMenuType): Promise<ListResult<MenuListTy
   })
 }
 
-export function getMenuOneApi(id: string): Promise<Result<MenuListType>> {
+export function getMenuOneApi(id: number): Promise<Result<MenuDetailType>> {
   return request(`/sys/menu/${id}`, {
     method: 'GET',
   })
@@ -34,7 +35,7 @@ export function updateMenuApi(data: UpdateMenuType): Promise<Result> {
   })
 }
 
-export function deleteMenuApi(id: string): Promise<Result> {
+export function deleteMenuApi(id: number): Promise<Result> {
   return request(`/sys/menu/${id}`, {
     method: 'DELETE',
   })

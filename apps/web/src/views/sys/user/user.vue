@@ -30,19 +30,12 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addUser">新增</el-button>
-        <el-button
-          type="danger"
-          :icon="Delete"
-          :disabled="!selectedUserIds.length"
-          @click="delUsers(DeleteEnum.Multiple)"
+        <el-button type="primary" :icon="Plus" v-auth="'sys:user:create'" @click="addUser"
+          >新增</el-button
         >
-          批量删除
-        </el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="userSelectionChange">
-          <el-table-column type="selection" width="55" />
+        <el-table :data="tableData" border row-key="id">
           <el-table-column type="index" label="序号" width="80" />
           <el-table-column prop="userName" label="用户名" />
           <el-table-column prop="nickName" label="昵称" />
@@ -61,17 +54,12 @@
             <template #default="scope">
               <el-button
                 type="primary"
-                v-if="scope.row.userName !== 'admin'"
+                v-auth="'sys:user:update'"
                 link
                 @click="updateUser(scope.row)"
                 >修改</el-button
               >
-              <el-button
-                type="danger"
-                v-if="scope.row.userName !== 'admin'"
-                link
-                @click="delUsers(DeleteEnum.Single, scope.row)"
-              >
+              <el-button type="danger" v-auth="'sys:user:remove'" link @click="delUsers(scope.row)">
                 删除
               </el-button>
             </template>
@@ -106,13 +94,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
 import { transTime } from '@/utils/util.ts'
-import type { CreateUserType, UpdateUserType, UserListType } from '@/views/sys/user/user.type'
+import type {
+  CreateUserType,
+  UpdateUserType,
+  UserDetailType,
+  UserListType,
+} from '@/views/sys/user/user.type'
 import UserDialog from '@/views/sys/user/UserDialog.vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { addUserApi, deleteUserApi, getUserApi, getUserOneApi, updateUserApi } from './service.ts'
@@ -209,7 +202,7 @@ const { loading: actionLoading, run: runActionUser } = useRequest(
     },
   },
 )
-const currentUser = ref<UserListType | undefined>(undefined)
+const currentUser = ref<UserDetailType | undefined>(undefined)
 const { loading: detailLoading, run: runGetUserOne } = useRequest(getUserOneApi, {
   loadingKeep: 500,
   onSuccess: (res) => {
@@ -227,16 +220,8 @@ const { runAsync: runDeleteUser } = useRequest(deleteUserApi, {
   loadingKeep: 500,
 })
 
-const delUsers = (action: DeleteEnum, row?: UserListType) => {
+const delUsers = (row: UserListType) => {
   let message = '此操作将永久删除该用户, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedUserIds.value.length}个用户, 是否继续?`
-    ids = selectedUserIds.value
-  }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -245,9 +230,8 @@ const delUsers = (action: DeleteEnum, row?: UserListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteUser(ids)
+        runDeleteUser(row.id)
           .then(() => {
-            selectedUserIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -264,11 +248,6 @@ const delUsers = (action: DeleteEnum, row?: UserListType) => {
     ElMessage.success('删除成功')
     runGetUser()
   })
-}
-
-const selectedUserIds = ref<string[]>([])
-const userSelectionChange = (users: UserListType[]) => {
-  selectedUserIds.value = users.map((user) => user.id)
 }
 </script>
 <style scoped lang="scss">

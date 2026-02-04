@@ -36,11 +36,10 @@ export async function initMenus(prisma: PrismaClient) {
       },
       menuBtns: {
         create: [
-          { name: '新增', auth: 'system:menu:create' },
-          { name: '单个删除', auth: 'system:menu:remove' },
-          { name: '批量删除', auth: 'system:menu:removes' }, // SQL ID 155
-          { name: '编辑', auth: 'system:menu:update' },
-          { name: '查询列表', auth: 'system:menu:list' },
+          { name: '新增', auth: 'sys:menu:create' },
+          { name: '单个删除', auth: 'sys:menu:remove' },
+          { name: '编辑', auth: 'sys:menu:update' },
+          { name: '查询列表', auth: 'sys:menu:list' },
           { name: '查询详情', auth: 'sys:menu:detail' },
         ],
       },
@@ -67,7 +66,6 @@ export async function initMenus(prisma: PrismaClient) {
         create: [
           { name: '新增字典表', auth: 'sys:dict:create' },
           { name: '删除单个字典表', auth: 'sys:dict:remove' },
-          { name: '批量删除字典表', auth: 'sys:dict:removes' }, // SQL ID 173
           { name: '编辑字典表', auth: 'sys:dict:update' },
           { name: '查询字典表列表', auth: 'sys:dict:list' },
           { name: '查询字典表详情', auth: 'sys:dict:detail' },
@@ -122,7 +120,6 @@ export async function initMenus(prisma: PrismaClient) {
         create: [
           { name: '新增角色管理', auth: 'sys:role:create' },
           { name: '删除单个角色管理', auth: 'sys:role:remove' },
-          { name: '批量删除角色管理', auth: 'sys:role:removes' },
           { name: '编辑角色管理', auth: 'sys:role:update' },
           { name: '查询角色管理列表', auth: 'sys:role:list' },
           { name: '查询角色管理详情', auth: 'sys:role:detail' },
@@ -180,7 +177,6 @@ export async function initMenus(prisma: PrismaClient) {
         create: [
           { name: '新增用户管理', auth: 'sys:user:create' },
           { name: '删除单个用户管理', auth: 'sys:user:remove' },
-          { name: '批量删除用户管理', auth: 'sys:user:removes' },
           { name: '编辑用户管理', auth: 'sys:user:update' },
           { name: '查询用户管理列表', auth: 'sys:user:list' },
           { name: '查询用户管理详情', auth: 'sys:user:detail' },
@@ -259,7 +255,6 @@ export async function initMenus(prisma: PrismaClient) {
         create: [
           { name: '新增生成代码', auth: 'tool:gen:create' },
           { name: '删除单个生成代码', auth: 'tool:gen:remove' },
-          { name: '批量删除生成代码', auth: 'tool:gen:removes' },
           { name: '编辑生成代码', auth: 'tool:gen:update' },
           { name: '查询生成代码列表', auth: 'tool:gen:list' },
           { name: '查询生成代码详情', auth: 'tool:gen:detail' },
@@ -280,10 +275,7 @@ export async function initMenus(prisma: PrismaClient) {
       meta: { create: { title: '生成列表', icon: '', closeTab: true } },
       menuBtns: {
         create: [
-          { name: '新增生成列表', auth: 'tool:auto-code:create' },
           { name: '单个删除生成列表', auth: 'tool:auto-code:remove' },
-          { name: '批量删除生成列表', auth: 'tool:auto-code:removes' },
-          { name: '编辑生成列表', auth: 'tool:auto-code:update' },
           { name: '查询生成列表列表', auth: 'tool:auto-code:list' },
           { name: '查询生成列表详情', auth: 'tool:auto-code:detail' },
         ],

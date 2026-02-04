@@ -27,18 +27,12 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addMenu">新增</el-button>
-        <el-button
-          type="danger"
-          :icon="Delete"
-          :disabled="!selectedMenuIds.length"
-          @click="delMenus(DeleteEnum.Multiple)"
+        <el-button type="primary" :icon="Plus" @click="addMenu" v-auth="'sys:menu:create'"
+          >新增</el-button
         >
-          批量删除
-        </el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="menuSelectionChange">
+        <el-table :data="tableData" border row-key="id">
           <el-table-column label="菜单名称">
             <template #default="scope">
               {{ scope.row.meta?.title }}
@@ -57,9 +51,25 @@
           <el-table-column prop="remark" label="备注" />
           <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
-              <el-button type="primary" link @click="addSubMenu(scope.row)">新增子菜单</el-button>
-              <el-button type="primary" link @click="updateMenu(scope.row)">编辑</el-button>
-              <el-button type="danger" link @click="delMenus(DeleteEnum.Single, scope.row)"
+              <el-button
+                type="primary"
+                link
+                @click="addSubMenu(scope.row)"
+                v-auth="'sys:menu:create'"
+                >新增子菜单</el-button
+              >
+              <el-button
+                type="primary"
+                link
+                v-auth="'sys:menu:update'"
+                @click="updateMenu(scope.row)"
+                >编辑</el-button
+              >
+              <el-button
+                type="danger"
+                v-auth="'sys:menu:remove'"
+                link
+                @click="delMenus(DeleteEnum.Single, scope.row)"
                 >删除</el-button
               >
             </template>
@@ -101,9 +111,14 @@ import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import { transTime } from '@/utils/util.ts'
-import type { CreateMenuType, MenuListType, UpdateMenuType } from '@/views/sys/menu/menu.type'
+import type {
+  CreateMenuType,
+  MenuDetailType,
+  MenuListType,
+  UpdateMenuType,
+} from '@/views/sys/menu/menu.type'
 import MenuDialog from '@/views/sys/menu/MenuDialog.vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { computed, ref } from 'vue'
 import { useRequest } from 'vue-request'
 
@@ -226,7 +241,7 @@ const { loading: actionLoading, run: runActionMenu } = useRequest(
     },
   },
 )
-const currentMenu = ref<MenuListType | undefined>(undefined)
+const currentMenu = ref<MenuDetailType | undefined>(undefined)
 const { loading: detailLoading, run: runGetMenuOne } = useRequest(getMenuOneApi, {
   loadingKeep: 500,
   onSuccess: (res) => {
@@ -247,16 +262,8 @@ const { runAsync: runDeleteMenu } = useRequest(deleteMenuApi, {
   loadingKeep: 500,
 })
 
-const delMenus = (action: DeleteEnum, row?: MenuListType) => {
+const delMenus = (action: DeleteEnum, row: MenuListType) => {
   let message = '此操作将永久删除该菜单, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedMenuIds.value.length}个菜单, 是否继续?`
-    ids = selectedMenuIds.value
-  }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -265,9 +272,8 @@ const delMenus = (action: DeleteEnum, row?: MenuListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteMenu(ids)
+        runDeleteMenu(row.id)
           .then(() => {
-            selectedMenuIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -284,11 +290,6 @@ const delMenus = (action: DeleteEnum, row?: MenuListType) => {
     ElMessage.success('删除成功')
     runGetMenu()
   })
-}
-
-const selectedMenuIds = ref<string[]>([])
-const menuSelectionChange = (menus: MenuListType[]) => {
-  selectedMenuIds.value = menus.map((menu) => menu.id)
 }
 </script>
 <style scoped lang="scss">

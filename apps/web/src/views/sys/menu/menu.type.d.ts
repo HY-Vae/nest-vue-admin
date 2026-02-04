@@ -25,6 +25,10 @@ export interface MenuListType {
   children: MenuListType[]
 }
 
+export interface MenuDetailType extends MenuListType {
+  menuBtns: CreateMenuBtnType[]
+}
+
 export interface CreateMenuMetaType {
   activeName?: string
   keepAlive: boolean

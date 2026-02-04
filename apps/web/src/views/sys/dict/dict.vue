@@ -31,45 +31,44 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addDict">新增</el-button>
-        <el-button
-          type="danger"
-          :icon="Delete"
-          :disabled="!selectedDictIds.length"
-          @click="delDicts(DeleteEnum.Multiple)"
+        <el-button type="primary" :icon="Plus" v-auth="'sys:dict:create'" @click="addDict"
+          >新增</el-button
         >
-          批量删除
-        </el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="dictSelectionChange">
-          <el-table-column type="selection" width="55" />
-          <el-table-column type="index" label="序号" />
-          <el-table-column prop="name" label="字典名称" />
-          <el-table-column prop="code" label="字典值">
+        <el-table :data="tableData" border row-key="id">
+          <el-table-column type="index" align="center" label="序号" />
+          <el-table-column prop="name" align="center" label="字典名称" />
+          <el-table-column prop="code" align="center" label="字典值">
             <template #default="scope">
               <el-button type="primary" link @click="gotoDetail(scope.row)">{{
                 scope.row.code
               }}</el-button>
             </template>
           </el-table-column>
-          <el-table-column label="字典状态">
+          <el-table-column align="center" label="字典状态">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
-          <el-table-column prop="sort" label="排序" />
-          <el-table-column prop="createBy" label="创建人" />
-          <el-table-column prop="createAt" label="创建时间">
+          <el-table-column align="center" prop="sort" label="排序" />
+          <el-table-column align="center" prop="createBy" label="创建人" />
+          <el-table-column prop="createAt" align="center" label="创建时间">
             <template #default="scope">
               {{ transTime(scope.row.createAt) }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" />
-          <el-table-column label="操作" width="110">
+          <el-table-column prop="remark" align="center" label="备注" />
+          <el-table-column label="操作" align="center" width="110">
             <template #default="scope">
-              <el-button type="primary" link @click="updateDict(scope.row)">修改</el-button>
-              <el-button type="danger" link @click="delDicts(DeleteEnum.Single, scope.row)"
+              <el-button
+                type="primary"
+                v-auth="'sys:dict:update'"
+                link
+                @click="updateDict(scope.row)"
+                >修改</el-button
+              >
+              <el-button type="danger" v-auth="'sys:dict:remove'" link @click="delDicts(scope.row)"
                 >删除</el-button
               >
             </template>
@@ -104,14 +103,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import router from '@/router'
 import type { SelectOptionItem } from '@/types/global.ts'
 import { transTime } from '@/utils/util.ts'
 import type { CreateDictType, DictListType, UpdateDictType } from '@/views/sys/dict/dict.type'
 import DictDialog from '@/views/sys/dict/DictDialog.vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { addDictApi, deleteDictApi, getDictApi, getDictOneApi, updateDictApi } from './service.ts'
@@ -224,16 +223,8 @@ const { runAsync: runDeleteDict } = useRequest(deleteDictApi, {
   loadingKeep: 500,
 })
 
-const delDicts = (action: DeleteEnum, row?: DictListType) => {
+const delDicts = (row: DictListType) => {
   let message = '此操作将永久删除该字典, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedDictIds.value.length}个字典, 是否继续?`
-    ids = selectedDictIds.value
-  }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -242,9 +233,8 @@ const delDicts = (action: DeleteEnum, row?: DictListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteDict(ids)
+        runDeleteDict(row.code)
           .then(() => {
-            selectedDictIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -261,11 +251,6 @@ const delDicts = (action: DeleteEnum, row?: DictListType) => {
     ElMessage.success('删除成功')
     runGetDict()
   })
-}
-
-const selectedDictIds = ref<string[]>([])
-const dictSelectionChange = (dicts: DictListType[]) => {
-  selectedDictIds.value = dicts.map((dict) => dict.id)
 }
 
 const gotoDetail = (row: DictListType) => {

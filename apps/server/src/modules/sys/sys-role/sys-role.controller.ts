@@ -82,8 +82,8 @@ export class SysRoleController {
     summary: '批量删除角色',
   })
   @Action({ action: ActionEnum.REMOVES, title: '批量删除角色' })
-  @Delete()
-  remove(@Body('ids') ids: string[]) {
-    return this.sysRoleService.remove(ids);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.sysRoleService.remove(id);
   }
 }

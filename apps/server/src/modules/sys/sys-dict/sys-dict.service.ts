@@ -189,25 +189,24 @@ export class SysDictService {
     return dict;
   }
 
-  async remove(codes: string[]) {
+  async remove(code: string) {
+    if (!code) {
+      throw new ApiException('参数异常');
+    }
     // 先查询这个字典下是否有用户
-    const user = await this.prisma.sysDictDetail.findFirst({
+    const sysDictDetail = await this.prisma.sysDictDetail.findFirst({
       where: {
-        sysDictCode: {
-          in: codes,
-        },
+        sysDictCode: code,
       },
     });
-    if (user) {
+    if (sysDictDetail) {
       throw new Error('该字典下有字典详情，请先删除字典详情信息');
     }
-    await this.prisma.sysDict.deleteMany({
+    await this.prisma.sysDict.delete({
       where: {
-        code: {
-          in: codes,
-        },
+        code,
       },
     });
-    await this.removeCache(codes);
+    await this.removeCache([code]);
   }
 }

@@ -98,7 +98,7 @@
         />
       </el-row>
     </el-card>
-    <dictDetail-dialog
+    <DictDetailDialog
       :action="action"
       :loading="actionLoading"
       :detailLoading="detailLoading"
@@ -110,13 +110,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import {
-  addDictDetailApi,
-  deleteDictDetailApi,
-  getDictDetailApi,
-  getDictDetailOneApi,
-  updateDictDetailApi,
-} from '@/api/dictDetail.ts'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
@@ -131,6 +124,14 @@ import { Delete, Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { useRoute } from 'vue-router'
+import {
+  addDictDetailApi,
+  deleteDictDetailApi,
+  deleteDictDetailsApi,
+  getDictDetailApi,
+  getDictDetailOneApi,
+  updateDictDetailApi,
+} from './service.ts'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -242,17 +243,25 @@ const updateDictDetail = (row: DictDetailListType) => {
   runGetDictDetailOne(row.id)
 }
 
-const { runAsync: runDeleteDictDetail } = useRequest(deleteDictDetailApi, {
-  loadingKeep: 500,
-})
+const { runAsync: runDeleteDictDetail } = useRequest(
+  (action: DeleteEnum, ids: number[]) => {
+    if (action === DeleteEnum.Multiple) {
+      return deleteDictDetailsApi(ids, route.params.code as string)
+    }
+    return deleteDictDetailApi(ids[0] as number, route.params.code as string)
+  },
+  {
+    loadingKeep: 500,
+  },
+)
 
-const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
+const delDictDetails = (delAction: DeleteEnum, row?: DictDetailListType) => {
   let message = '此操作将永久删除该字典, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
+  let ids: number[] = []
+  if (delAction === DeleteEnum.Single && row != undefined) {
     ids = [row.id]
   }
-  if (action === DeleteEnum.Multiple) {
+  if (delAction === DeleteEnum.Multiple) {
     message = `此操作将永久批量删除当前${selectedDictDetailIds.value.length}个字典, 是否继续?`
     ids = selectedDictDetailIds.value
   }
@@ -264,7 +273,7 @@ const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteDictDetail(ids)
+        runDeleteDictDetail(delAction, ids)
           .then(() => {
             selectedDictDetailIds.value = []
             instance.confirmButtonLoading = false
@@ -285,7 +294,7 @@ const delDictDetails = (action: DeleteEnum, row?: DictDetailListType) => {
   })
 }
 
-const selectedDictDetailIds = ref<string[]>([])
+const selectedDictDetailIds = ref<number[]>([])
 const dictDetailSelectionChange = (dictDetails: DictDetailListType[]) => {
   selectedDictDetailIds.value = dictDetails.map((dictDetail) => dictDetail.id)
 }

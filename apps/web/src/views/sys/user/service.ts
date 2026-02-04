@@ -4,6 +4,7 @@ import type {
   CreateUserType,
   QueryUserType,
   UpdateUserType,
+  UserDetailType,
   UserListType,
 } from '@/views/sys/user/user.type'
 
@@ -14,7 +15,7 @@ export function getUserApi(params: QueryUserType): Promise<ListResult<UserListTy
   })
 }
 
-export function getUserOneApi(id: string): Promise<Result<UserListType>> {
+export function getUserOneApi(id: string): Promise<Result<UserDetailType>> {
   return request(`/sys/user/${id}`, {
     method: 'GET',
   })
@@ -34,11 +35,8 @@ export function updateUserApi(data: UpdateUserType): Promise<Result> {
   })
 }
 
-export function deleteUserApi(ids: string[]): Promise<Result> {
-  return request(`/sys/user`, {
+export function deleteUserApi(id: string): Promise<Result> {
+  return request(`/sys/user/${id}`, {
     method: 'DELETE',
-    data: {
-      ids,
-    },
   })
 }

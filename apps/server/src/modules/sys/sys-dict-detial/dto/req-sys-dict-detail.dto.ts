@@ -3,6 +3,8 @@ import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
+  ArrayNotEmpty,
+  IsArray,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -74,8 +76,21 @@ export class UpdateSysDictDetailDto extends PartialType(
 ) {}
 
 export class RemoveSysDictDetailDto {
-  @ApiProperty({ description: '字典id', required: true })
-  @IsNumber()
+  @ApiProperty({ description: '字典Code', required: true })
+  @IsString()
+  @IsNotEmpty()
+  sysDictCode: string;
+}
+
+export class RemoveSysDictDetailsDto {
+  @ApiProperty({
+    description: '字典详情id集合',
+    required: true,
+    type: [Number],
+  })
+  @IsArray()
+  @ArrayNotEmpty({ message: '请至少选择一条数据' })
+  @IsNumber({}, { each: true, message: 'ID必须为数字' })
   ids: number[];
 
   @ApiProperty({ description: '字典Code', required: true })

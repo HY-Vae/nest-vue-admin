@@ -79,7 +79,7 @@ export class FileUploadService {
 
   /* 更新 */
   async update(id: string, updateFileUploadDto: UpdateFileUploadDto) {
-    return await this.prisma.fileUpload.update({
+    return this.prisma.fileUpload.update({
       where: {
         id,
       },
@@ -107,7 +107,7 @@ export class FileUploadService {
 
   /* 批量删除 */
   async removes(ids: string[]) {
-    return await this.prisma.fileUpload.deleteMany({
+    return this.prisma.fileUpload.deleteMany({
       where: {
         id: {
           in: ids,

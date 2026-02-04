@@ -49,28 +49,9 @@
       </el-form>
     </el-card>
     <el-card class="table-container">
-      <el-row class="table-bar">
-        <el-button
-          type="primary"
-          :icon="Plus"
-          v-auth="['tool:auto-code:create']"
-          @click="addAutoCode"
-          >新增</el-button
-        >
-        <el-button
-          type="danger"
-          :icon="Delete"
-          v-auth="['tool:auto-code:removes']"
-          :disabled="!selectedAutoCodeIds.length"
-          @click="delAutoCodes(DeleteEnum.Multiple)"
-        >
-          批量删除
-        </el-button>
-      </el-row>
+      <el-row class="table-bar"> </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="autoCodeSelectionChange">
-          <el-table-column type="selection" width="55" align="center" />
-
+        <el-table :data="tableData" border row-key="id">
           <el-table-column label="模块code" align="center" prop="name" />
 
           <el-table-column label="模块中文名称" align="center" prop="nameZh" />
@@ -94,17 +75,10 @@
           <el-table-column label="操作" width="110">
             <template #default="scope">
               <el-button
-                type="primary"
-                v-auth="['tool:auto-code:update']"
-                link
-                @click="updateAutoCode(scope.row)"
-                >修改</el-button
-              >
-              <el-button
                 type="danger"
-                v-auth="['tool:auto-code:remove']"
+                v-auth="'tool:auto-code:remove'"
                 link
-                @click="delAutoCodes(DeleteEnum.Single, scope.row)"
+                @click="delAutoCodes(scope.row)"
                 >删除</el-button
               >
             </template>
@@ -127,32 +101,14 @@
         />
       </el-row>
     </el-card>
-    <autoCode-dialog
-      :action="action"
-      :loading="actionLoading"
-      :detailLoading="detailLoading"
-      :current="currentAutoCode"
-      v-model="visible"
-      @cancel="cancelDialog"
-      @confirm="runActionAutoCode"
-    />
   </div>
 </template>
 <script setup lang="ts">
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import { transTime } from '@/utils/util.ts'
-import { Delete, Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
-import type { AutoCodeListType, CreateAutoCodeType, UpdateAutoCodeType } from './autoCode.type'
-import AutoCodeDialog from './AutoCodeDialog.vue'
-import {
-  addAutoCodeApi,
-  deleteAutoCodesApi,
-  getAutoCodeApi,
-  getAutoCodeOneApi,
-  updateAutoCodeApi,
-} from './service'
+import type { AutoCodeListType } from './autoCode.type'
+import { deleteAutoCodeApi, getAutoCodeApi } from './service'
 
 const searchSpan = ref({
   xs: 24,
@@ -213,61 +169,12 @@ const handleCurrentChange = () => {
   runGetAutoCode()
 }
 
-const visible = ref<boolean>(false)
-const action = ref<ActionEnum>(ActionEnum.Add)
-
-const addAutoCode = () => {
-  action.value = ActionEnum.Add
-  currentAutoCode.value = undefined
-  visible.value = true
-}
-
-const cancelDialog = () => {}
-
-const { loading: actionLoading, run: runActionAutoCode } = useRequest(
-  (values: CreateAutoCodeType | UpdateAutoCodeType) => {
-    if (action.value === ActionEnum.Add) {
-      return addAutoCodeApi(values as CreateAutoCodeType)
-    }
-    return updateAutoCodeApi(values as UpdateAutoCodeType)
-  },
-  {
-    loadingKeep: 500,
-    onSuccess: (res) => {
-      visible.value = false
-      const message = action.value === ActionEnum.Add ? '新增生成列表成功' : '修改生成列表成功'
-      ElMessage.success(message)
-    },
-  },
-)
-const currentAutoCode = ref<AutoCodeListType | undefined>(undefined)
-const { loading: detailLoading, run: runGetAutoCodeOne } = useRequest(getAutoCodeOneApi, {
-  loadingKeep: 500,
-  onSuccess: (res) => {
-    currentAutoCode.value = res.data
-  },
-})
-
-const updateAutoCode = (row: AutoCodeListType) => {
-  action.value = ActionEnum.Edit
-  visible.value = true
-  runGetAutoCodeOne(row.id)
-}
-
-const { runAsync: runDeleteAutoCodes } = useRequest(deleteAutoCodesApi, {
+const { runAsync: runDeleteAutoCodes } = useRequest(deleteAutoCodeApi, {
   loadingKeep: 500,
 })
 
-const delAutoCodes = (action: DeleteEnum, row?: AutoCodeListType) => {
+const delAutoCodes = (row: AutoCodeListType) => {
   let message = '此操作将永久删除该生成列表, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedAutoCodeIds.value.length}个生成列表, 是否继续?`
-    ids = selectedAutoCodeIds.value
-  }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -276,9 +183,8 @@ const delAutoCodes = (action: DeleteEnum, row?: AutoCodeListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteAutoCodes(ids)
+        runDeleteAutoCodes(row.id)
           .then(() => {
-            selectedAutoCodeIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -295,11 +201,6 @@ const delAutoCodes = (action: DeleteEnum, row?: AutoCodeListType) => {
     ElMessage.success('删除成功')
     runGetAutoCode()
   })
-}
-
-const selectedAutoCodeIds = ref<string[]>([])
-const autoCodeSelectionChange = (autoCodes: AutoCodeListType[]) => {
-  selectedAutoCodeIds.value = autoCodes.map((autoCode) => autoCode.id)
 }
 </script>
 <style scoped lang="scss">

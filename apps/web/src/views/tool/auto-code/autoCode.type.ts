@@ -10,7 +10,7 @@ export interface QueryAutoCodeType {
 }
 
 export interface AutoCodeListType {
-  id: string
+  id: number
 
   name: string
 
@@ -33,24 +33,4 @@ export interface AutoCodeListType {
   updateBy?: string
 
   updateTime?: Date
-}
-
-export interface CreateAutoCodeType {
-  name: string
-
-  nameZh: string
-
-  modelName: string
-
-  webPath: string
-
-  tempId: string
-
-  routePath: string
-
-  fields: string
-}
-
-export interface UpdateAutoCodeType extends Partial<CreateAutoCodeType> {
-  id: string
 }

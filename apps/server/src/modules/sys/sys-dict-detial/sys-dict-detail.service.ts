@@ -3,6 +3,7 @@ import {
   CreateSysDictDetailDto,
   GetSysDictDetailListDto,
   RemoveSysDictDetailDto,
+  RemoveSysDictDetailsDto,
   UpdateSysDictDetailDto,
 } from './dto/req-sys-dict-detail.dto';
 
@@ -107,8 +108,19 @@ export class SysDictDetailService {
     await this.removeCache(detail.sysDictCode);
     return detail;
   }
+  async remove(id: number, body: RemoveSysDictDetailDto) {
+    await this.prisma.sysDictDetail.delete({
+      where: {
+        id,
+      },
+    });
+    await this.removeCache(body.sysDictCode);
+  }
 
-  async remove(body: RemoveSysDictDetailDto) {
+  async removes(body: RemoveSysDictDetailsDto) {
+    if (!body.ids || body.ids.length === 0) {
+      throw new ApiException('参数异常');
+    }
     await this.prisma.sysDictDetail.deleteMany({
       where: {
         id: {

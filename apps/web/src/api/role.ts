@@ -40,11 +40,8 @@ export function updateRoleApi(data: UpdateRoleType): Promise<Result> {
   })
 }
 
-export function deleteRoleApi(ids: string[]): Promise<Result> {
-  return request(`/sys/role`, {
+export function deleteRoleApi(id: string): Promise<Result> {
+  return request(`/sys/role/${id}`, {
     method: 'DELETE',
-    data: {
-      ids,
-    },
   })
 }

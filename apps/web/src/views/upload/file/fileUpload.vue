@@ -53,14 +53,14 @@
         <el-button
           type="primary"
           :icon="UploadFilled"
-          v-auth="['upload:file:create']"
+          v-auth="'upload:file:create'"
           @click="addFileUpload"
           >上传</el-button
         >
         <el-button
           type="danger"
           :icon="Delete"
-          v-auth="['upload:file:removes']"
+          v-auth="'upload:file:removes'"
           :disabled="!selectedFileUploadIds.length"
           @click="delFileUploads(DeleteEnum.Multiple)"
         >
@@ -125,7 +125,7 @@
               <!--            >-->
               <el-button
                 type="danger"
-                v-auth="['upload:file:remove']"
+                v-auth="'upload:file:remove'"
                 link
                 @click="delFileUploads(DeleteEnum.Single, scope.row)"
                 >删除</el-button
@@ -273,12 +273,6 @@ const { loading: detailLoading, run: runGetFileUploadOne } = useRequest(getFileU
     currentFileUpload.value = res.data
   },
 })
-
-const updateFileUpload = (row: FileUploadListType) => {
-  action.value = ActionEnum.Edit
-  visible.value = true
-  runGetFileUploadOne(row.id)
-}
 
 const { runAsync: runDeleteFileUploads } = useRequest(
   (action: DeleteEnum, ids: string[]) => {

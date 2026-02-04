@@ -36,7 +36,7 @@ const dictForm = ref<CreateDictType>({
   name: '',
   code: '',
   sort: 0,
-  status: '',
+  status: '0',
   remark: '',
 })
 
@@ -70,7 +70,7 @@ const closeDialog = () => {
     name: '',
     code: '',
     sort: 0,
-    status: '',
+    status: '0',
     remark: '',
   }
 }

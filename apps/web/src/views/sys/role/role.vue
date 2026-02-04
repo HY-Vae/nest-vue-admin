@@ -30,39 +30,38 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" @click="addRole">新增</el-button>
-        <el-button
-          type="danger"
-          :icon="Delete"
-          :disabled="!selectedRoleIds.length"
-          @click="delRoles(DeleteEnum.Multiple)"
+        <el-button type="primary" :icon="Plus" v-auth="'sys:role:create'" @click="addRole"
+          >新增</el-button
         >
-          批量删除
-        </el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="roleSelectionChange">
-          <el-table-column type="selection" width="55" />
-          <el-table-column type="index" label="序号" />
-          <el-table-column prop="name" label="角色名称" />
-          <el-table-column prop="key" label="角色值" />
-          <el-table-column prop="status" label="角色状态">
+        <el-table :data="tableData" border row-key="id">
+          <el-table-column type="index" align="center" label="序号" />
+          <el-table-column prop="name" align="center" label="角色名称" />
+          <el-table-column prop="key" align="center" label="角色值" />
+          <el-table-column prop="status" align="center" label="角色状态">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
-          <el-table-column prop="sort" label="排序" />
-          <el-table-column prop="createBy" label="创建人" />
-          <el-table-column prop="createAt" label="创建时间">
+          <el-table-column prop="sort" align="center" label="排序" />
+          <el-table-column prop="createBy" align="center" label="创建人" />
+          <el-table-column prop="createAt" align="center" label="创建时间" width="170">
             <template #default="scope">
               {{ transTime(scope.row.createAt) }}
             </template>
           </el-table-column>
-          <el-table-column prop="remark" label="备注" />
-          <el-table-column label="操作" width="110">
+          <el-table-column prop="remark" align="center" label="备注" />
+          <el-table-column label="操作" align="center" width="110">
             <template #default="scope">
-              <el-button type="primary" link @click="updateRole(scope.row)">修改</el-button>
-              <el-button type="danger" link @click="delRoles(DeleteEnum.Single, scope.row)"
+              <el-button
+                type="primary"
+                v-auth="'sys:role:update'"
+                link
+                @click="updateRole(scope.row)"
+                >修改</el-button
+              >
+              <el-button type="danger" v-auth="'sys:role:remove'" link @click="delRoles(scope.row)"
                 >删除</el-button
               >
             </template>
@@ -98,13 +97,13 @@
 </template>
 <script setup lang="ts">
 import { addRoleApi, deleteRoleApi, getRoleApi, getRoleOneApi, updateRoleApi } from '@/api/role.ts'
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
 import { transTime } from '@/utils/util.ts'
 import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
 import RoleDialog from '@/views/sys/role/RoleDialog.vue'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
 
@@ -218,16 +217,8 @@ const { runAsync: runDeleteRole } = useRequest(deleteRoleApi, {
   loadingKeep: 500,
 })
 
-const delRoles = (action: DeleteEnum, row?: RoleListType) => {
+const delRoles = (row: RoleListType) => {
   let message = '此操作将永久删除该角色, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedRoleIds.value.length}个角色, 是否继续?`
-    ids = selectedRoleIds.value
-  }
   ElMessageBox.confirm(message, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
@@ -236,9 +227,8 @@ const delRoles = (action: DeleteEnum, row?: RoleListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteRole(ids)
+        runDeleteRole(row.id)
           .then(() => {
-            selectedRoleIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -255,11 +245,6 @@ const delRoles = (action: DeleteEnum, row?: RoleListType) => {
     ElMessage.success('删除成功')
     runGetRole()
   })
-}
-
-const selectedRoleIds = ref<string[]>([])
-const roleSelectionChange = (roles: RoleListType[]) => {
-  selectedRoleIds.value = roles.map((role) => role.id)
 }
 </script>
 <style scoped lang="scss">

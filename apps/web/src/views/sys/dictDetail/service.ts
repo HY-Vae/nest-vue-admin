@@ -16,7 +16,7 @@ export function getDictDetailApi(
   })
 }
 
-export function getDictDetailOneApi(id: string): Promise<Result<DictDetailListType>> {
+export function getDictDetailOneApi(id: number): Promise<Result<DictDetailListType>> {
   return request(`/sys/dictDetail/${id}`, {
     method: 'GET',
   })
@@ -36,11 +36,21 @@ export function updateDictDetailApi(data: UpdateDictDetailType): Promise<Result>
   })
 }
 
-export function deleteDictDetailApi(ids: string[]): Promise<Result> {
+export function deleteDictDetailApi(id: number, sysDictCode: string): Promise<Result> {
+  return request(`/sys/dictDetail/${id}`, {
+    method: 'DELETE',
+    data: {
+      sysDictCode,
+    },
+  })
+}
+
+export function deleteDictDetailsApi(ids: number[], sysDictCode: string): Promise<Result> {
   return request(`/sys/dictDetail`, {
     method: 'DELETE',
     data: {
       ids,
+      sysDictCode,
     },
   })
 }

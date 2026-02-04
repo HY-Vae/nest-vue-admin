@@ -3,7 +3,7 @@ import { getRoleOptionsApi } from '@/api/role.ts'
 import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
-import type { CreateUserType, UserListType } from '@/views/sys/user/user.type'
+import type { CreateUserType, UserDetailType } from '@/views/sys/user/user.type'
 import type { FormInstance } from 'element-plus'
 import { computed, ref, watch, type PropType } from 'vue'
 const props = defineProps({
@@ -21,7 +21,7 @@ const props = defineProps({
   },
   current: {
     required: false,
-    type: Object as PropType<UserListType>,
+    type: Object as PropType<UserDetailType>,
   },
 })
 const visible = defineModel<boolean>({ required: true })
@@ -117,7 +117,7 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      userForm.value = val
+      userForm.value = val as CreateUserType
     }
   },
 )

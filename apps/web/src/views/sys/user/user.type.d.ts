@@ -17,10 +17,15 @@ export interface UserListType {
   status: string
   userType: string | null
   remark: string | null
-  createBy: string | null
-  createAt: Date
-  updateBy: string | null
-  updateAt: Date
+  createBy?: string | null
+  createAt?: Date
+  updateBy?: string | null
+  updateAt?: Date
+}
+
+export interface UserDetailType extends UserListType {
+  roleIds: string[]
+  id?: string
 }
 
 export interface CreateUserType {

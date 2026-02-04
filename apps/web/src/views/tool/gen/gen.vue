@@ -4,8 +4,10 @@
       <div class="flex justify-between mb-2">
         <p>结构配置</p>
         <div>
-          <el-button @click="generateWebCode">生成前端代码</el-button>
-          <el-button type="primary" plain @click="generateCode">生成代码</el-button>
+          <!--          <el-button @click="generateWebCode">生成前端代码</el-button>-->
+          <el-button type="primary" plain v-auth="'tool:gen:create'" @click="generateCode"
+            >生成代码</el-button
+          >
         </div>
       </div>
       <el-form :model="generateForm" ref="genFormRef" :rules="rules">
@@ -93,7 +95,9 @@
 
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button @click="addField" type="primary" :icon="Plus">新增字段</el-button>
+        <el-button @click="addField" v-auth="'tool:gen:create'" type="primary" :icon="Plus"
+          >新增字段</el-button
+        >
       </el-row>
       <div class="table-main">
         <FieldTable

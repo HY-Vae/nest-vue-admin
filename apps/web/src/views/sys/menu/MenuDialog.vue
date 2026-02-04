@@ -4,7 +4,12 @@ import { ActionEnum } from '@/enums/common.ts'
 import type { SelectTreeItem } from '@/types/global.ts'
 import { fetchIconsFromCollection } from '@/views/sys/menu/fetchIcons.ts'
 import IconPicker from '@/views/sys/menu/IconPicker.vue'
-import type { CreateMenuType, IconResult, MenuListType } from '@/views/sys/menu/menu.type'
+import type {
+  CreateMenuBtnType,
+  CreateMenuType,
+  IconResult,
+  MenuDetailType,
+} from '@/views/sys/menu/menu.type'
 import { Plus } from '@element-plus/icons-vue'
 import type { FormInstance, TreeInstance } from 'element-plus'
 import { computed, ref, watch, type PropType } from 'vue'
@@ -23,11 +28,11 @@ const props = defineProps({
   },
   current: {
     required: false,
-    type: Object as PropType<MenuListType>,
+    type: Object as PropType<MenuDetailType>,
   },
   menuTree: {
     required: true,
-    type: Array as PropType<SelectTreeItem[]>,
+    type: Array as PropType<SelectTreeItem<number>[]>,
   },
   parentId: {
     type: Number,
@@ -47,7 +52,7 @@ const menuForm = ref<CreateMenuType>({
   parentId: 0,
   name: '',
   sort: 0,
-  status: '',
+  status: '0',
   remark: '',
   meta: {
     title: '',
@@ -107,7 +112,7 @@ const closeDialog = () => {
     parentId: 0,
     name: '',
     sort: 0,
-    status: '',
+    status: '0',
     remark: '',
     meta: {
       title: '',
@@ -198,14 +203,13 @@ const generateBtnAuth = () => {
     `查询${menuName}详情`,
   ]
   //   判断是否已经含有某个权限值
-  const btns = []
-  debugger
+  const btns: CreateMenuBtnType[] = []
   authKeys.forEach((auth, index) => {
     const key = [authPrefix.value, auth].join(':')
     if (!menuForm.value.menuBtns.some((item) => item.auth === key)) {
       btns.push({
         auth: key,
-        name: authNameKeys[index],
+        name: authNameKeys[index] as string,
       })
     }
   })

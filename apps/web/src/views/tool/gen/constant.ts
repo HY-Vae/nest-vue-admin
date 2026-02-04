@@ -66,14 +66,14 @@ export const formItemTypeOptions: SelectOptionItem<GenTypeEnum>[] = [
     label: '日期控件',
     value: GenTypeEnum.DATETIME,
   },
-  {
-    label: '图片上传',
-    value: GenTypeEnum.IMAGE_UPLOAD,
-  },
-  {
-    label: '文件上传',
-    value: GenTypeEnum.FILE_UPLOAD,
-  },
+  // {
+  //   label: '图片上传',
+  //   value: GenTypeEnum.IMAGE_UPLOAD,
+  // },
+  // {
+  //   label: '文件上传',
+  //   value: GenTypeEnum.FILE_UPLOAD,
+  // },
 ]
 
 export const baseFieldsTable: BaseFieldType[] = [

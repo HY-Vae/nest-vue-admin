@@ -28,7 +28,7 @@ export class SysRoleService {
       throw new ApiException('角色值已存在');
     }
     const { menus, menuBtns, ...others } = createSysRoleDto;
-    return await this.prisma.sysRole.create({
+    return this.prisma.sysRole.create({
       data: {
         ...others,
         id: generateUUid(),
@@ -150,7 +150,7 @@ export class SysRoleService {
     }
     const { menus, menuBtns, ...others } = updateSysRoleDto;
     await this.removeCache(id);
-    return await this.prisma.sysRole.update({
+    return this.prisma.sysRole.update({
       where: {
         id,
       },
@@ -166,15 +166,16 @@ export class SysRoleService {
     });
   }
 
-  async remove(ids: string[]) {
-    // 先查询这个角色下是否有用户
+  async remove(id: string) {
+    // 先查询这个角色下是否有用户;
+    if (!id) {
+      throw new ApiException('参数异常');
+    }
     const user = await this.prisma.sysUser.findFirst({
       where: {
         roles: {
           some: {
-            id: {
-              in: ids,
-            },
+            id,
           },
         },
       },
@@ -182,14 +183,10 @@ export class SysRoleService {
     if (user) {
       throw new Error('该角色下有用户，请先解除用户角色分配');
     }
-    for (let i = 0; i < ids.length; i++) {
-      await this.removeCache(ids[i]);
-    }
-    await this.prisma.sysRole.deleteMany({
+    await this.removeCache(id);
+    await this.prisma.sysRole.delete({
       where: {
-        id: {
-          in: ids,
-        },
+        id,
       },
     });
   }

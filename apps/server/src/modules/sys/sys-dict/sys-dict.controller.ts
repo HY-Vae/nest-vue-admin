@@ -1,4 +1,6 @@
+import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
+import { ActionEnum } from '@/common/enums/action.enum';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
@@ -11,7 +13,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysDictDto,
   GetSysDictListDto,
@@ -25,37 +27,57 @@ import { SysDictService } from './sys-dict.service';
 export class SysDictController {
   constructor(private readonly sysDictService: SysDictService) {}
 
+  @ApiOperation({
+    summary: '创建用户字典',
+  })
   @Permission('sys:dict:create')
+  @Action({ title: '创建用户字典', action: ActionEnum.CREATE })
   @Post()
   create(@Body(CreateDtoPipe) createSysDictDto: CreateSysDictDto) {
     return this.sysDictService.create(createSysDictDto);
   }
 
+  @ApiOperation({
+    summary: '查询用户字典列表',
+  })
   @Permission('sys:dict:list')
   @Get()
   findAll(@Query() query: GetSysDictListDto) {
     return this.sysDictService.findAll(query);
   }
 
+  @ApiOperation({
+    summary: '查询用户字典列表',
+  })
   @Permission('sys:dict:list')
   @Get('options')
   findAllOptions() {
     return this.sysDictService.findAllOptions();
   }
 
+  @ApiOperation({
+    summary: '查询用户下拉框数据（缓存）',
+  })
   @Permission('sys:dict:list')
   @Post('options')
   findDicts(@Body('codes') codes: string[]) {
     return this.sysDictService.findDicts(codes);
   }
 
-  @Permission('sys:dict:list')
+  @ApiOperation({
+    summary: '查询用户字典详情',
+  })
+  @Permission('sys:dict:detail')
   @Get(':code')
   findOne(@Param('code') code: string) {
     return this.sysDictService.findOne(code);
   }
 
+  @ApiOperation({
+    summary: '更新用户字典',
+  })
   @Permission('sys:dict:update')
+  @Action({ title: '更新用户字典', action: ActionEnum.UPDATE })
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -64,9 +86,13 @@ export class SysDictController {
     return this.sysDictService.update(id, updateSysDictDto);
   }
 
+  @ApiOperation({
+    summary: '删除用户字典',
+  })
   @Permission('sys:dict:remove')
-  @Delete()
-  remove(@Body('codes') codes: string[]) {
-    return this.sysDictService.remove(codes);
+  @Action({ title: '删除用户字典', action: ActionEnum.REMOVE })
+  @Delete(':code')
+  remove(@Param('code') code: string) {
+    return this.sysDictService.remove(code);
   }
 }

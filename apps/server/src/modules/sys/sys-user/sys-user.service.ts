@@ -135,7 +135,6 @@ export class SysUserService {
   }
 
   async remove(id: string) {
-    // 暂时禁止删除用户吧
     const role = await this.prisma.sysRole.findFirst({
       where: {
         users: {
@@ -148,7 +147,7 @@ export class SysUserService {
     if (role) {
       throw new ApiException('该用户已分配角色，请先解除角色分配');
     }
-    return await this.prisma.sysUser.delete({
+    return this.prisma.sysUser.delete({
       where: {
         id,
       },

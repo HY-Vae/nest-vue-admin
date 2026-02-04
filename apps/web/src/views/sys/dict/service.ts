@@ -49,11 +49,8 @@ export function updateDictApi(data: UpdateDictType): Promise<Result> {
   })
 }
 
-export function deleteDictApi(ids: string[]): Promise<Result> {
-  return request(`/sys/dict`, {
+export function deleteDictApi(code: string): Promise<Result> {
+  return request(`/sys/dict/${code}`, {
     method: 'DELETE',
-    data: {
-      ids,
-    },
   })
 }

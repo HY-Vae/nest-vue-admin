@@ -1,4 +1,6 @@
+import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
+import { ActionEnum } from '@/common/enums/action.enum';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
@@ -29,6 +31,7 @@ export class SysMenuController {
   @ApiOperation({
     summary: '创建菜单',
   })
+  @Action({ title: '创建菜单', action: ActionEnum.CREATE })
   @Post()
   create(@Body(CreateDtoPipe) createSysMenuDto: CreateSysMenuDto) {
     return this.sysMenuService.create(createSysMenuDto);
@@ -56,6 +59,7 @@ export class SysMenuController {
   @ApiOperation({
     summary: '更新菜单',
   })
+  @Action({ title: '更新菜单', action: ActionEnum.UPDATE })
   @Patch(':id')
   update(
     @Param('id') id: number,
@@ -68,6 +72,7 @@ export class SysMenuController {
   @ApiOperation({
     summary: '删除菜单',
   })
+  @Action({ title: '删除菜单', action: ActionEnum.REMOVE })
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.sysMenuService.remove(id);

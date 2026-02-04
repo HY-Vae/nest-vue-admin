@@ -20,11 +20,11 @@ export class {{pascalCase}}Service {
   async create(create{{pascalCase}}Dto: Create{{pascalCase}}Dto) {
 
     {{#if primaryKeyIsNumber}}
-      return await this.prisma.{{camelCase}}.create({
+      return this.prisma.{{camelCase}}.create({
         data: create{{pascalCase}}Dto,
       });
     {{else}}
-      return await this.prisma.{{camelCase}}.create({
+      return this.prisma.{{camelCase}}.create({
         data: {
           ...create{{pascalCase}}Dto,
           {{primaryKey}}: generateUUid(),
@@ -66,7 +66,7 @@ export class {{pascalCase}}Service {
 
   /* 更新 */
   async update({{primaryKey}}: {{pimaryKeyType}}, update{{pascalCase}}Dto: Update{{pascalCase}}Dto) {
-    return await this.prisma.{{camelCase}}.update({
+    return this.prisma.{{camelCase}}.update({
       where: {
         {{primaryKey}},
       },
@@ -76,7 +76,7 @@ export class {{pascalCase}}Service {
 
   /* 删除 */
   async remove({{primaryKey}}: {{pimaryKeyType}}) {
-    return await this.prisma.{{camelCase}}.delete({
+    return this.prisma.{{camelCase}}.delete({
       where: {
         {{primaryKey}},
       },
@@ -85,7 +85,7 @@ export class {{pascalCase}}Service {
 
   /* 批量删除 */
   async removes(ids: {{pimaryKeyType}}[]) {
-    return await this.prisma.{{camelCase}}.deleteMany({
+    return this.prisma.{{camelCase}}.deleteMany({
       where: {
         id: {
           in: ids

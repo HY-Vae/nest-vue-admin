@@ -8,7 +8,7 @@ export interface QueryDictDetailType {
 }
 
 export interface DictDetailListType {
-  id: string
+  id: number
   label: string
   value: string
   sort: number
@@ -30,5 +30,5 @@ export interface CreateDictDetailType {
 }
 
 export interface UpdateDictDetailType extends Partial<CreateDictDetailType> {
-  id: string
+  id: number
 }

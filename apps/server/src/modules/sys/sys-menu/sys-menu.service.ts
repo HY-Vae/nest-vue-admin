@@ -99,7 +99,7 @@ export class SysMenuService {
     const { meta, menuBtns = [], parentId, ...other } = updateSysMenuDto;
     const metaInfo = meta ? { update: meta } : undefined;
     // TODO: 这里还需要删除角色菜单权限表的关系
-    return await this.prisma.sysMenu.update({
+    return this.prisma.sysMenu.update({
       where: {
         id,
       },
@@ -118,7 +118,7 @@ export class SysMenuService {
   }
 
   async remove(id: number) {
-    // 需要级联删除掉数据
+    // TODO: 需要级联删除掉数据
     this.prisma.$transaction(async (tx) => {
       //   1.需要删除角色菜单权限表关系
       //   2.需要删除角色按钮权限表关系
@@ -127,7 +127,7 @@ export class SysMenuService {
       //   5.删除菜单信息
     });
 
-    return await this.prisma.sysMenu.delete({
+    return this.prisma.sysMenu.delete({
       where: {
         id,
       },
