@@ -141,7 +141,7 @@ watch(
                 <%}%>
               </el-form-item>
             </el-col>
-          <% } else if(field.type === 'Int'){ %>
+          <% } else if(field.type === 'Int' || field.type === 'Float'){ %>
             <el-col :span="rowSpan">
               <el-form-item label="<%= field.nameCh%>" prop="<%= field.nameJson %>">
                 <el-input-number
