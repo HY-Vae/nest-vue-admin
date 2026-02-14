@@ -32,6 +32,8 @@ const { getDictOptions } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
 
+const menuRef = ref<InstanceType<typeof ElTreeSelect>>()
+
 const formLabelWidth = '100px'
 const roleForm = ref<CreateRoleType>({
   name: '',
@@ -95,6 +97,46 @@ const openRole = () => {
   })
 }
 
+const getAllChildrenIds = (nodeData: any, ids: number[] = []) => {
+  if (nodeData.children && nodeData.children.length > 0) {
+    nodeData.children.forEach((child: any) => {
+      ids.push(child.value)
+      getAllChildrenIds(child, ids)
+    })
+  }
+  return ids
+}
+
+const handleCheck = (data: SelectTreeItem<number>, { checkedKeys }: { checkedKeys: number[] }) => {
+  const currentId = data.value
+  const isChecked = checkedKeys.includes(currentId)
+
+  const finalIds = new Set(roleForm.value.menus)
+
+  const childrenIds = getAllChildrenIds(data)
+  if (isChecked) {
+    childrenIds.forEach((cid) => finalIds.add(cid))
+  } else {
+    childrenIds.forEach((cid) => finalIds.delete(cid))
+  }
+
+  if (isChecked) {
+    const treeInstance = menuRef.value
+
+    if (treeInstance) {
+      const node = treeInstance.getNode(currentId)
+
+      let parent = node.parent
+      while (parent && parent.level > 0) {
+        finalIds.add(parent.key) // 将父 ID 加入集合
+        parent = parent.parent
+      }
+    }
+  }
+
+  roleForm.value.menus = [...finalIds]
+}
+
 watch(
   () => props.current,
   (val) => {
@@ -134,8 +176,9 @@ watch(
           check-strictly
           collapse-tags-tooltip
           show-checkbox
+          @check="handleCheck"
           v-model="roleForm.menus"
-          treeRef="menuRef"
+          ref="menuRef"
           :data="menuTree"
           highlight-current
           auto-expand-parent

@@ -27,6 +27,7 @@ router.beforeEach(async (to, from, next) => {
     await userStore.getCurrentUser()
     await userStore.renderRoutes()
     next({ ...to, replace: true })
+    return
   }
   next()
   return

@@ -98,9 +98,9 @@ model SysMenuMeta {
 model SysMenuParameter {
   id        Int      @id @default(autoincrement())
   /// query 或者 params
-  type      String?  @db.VarChar(50)
+  type      String   @db.VarChar(10)
   key       String?  @db.VarChar(100)
-  value     String?  @db.Text
+  value     String?  @db.VarChar(191)
   sysMenuId Int?     @map("sys_menu_id")
   sysMenu   SysMenu? @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
 

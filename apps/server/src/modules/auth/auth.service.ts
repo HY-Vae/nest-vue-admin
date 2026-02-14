@@ -220,7 +220,7 @@ export class AuthService {
     const apiTree = apis.map((item) => {
       return {
         label: item.meta?.title || '',
-        value: item.id,
+        value: `menu-${item.id}`,
         children: item.menuBtns.map((btn) => ({
           label: btn.name,
           value: btn.id,

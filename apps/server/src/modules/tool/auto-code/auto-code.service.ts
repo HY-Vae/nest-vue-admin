@@ -97,7 +97,7 @@ export class AutoCodeService {
       menuBody.parentId = parentMenu.id;
     }
     await this.prisma.$transaction(async (tx) => {
-      let { menuBtns, meta, path, ...others } = menuBody;
+      let { menuBtns, meta, parameters = [], path, ...others } = menuBody;
       const menuPath = posix.join(parentMenu?.path || '/', path);
       await tx.sysMenu.create({
         data: {
@@ -110,6 +110,11 @@ export class AutoCodeService {
           menuBtns: {
             createMany: {
               data: createBtnAuthMap(config.authPrefix, config.nameZh),
+            },
+          },
+          parameters: {
+            createMany: {
+              data: parameters,
             },
           },
         },
@@ -157,7 +162,7 @@ export class AutoCodeService {
       menuBody.parentId = parentMenu.id;
     }
     await this.prisma.$transaction(async (tx) => {
-      let { menuBtns, meta, ...others } = menuBody;
+      let { menuBtns, parameters = [], meta, ...others } = menuBody;
       await tx.sysMenu.create({
         data: {
           ...others,
@@ -167,6 +172,11 @@ export class AutoCodeService {
           menuBtns: {
             createMany: {
               data: createBtnAuthMap(config.authPrefix, config.nameZh),
+            },
+          },
+          parameters: {
+            createMany: {
+              data: parameters,
             },
           },
         },

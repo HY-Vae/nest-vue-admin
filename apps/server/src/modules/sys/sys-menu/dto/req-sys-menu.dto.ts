@@ -56,6 +56,11 @@ export class GetSysMenuListDto extends PaginationDto {
 }
 
 export class CreateSysMenuBtnDto {
+  @ApiProperty({ description: 'ID（更新时必传，新增时忽略）', required: false })
+  @IsNumber()
+  @IsOptional()
+  id?: number;
+
   @ApiProperty({ description: '功能名称', required: true })
   @IsString()
   @IsNotEmpty()
@@ -67,6 +72,26 @@ export class CreateSysMenuBtnDto {
   @IsNotEmpty()
   @MaxLength(30)
   auth: string;
+}
+
+export class CreateSysMenuParameterDto {
+  @ApiProperty({ description: '参数类型', required: true })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(10)
+  type: string;
+
+  @ApiProperty({ description: '参数key', required: false })
+  @IsString()
+  @MaxLength(100)
+  @IsOptional()
+  key?: string;
+
+  @ApiProperty({ description: '参数value', required: false })
+  @IsString()
+  @MaxLength(191)
+  @IsOptional()
+  value?: string;
 }
 
 export class CreateSysMenuDto extends CommonBaseDto {
@@ -124,7 +149,15 @@ export class CreateSysMenuDto extends CommonBaseDto {
   @ValidateNested({ each: true })
   @Type(() => CreateSysMenuBtnDto)
   @IsArray()
-  menuBtns: CreateSysMenuBtnDto[];
+  @IsOptional()
+  menuBtns?: CreateSysMenuBtnDto[];
+
+  @ApiProperty({ description: '路由参数', required: true })
+  @ValidateNested({ each: true })
+  @Type(() => CreateSysMenuParameterDto)
+  @IsArray()
+  @IsOptional()
+  parameters?: CreateSysMenuParameterDto[];
 }
 
 export class UpdateSysMenuDto extends PartialType(CreateSysMenuDto) {}
