@@ -22,7 +22,8 @@ pnpm i
 
 **操作步骤：**
 1. 找到 `apps/server/.env` 文件
-2. 将 `DATABASE_URL` 修改为你的实际连接信息：
+2. 复制 `.env.example` 文件并更改名称保存为 `.env` 文件
+3. 将 `DATABASE_URL` 修改为你的实际连接信息：
 
 ```bash
 DATABASE_URL="mysql://root:Aa123456@127.0.0.1:3306/nest-vue-admin?connection_limit=20&pool_timeout=0"
