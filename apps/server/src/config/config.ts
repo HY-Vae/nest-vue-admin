@@ -1,52 +1,74 @@
 import { CacheModeEnum, UploadModeEnum } from '@/common/enums/config.enum';
 import { ConfigType } from '@/common/types/config.type';
 
-const config: ConfigType = {
-  port: 3333,
-  jwt: {
-    secret: 'This system is nest-vue-admin',
-    expiresIn: 60 * 60 * 24 * 7 * 1000,
-  },
-  cache: {
-    mode: CacheModeEnum.REDIS,
-    ttl: 60000,
-  },
-  /**
-   * reids 配置
-   */
-  redis: {
-    host: '127.0.0.1',
-    port: 6379,
-    username: '',
-    password: '',
-    database: 6,
-  },
-  captcha: {
-    size: 4,
-    width: 100,
-    height: 40,
-  },
-  genCode: {
-    serverFolder: 'src',
-    mainModuleName: 'app.module.ts',
-  },
-  upload: {
-    maxFileSize: 1024 * 1024 * 10,
-    mode: UploadModeEnum.LOCAL,
-    [UploadModeEnum.LOCAL]: {
-      folder: 'uploads',
-      prefix: '/uploads',
-      baseUrl: 'http://127.0.0.1:3333',
-    },
-    [UploadModeEnum.ALIYUN]: {
-      region: '',
-      accessKeyId: '',
-      accessKeySecret: '',
-      bucket: '',
-      folder: '',
-      baseUrl: '',
-    },
-  },
+// 1. 简化辅助函数：只负责读取，不再负责“兜底”
+// 因为 Joi 保证了值一定存在（或者是空字符串）
+const env = (key: string): string => {
+  return process.env[key] || '';
 };
 
-export const getConfig = () => config;
+// 2. 数字转换函数：只负责转类型
+const envNumber = (key: string): number => {
+  return Number(process.env[key]);
+};
+
+export const getConfig = (): ConfigType => ({
+  // 1. 端口
+  port: envNumber('APP_PORT'),
+
+  // 2. JWT
+  jwt: {
+    secret: env('JWT_SECRET'),
+    expiresIn: envNumber('JWT_EXPIRES_IN'),
+  },
+
+  // 3. 缓存
+  cache: {
+    mode: env('CACHE_MODE') as CacheModeEnum,
+    ttl: envNumber('CACHE_TTL'),
+  },
+
+  // 4. Redis (Joi 保证了：如果是 Redis 模式，这些必填；否则允许为空)
+  redis: {
+    host: env('REDIS_HOST'),
+    port: envNumber('REDIS_PORT'),
+    username: env('REDIS_USERNAME'),
+    password: env('REDIS_PASSWORD'),
+    database: envNumber('REDIS_DB'),
+  },
+
+  // 5. 验证码
+  captcha: {
+    size: envNumber('CAPTCHA_SIZE'),
+    width: envNumber('CAPTCHA_WIDTH'),
+    height: envNumber('CAPTCHA_HEIGHT'),
+  },
+
+  // 6. 代码生成
+  genCode: {
+    serverFolder: env('GEN_CODE_SERVER_FOLDER'),
+    mainModuleName: env('GEN_CODE_MAIN_MODULE'),
+  },
+
+  // 7. 上传配置
+  upload: {
+    maxFileSize: envNumber('UPLOAD_MAX_FILE_SIZE'),
+    mode: env('UPLOAD_MODE') as UploadModeEnum,
+
+    // 结构化组装
+    [UploadModeEnum.LOCAL]: {
+      folder: env('UPLOAD_LOCAL_FOLDER'),
+      prefix: env('UPLOAD_LOCAL_PREFIX'),
+      baseUrl: env('UPLOAD_LOCAL_BASE_URL'),
+    },
+
+    [UploadModeEnum.ALIYUN]: {
+      region: env('ALIYUN_REGION'),
+      accessKeyId: env('ALIYUN_ACCESS_KEY_ID'),
+      accessKeySecret: env('ALIYUN_ACCESS_KEY_SECRET'),
+      bucket: env('ALIYUN_BUCKET'),
+      folder: env('ALIYUN_FOLDER'),
+      baseUrl: env('ALIYUN_BASE_URL'),
+    },
+  },
+});

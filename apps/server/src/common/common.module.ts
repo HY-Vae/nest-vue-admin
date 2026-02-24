@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
 import { ActionInterceptor } from '@/common/interceptors/action.interceptor';
 import { CacheConfigType, RedisConfigType } from '@/common/types/config.type';
 import { getConfig } from '@/config/config';
+import { envValidationSchema } from '@/config/config.validation';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
@@ -25,6 +26,7 @@ import { PrismaConfigService } from './prismaService/prismaConfigService';
       isGlobal: true,
       cache: true,
       load: [getConfig],
+      validationSchema: envValidationSchema,
     }),
     // prisma 模块
     PrismaModule.forRootAsync({
