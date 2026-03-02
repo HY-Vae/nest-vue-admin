@@ -1,7 +1,12 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchSysDeptForm" class="demo-form-inline">
+      <el-form
+        :model="searchSysDeptForm"
+        class="demo-form-inline"
+        @keydown.enter="onSysDeptSearch"
+        @submit.prevent
+      >
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
             <el-form-item label="部门名称" prop="deptName">
@@ -10,7 +15,6 @@
                 placeholder="请输入部门名称"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysDeptSearch"
               />
             </el-form-item>
           </el-col>
@@ -22,7 +26,6 @@
                 placeholder="请输入部门编码"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysDeptSearch"
               />
             </el-form-item>
           </el-col>
@@ -87,7 +90,7 @@
 
           <el-table-column label="创建时间" align="center" width="180">
             <template #default="scope">
-              <span>{{ transTime(scope.row.createTime) }}</span>
+              <span>{{ transTime(scope.row.createdAt) }}</span>
             </template>
           </el-table-column>
 

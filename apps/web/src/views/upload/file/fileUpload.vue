@@ -110,7 +110,7 @@
 
           <el-table-column label="创建时间" align="center" width="180">
             <template #default="scope">
-              <span>{{ transTime(scope.row.createTime) }}</span>
+              <span>{{ transTime(scope.row.createdAt) }}</span>
             </template>
           </el-table-column>
 

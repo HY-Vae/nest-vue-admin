@@ -18,9 +18,9 @@ export interface UserListType {
   userType: string | null
   remark: string | null
   createBy?: string | null
-  createAt?: Date
+  createdAt?: Date
   updateBy?: string | null
-  updateAt?: Date
+  updatedAt?: Date
 }
 
 export interface UserDetailType extends UserListType {

@@ -15,9 +15,9 @@ export interface DictDetailListType {
   status: string
   remark: string | null
   createBy: string
-  createAt: Date
+  createdAt: Date
   updateBy: string | null
-  updateAt: Date
+  updatedAt: Date
 }
 
 export interface CreateDictDetailType {

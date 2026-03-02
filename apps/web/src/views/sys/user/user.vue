@@ -1,7 +1,12 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchUserForm" class="demo-form-inline">
+      <el-form
+        :model="searchUserForm"
+        class="demo-form-inline"
+        @keydown.enter="onUserSearch"
+        @submit.prevent
+      >
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
             <el-form-item label="用户名称">
@@ -45,9 +50,9 @@
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
-          <el-table-column prop="createAt" label="创建时间" width="180" align="center">
+          <el-table-column prop="createdAt" label="创建时间" width="180" align="center">
             <template #default="scope">
-              {{ transTime(scope.row.createAt) }}
+              {{ transTime(scope.row.createdAt) }}
             </template>
           </el-table-column>
           <el-table-column label="操作" width="110">

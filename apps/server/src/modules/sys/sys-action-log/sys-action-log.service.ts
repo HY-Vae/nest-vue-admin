@@ -39,7 +39,7 @@ export class SysActionLogService {
       skip,
       take,
       orderBy: {
-        createTime: 'desc',
+        createdAt: 'desc',
       },
     });
     const totalPromise = this.prisma.sysActionLog.count({

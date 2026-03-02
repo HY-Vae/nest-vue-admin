@@ -12,9 +12,9 @@ CREATE TABLE `sys_user` (
     `user_type` VARCHAR(2) NULL,
     `remark` VARCHAR(255) NULL,
     `create_by` VARCHAR(64) NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(64) NULL,
-    `update_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `sys_user_user_name_key`(`user_name`),
     PRIMARY KEY (`id`)
@@ -29,9 +29,9 @@ CREATE TABLE `sys_role` (
     `status` CHAR(1) NOT NULL,
     `remark` VARCHAR(255) NULL,
     `create_by` VARCHAR(64) NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(64) NULL,
-    `update_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `sys_role_key_key`(`key`),
     PRIMARY KEY (`id`)
@@ -50,9 +50,9 @@ CREATE TABLE `sys_menu` (
     `sort` INTEGER NOT NULL DEFAULT 0,
     `remark` VARCHAR(255) NULL,
     `create_by` VARCHAR(64) NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(64) NULL,
-    `update_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `sys_menu_name_key`(`name`),
     PRIMARY KEY (`id`)
@@ -76,9 +76,9 @@ CREATE TABLE `sys_menu_meta` (
 -- CreateTable
 CREATE TABLE `sys_menu_parameter` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `type` VARCHAR(50) NULL,
+    `type` VARCHAR(10) NOT NULL,
     `key` VARCHAR(100) NULL,
-    `value` TEXT NULL,
+    `value` VARCHAR(191) NULL,
     `sys_menu_id` INTEGER NULL,
 
     PRIMARY KEY (`id`)
@@ -90,8 +90,8 @@ CREATE TABLE `sys_menu_btn` (
     `name` CHAR(30) NOT NULL,
     `auth` CHAR(30) NOT NULL,
     `sys_menu_id` INTEGER NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `update_at` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -105,9 +105,9 @@ CREATE TABLE `sys_dict` (
     `status` CHAR(1) NOT NULL,
     `remark` VARCHAR(255) NULL,
     `create_by` VARCHAR(64) NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(64) NULL,
-    `update_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `sys_dict_code_key`(`code`),
     PRIMARY KEY (`id`)
@@ -123,9 +123,9 @@ CREATE TABLE `sys_dict_detail` (
     `remark` VARCHAR(255) NULL,
     `sys_dict_code` VARCHAR(30) NOT NULL,
     `create_by` VARCHAR(64) NULL,
-    `create_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(64) NULL,
-    `update_at` DATETIME(3) NOT NULL,
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `sys_dict_detail_value_sys_dict_code_key`(`value`, `sys_dict_code`),
     PRIMARY KEY (`id`)
@@ -138,9 +138,9 @@ CREATE TABLE `temp` (
     `code` VARCHAR(20) NOT NULL,
     `temp_path` VARCHAR(30) NOT NULL,
     `create_by` VARCHAR(30) NULL,
-    `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(30) NULL,
-    `update_time` DATETIME(3) NULL,
+    `updated_at` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -152,9 +152,9 @@ CREATE TABLE `sys_dept` (
     `dept_code` VARCHAR(20) NOT NULL,
     `status` VARCHAR(191) NOT NULL,
     `create_by` VARCHAR(30) NULL,
-    `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(30) NULL,
-    `update_time` DATETIME(3) NULL,
+    `updated_at` DATETIME(3) NULL,
 
     UNIQUE INDEX `sys_dept_dept_name_key`(`dept_name`),
     UNIQUE INDEX `sys_dept_dept_code_key`(`dept_code`),
@@ -175,7 +175,7 @@ CREATE TABLE `sys_action_log` (
     `result` TEXT NULL,
     `error_info` TEXT NULL,
     `status` VARCHAR(1) NULL,
-    `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -191,9 +191,9 @@ CREATE TABLE `auto_code` (
     `route_path` VARCHAR(50) NOT NULL,
     `fields` TEXT NOT NULL,
     `create_by` VARCHAR(30) NULL,
-    `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(30) NULL,
-    `update_time` DATETIME(3) NULL,
+    `updated_at` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -208,9 +208,9 @@ CREATE TABLE `file_upload` (
     `size` INTEGER NOT NULL,
     `mime` VARCHAR(100) NOT NULL,
     `create_by` VARCHAR(30) NULL,
-    `create_time` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `created_at` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
     `update_by` VARCHAR(30) NULL,
-    `update_time` DATETIME(3) NULL,
+    `updated_at` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

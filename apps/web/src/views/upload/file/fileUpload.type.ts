@@ -26,11 +26,11 @@ export interface FileUploadListType {
 
   createBy?: string
 
-  createTime?: Date
+  createdAt?: Date
 
   updateBy?: string
 
-  updateTime?: Date
+  updatedAt?: Date
 }
 
 export interface CreateFileUploadType {}

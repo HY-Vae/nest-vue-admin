@@ -19,9 +19,9 @@ export interface MenuListType {
   remark: string | null
   meta: CreateMenuMetaType
   createBy: string
-  createAt: Date
+  createdAt: Date
   updateBy: string | null
-  updateAt: Date
+  updatedAt: Date
   children: MenuListType[]
 }
 

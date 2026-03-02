@@ -15,40 +15,40 @@ datasource db {
 }
 
 model SysUser {
-  id       String    @id @db.VarChar(36)
-  userName String    @unique @map("user_name") @db.VarChar(30)
-  avatar   String?   @db.VarChar(100)
-  email    String?   @db.VarChar(50)
-  nickName String    @map("nick_name") @db.VarChar(30)
-  password String    @db.VarChar(100)
-  phone    String?   @db.VarChar(11)
-  sex      String?   @default("0") @db.Char(1)
-  status   String?   @default("0") @db.Char(1)
-  userType String?   @map("user_type") @db.VarChar(2)
-  remark   String?   @db.VarChar(255)
-  createBy String?   @map("create_by") @db.VarChar(64)
-  createAt DateTime  @default(now()) @map("create_at")
-  updateBy String?   @map("update_by") @db.VarChar(64)
-  updateAt DateTime  @updatedAt @map("update_at")
-  roles    SysRole[]
+  id        String    @id @db.VarChar(36)
+  userName  String    @unique @map("user_name") @db.VarChar(30)
+  avatar    String?   @db.VarChar(100)
+  email     String?   @db.VarChar(50)
+  nickName  String    @map("nick_name") @db.VarChar(30)
+  password  String    @db.VarChar(100)
+  phone     String?   @db.VarChar(11)
+  sex       String?   @default("0") @db.Char(1)
+  status    String?   @default("0") @db.Char(1)
+  userType  String?   @map("user_type") @db.VarChar(2)
+  remark    String?   @db.VarChar(255)
+  createBy  String?   @map("create_by") @db.VarChar(64)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updateBy  String?   @map("update_by") @db.VarChar(64)
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  roles     SysRole[]
 
   @@map("sys_user")
 }
 
 model SysRole {
-  id       String       @id @db.VarChar(36)
-  name     String       @db.VarChar(30)
-  key      String       @unique @db.VarChar(30)
-  sort     Int          @default(0)
-  status   String       @db.Char(1)
-  remark   String?      @db.VarChar(255)
-  createBy String?      @map("create_by") @db.VarChar(64)
-  createAt DateTime     @default(now()) @map("create_at")
-  updateBy String?      @map("update_by") @db.VarChar(64)
-  updateAt DateTime     @updatedAt @map("update_at")
-  users    SysUser[]
-  menus    SysMenu[]
-  menuBtns SysMenuBtn[]
+  id        String       @id @db.VarChar(36)
+  name      String       @db.VarChar(30)
+  key       String       @unique @db.VarChar(30)
+  sort      Int          @default(0)
+  status    String       @db.Char(1)
+  remark    String?      @db.VarChar(255)
+  createBy  String?      @map("create_by") @db.VarChar(64)
+  createdAt DateTime     @default(now()) @map("created_at")
+  updateBy  String?      @map("update_by") @db.VarChar(64)
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  users     SysUser[]
+  menus     SysMenu[]
+  menuBtns  SysMenuBtn[]
 
   @@map("sys_role")
 }
@@ -66,9 +66,9 @@ model SysMenu {
   remark    String? @db.VarChar(255)
 
   createBy   String?            @map("create_by") @db.VarChar(64)
-  createAt   DateTime           @default(now()) @map("create_at")
+  createdAt  DateTime           @default(now()) @map("created_at")
   updateBy   String?            @map("update_by") @db.VarChar(64)
-  updateAt   DateTime           @updatedAt @map("update_at")
+  updatedAt  DateTime           @updatedAt @map("updated_at")
   // Meta字段直接展开
   meta       SysMenuMeta?
   // 关系定义
@@ -112,8 +112,8 @@ model SysMenuBtn {
   name      String    @db.Char(30)
   auth      String    @db.Char(30)
   sysMenuId Int?      @map("sys_menu_id")
-  createAt  DateTime  @default(now()) @map("create_at")
-  updateAt  DateTime  @updatedAt @map("update_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
   sysMenu   SysMenu?  @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
   roles     SysRole[]
 
@@ -121,17 +121,17 @@ model SysMenuBtn {
 }
 
 model SysDict {
-  id       Int             @id @default(autoincrement())
-  name     String          @db.VarChar(30)
-  code     String          @unique @db.VarChar(30)
-  sort     Int
-  status   String          @db.Char(1)
-  remark   String?         @db.VarChar(255)
-  createBy String?         @map("create_by") @db.VarChar(64)
-  createAt DateTime        @default(now()) @map("create_at")
-  updateBy String?         @map("update_by") @db.VarChar(64)
-  updateAt DateTime        @updatedAt @map("update_at")
-  details  SysDictDetail[]
+  id        Int             @id @default(autoincrement())
+  name      String          @db.VarChar(30)
+  code      String          @unique @db.VarChar(30)
+  sort      Int
+  status    String          @db.Char(1)
+  remark    String?         @db.VarChar(255)
+  createBy  String?         @map("create_by") @db.VarChar(64)
+  createdAt DateTime        @default(now()) @map("created_at")
+  updateBy  String?         @map("update_by") @db.VarChar(64)
+  updatedAt DateTime        @updatedAt @map("updated_at")
+  details   SysDictDetail[]
 
   @@map("sys_dict")
 }
@@ -146,131 +146,131 @@ model SysDictDetail {
   sysDictCode String   @map("sys_dict_code") @db.VarChar(30)
   sysDict     SysDict? @relation(fields: [sysDictCode], references: [code], onDelete: Cascade)
   createBy    String?  @map("create_by") @db.VarChar(64)
-  createAt    DateTime @default(now()) @map("create_at")
+  createdAt   DateTime @default(now()) @map("created_at")
   updateBy    String?  @map("update_by") @db.VarChar(64)
-  updateAt    DateTime @updatedAt @map("update_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@unique([value, sysDictCode])
   @@map("sys_dict_detail")
 }
 
 model Temp {
-  id         String    @id @map("id") @db.VarChar(36)
-  name       String    @map("name") @db.VarChar(20)
-  code       String    @map("code") @db.VarChar(20)
-  tempPath   String    @map("temp_path") @db.VarChar(30)
-  createBy   String?   @map("create_by") @db.VarChar(30)
-  createTime DateTime? @default(now()) @map("create_time")
-  updateBy   String?   @map("update_by") @db.VarChar(30)
-  updateTime DateTime? @updatedAt @map("update_time")
+  id        String    @id @map("id") @db.VarChar(36)
+  name      String    @map("name") @db.VarChar(20)
+  code      String    @map("code") @db.VarChar(20)
+  tempPath  String    @map("temp_path") @db.VarChar(30)
+  createBy  String?   @map("create_by") @db.VarChar(30)
+  createdAt DateTime? @default(now()) @map("created_at")
+  updateBy  String?   @map("update_by") @db.VarChar(30)
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("temp")
 }
 
 model SysDept {
   /// id
-  id         String    @id @map("id") @db.VarChar(36)
+  id        String    @id @map("id") @db.VarChar(36)
   /// 部门名称
-  deptName   String    @unique @map("dept_name") @db.VarChar(30)
+  deptName  String    @unique @map("dept_name") @db.VarChar(30)
   /// 部门编码
-  deptCode   String    @unique @map("dept_code") @db.VarChar(20)
+  deptCode  String    @unique @map("dept_code") @db.VarChar(20)
   /// 启用状态
-  status     String    @map("status") @db.VarChar(191)
+  status    String    @map("status") @db.VarChar(191)
   /// 创建人
-  createBy   String?   @map("create_by") @db.VarChar(30)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createTime DateTime? @default(now()) @map("create_time")
+  createdAt DateTime? @default(now()) @map("created_at")
   /// 修改人
-  updateBy   String?   @map("update_by") @db.VarChar(30)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updateTime DateTime? @updatedAt @map("update_time")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("sys_dept")
 }
 
 model SysActionLog {
   /// id
-  id         Int       @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   /// 标题
-  title      String?   @db.VarChar(50)
+  title     String?   @db.VarChar(50)
   /// 操作类型
-  action     String?   @db.VarChar(2)
+  action    String?   @db.VarChar(2)
   /// 请求方式
-  method     String?   @db.VarChar(20)
+  method    String?   @db.VarChar(20)
   /// IP
-  ip         String?   @db.VarChar(20)
+  ip        String?   @db.VarChar(20)
   /// 地址
-  address    String?   @db.VarChar(100)
+  address   String?   @db.VarChar(100)
   /// 用户ID
-  userId     String?   @map("user_id") @db.VarChar(36)
+  userId    String?   @map("user_id") @db.VarChar(36)
   /// 姓名
-  userName   String?   @map("user_name") @db.VarChar(30)
+  userName  String?   @map("user_name") @db.VarChar(30)
   /// 请求参数
-  params     String?   @db.Text
+  params    String?   @db.Text
   /// 响应结果
-  result     String?   @db.Text
+  result    String?   @db.Text
   /// 错误信息
-  errorInfo  String?   @map("error_info") @db.Text
+  errorInfo String?   @map("error_info") @db.Text
   /// 状态
-  status     String?   @db.VarChar(1)
+  status    String?   @db.VarChar(1)
   /// 创建时间
-  createTime DateTime? @default(now()) @map("create_time")
+  createdAt DateTime? @default(now()) @map("created_at")
 
   @@map("sys_action_log")
 }
 
 model AutoCode {
   /// id
-  id         Int       @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   /// 模块code
-  name       String    @map("name") @db.VarChar(50)
+  name      String    @map("name") @db.VarChar(50)
   /// 模块中文名称
-  nameZh     String    @map("name_zh") @db.VarChar(50)
+  nameZh    String    @map("name_zh") @db.VarChar(50)
   /// Prisma 表名
-  modelName  String    @default("") @map("model_name") @db.VarChar(50)
+  modelName String    @default("") @map("model_name") @db.VarChar(50)
   /// Web目录
-  webPath    String    @map("web_path") @db.VarChar(50)
+  webPath   String    @map("web_path") @db.VarChar(50)
   /// 模板目录
-  tempId     String    @map("temp_id") @db.VarChar(36)
+  tempId    String    @map("temp_id") @db.VarChar(36)
   /// 路由地址
-  routePath  String    @map("route_path") @db.VarChar(50)
+  routePath String    @map("route_path") @db.VarChar(50)
   /// 字段列表
-  fields     String    @map("fields") @db.Text
+  fields    String    @map("fields") @db.Text
   /// 创建人
-  createBy   String?   @map("create_by") @db.VarChar(30)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createTime DateTime? @default(now()) @map("create_time")
+  createdAt DateTime? @default(now()) @map("created_at")
   /// 修改人
-  updateBy   String?   @map("update_by") @db.VarChar(30)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updateTime DateTime? @updatedAt @map("update_time")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("auto_code")
 }
 
 model FileUpload {
   /// id
-  id         String    @id @map("id") @db.VarChar(36)
+  id        String    @id @map("id") @db.VarChar(36)
   /// 文件名
-  name       String    @map("name") @db.VarChar(100)
+  name      String    @map("name") @db.VarChar(100)
   /// 文件地址
-  url        String    @map("url") @db.VarChar(191)
+  url       String    @map("url") @db.VarChar(191)
   /// 文件标签
-  tag        String    @map("tag") @db.VarChar(20)
+  tag       String    @map("tag") @db.VarChar(20)
   /// 编号
-  key        String    @map("key") @db.VarChar(191)
+  key       String    @map("key") @db.VarChar(191)
   /// 文件大小
-  size       Int       @map("size") @db.Int
+  size      Int       @map("size") @db.Int
   /// MIME类型
-  mime       String    @map("mime") @db.VarChar(100)
+  mime      String    @map("mime") @db.VarChar(100)
   /// 创建人
-  createBy   String?   @map("create_by") @db.VarChar(30)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createTime DateTime? @default(now()) @map("create_time")
+  createdAt DateTime? @default(now()) @map("created_at")
   /// 修改人
-  updateBy   String?   @map("update_by") @db.VarChar(30)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updateTime DateTime? @updatedAt @map("update_time")
+  updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("file_upload")
 }

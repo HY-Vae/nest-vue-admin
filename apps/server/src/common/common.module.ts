@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { CacheModeEnum } from '@/common/enums/config.enum';
 import { HttpExceptionFilter } from '@/common/filters/exception.filter';
+import { DemoEnvironmentGuard } from '@/common/guards/demo.guard';
 import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
 import { ActionInterceptor } from '@/common/interceptors/action.interceptor';
 import { CacheConfigType, RedisConfigType } from '@/common/types/config.type';
@@ -27,6 +28,12 @@ import { PrismaConfigService } from './prismaService/prismaConfigService';
       cache: true,
       load: [getConfig],
       validationSchema: envValidationSchema,
+      validationOptions: {
+        // 允许有未定义的字段
+        allowUnknown: true,
+        // 遇到错误不立即停止，而是收集所有错误一次性抛出
+        abortEarly: false,
+      },
     }),
     // prisma 模块
     PrismaModule.forRootAsync({
@@ -109,6 +116,10 @@ import { PrismaConfigService } from './prismaService/prismaConfigService';
     {
       provide: APP_GUARD,
       useClass: PermissionGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: DemoEnvironmentGuard,
     },
     {
       provide: APP_INTERCEPTOR,

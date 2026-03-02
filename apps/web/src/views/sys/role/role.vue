@@ -1,7 +1,12 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchRoleForm" class="demo-form-inline">
+      <el-form
+        :model="searchRoleForm"
+        class="demo-form-inline"
+        @keydown.enter="onRoleSearch"
+        @submit.prevent
+      >
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
             <el-form-item label="角色名称">
@@ -46,9 +51,9 @@
           </el-table-column>
           <el-table-column prop="sort" align="center" label="排序" />
           <el-table-column prop="createBy" align="center" label="创建人" />
-          <el-table-column prop="createAt" align="center" label="创建时间" width="170">
+          <el-table-column prop="createdAt" align="center" label="创建时间" width="170">
             <template #default="scope">
-              {{ transTime(scope.row.createAt) }}
+              {{ transTime(scope.row.createdAt) }}
             </template>
           </el-table-column>
           <el-table-column prop="remark" align="center" label="备注" />

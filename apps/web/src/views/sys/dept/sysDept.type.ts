@@ -20,11 +20,11 @@ export interface SysDeptListType {
 
   createBy?: string
 
-  createTime?: Date
+  createdAt?: Date
 
   updateBy?: string
 
-  updateTime?: Date
+  updatedAt?: Date
 }
 
 export interface CreateSysDeptType {

@@ -1,7 +1,12 @@
 <template>
   <div class="page-container sysActionLog-container">
     <el-card class="search-bar">
-      <el-form :model="searchSysActionLogForm" :label-width="searchlabelWith">
+      <el-form
+        :model="searchSysActionLogForm"
+        :label-width="searchlabelWith"
+        @keydown.enter="onSysActionLogSearch"
+        @submit.prevent
+      >
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
             <el-form-item label="标题" prop="title">
@@ -10,7 +15,6 @@
                 placeholder="请输入标题"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysActionLogSearch"
               />
             </el-form-item>
           </el-col>
@@ -22,7 +26,6 @@
                 placeholder="请输入操作类型"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysActionLogSearch"
               />
             </el-form-item>
           </el-col>
@@ -34,7 +37,6 @@
                 placeholder="请输入IP"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysActionLogSearch"
               />
             </el-form-item>
           </el-col>
@@ -46,7 +48,6 @@
                 placeholder="请输入地址"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysActionLogSearch"
               />
             </el-form-item>
           </el-col>
@@ -58,7 +59,6 @@
                 placeholder="请输入姓名"
                 clearable
                 style="width: 200px"
-                @keyup.enter="onSysActionLogSearch"
               />
             </el-form-item>
           </el-col>
@@ -124,7 +124,7 @@
 
           <el-table-column label="创建时间" align="center" width="180">
             <template #default="scope">
-              <span>{{ transTime(scope.row.createTime) }}</span>
+              <span>{{ transTime(scope.row.createdAt) }}</span>
             </template>
           </el-table-column>
           <template #empty>

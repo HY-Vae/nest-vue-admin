@@ -55,9 +55,9 @@
           <el-table-column label="模板路径" align="center" prop="tempPath" />
 
           <el-table-column label="创建人" align="center" prop="createBy" />
-          <el-table-column prop="createAt" label="创建时间">
+          <el-table-column prop="createdAt" label="创建时间">
             <template #default="scope">
-              {{ transTime(scope.row.createAt) }}
+              {{ transTime(scope.row.createdAt) }}
             </template>
           </el-table-column>
           <el-table-column label="操作" width="110">

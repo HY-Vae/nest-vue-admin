@@ -55,7 +55,7 @@ export class FileUploadService {
       skip,
       take,
       orderBy: {
-        createTime: 'desc',
+        createdAt: 'desc',
       },
     });
     const totalPromise = this.prisma.fileUpload.count({

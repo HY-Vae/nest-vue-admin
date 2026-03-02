@@ -11,9 +11,9 @@ export interface CurrentUserType {
   userType: null
   remark: null
   createBy: null
-  createAt: Date
+  createdAt: Date
   updateBy: null
-  updateAt: Date
+  updatedAt: Date
   isSuper: boolean
   permissions: string[]
 }

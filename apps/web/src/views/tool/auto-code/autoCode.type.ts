@@ -28,9 +28,9 @@ export interface AutoCodeListType {
 
   createBy?: string
 
-  createTime?: Date
+  createdAt?: Date
 
   updateBy?: string
 
-  updateTime?: Date
+  updatedAt?: Date
 }

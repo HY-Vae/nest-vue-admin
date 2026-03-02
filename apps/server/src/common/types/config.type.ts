@@ -25,6 +25,7 @@ export type GenCodeType = {
 
 export type ConfigType = {
   port: number;
+  isDemo: boolean;
   jwt: JwtConfigType;
   cache: CacheConfigType;
   redis: RedisConfigType;

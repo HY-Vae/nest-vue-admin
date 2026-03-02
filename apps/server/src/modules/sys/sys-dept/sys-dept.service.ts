@@ -14,7 +14,7 @@ export class SysDeptService {
 
   /* 新增 */
   async create(createSysDeptDto: CreateSysDeptDto) {
-    return await this.prisma.sysDept.create({
+    return this.prisma.sysDept.create({
       data: {
         ...createSysDeptDto,
         id: generateUUid(),
@@ -28,10 +28,14 @@ export class SysDeptService {
     const where: Prisma.SysDeptWhereInput = {};
 
     if (query.deptName != undefined) {
-      where.deptName = query.deptName;
+      where.deptName = {
+        contains: query.deptName,
+      };
     }
     if (query.deptCode != undefined) {
-      where.deptCode = query.deptCode;
+      where.deptCode = {
+        contains: query.deptCode,
+      };
     }
     if (query.status != undefined) {
       where.status = query.status;

@@ -11,10 +11,17 @@ const env = (key: string): string => {
 const envNumber = (key: string): number => {
   return Number(process.env[key]);
 };
+// 3. 转换bool值
+const envBoolean = (key: string): boolean => {
+  const value = process.env[key];
+  return value === 'true';
+};
 
 export const getConfig = (): ConfigType => ({
   // 1. 端口
   port: envNumber('APP_PORT'),
+
+  isDemo: envBoolean('IS_DEMO'),
 
   // 2. JWT
   jwt: {

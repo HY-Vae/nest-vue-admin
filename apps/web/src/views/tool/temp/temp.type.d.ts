@@ -11,9 +11,9 @@ export interface TempListType {
   code: string
   tempPath: string
   createBy: string
-  createAt: Date
+  createdAt: Date
   updateBy: string | null
-  updateAt: Date
+  updatedAt: Date
 }
 
 export interface CreateTempType {

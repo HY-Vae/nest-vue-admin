@@ -1,7 +1,8 @@
 <template>
   <div class="page-container <%= camelCase %>-container">
     <el-card class="search-bar">
-      <el-form :model="search<%= pascalCase %>Form" :label-width="searchlabelWith">
+      <el-form :model="search<%= pascalCase %>Form" :label-width="searchlabelWith" @keydown.enter="on<%= pascalCase %>Search"
+               @submit.prevent>
         <el-row :gutter="24">
           <%fields.forEach(function(field){%>
             <% if(field.isSearch){%>

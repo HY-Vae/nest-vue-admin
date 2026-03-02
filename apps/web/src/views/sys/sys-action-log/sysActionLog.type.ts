@@ -23,7 +23,7 @@ export interface SysActionLogListType {
   errorInfo?: string
   status?: string
   createBy?: string
-  createTime?: Date
+  createdAt?: Date
   updateBy?: string
-  updateTime?: Date
+  updatedAt?: Date
 }

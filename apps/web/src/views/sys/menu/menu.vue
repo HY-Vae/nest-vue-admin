@@ -1,7 +1,12 @@
 <template>
   <div class="page-container">
     <el-card class="search-bar">
-      <el-form :model="searchMenuForm" class="demo-form-inline">
+      <el-form
+        :model="searchMenuForm"
+        class="demo-form-inline"
+        @keydown.enter="onMenuSearch"
+        @submit.prevent
+      >
         <el-row :gutter="24">
           <el-col v-bind="searchSpan">
             <el-form-item label="菜单名称">
@@ -43,9 +48,9 @@
           <el-table-column prop="status" label="菜单状态" />
           <el-table-column prop="sort" label="排序" />
           <el-table-column prop="createBy" label="创建人" />
-          <el-table-column prop="createAt" label="创建时间">
+          <el-table-column prop="createdAt" label="创建时间">
             <template #default="scope">
-              {{ transTime(scope.row.createAt) }}
+              {{ transTime(scope.row.createdAt) }}
             </template>
           </el-table-column>
           <el-table-column prop="remark" label="备注" />
