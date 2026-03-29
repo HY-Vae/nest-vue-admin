@@ -42,6 +42,15 @@ export function deleteFileUploadApi(id: string): Promise<Result> {
   })
 }
 
+export function deleteFileUploadByUrlApi(url: string): Promise<Result> {
+  return request('/upload/file/by-url', {
+    method: 'DELETE',
+    data: {
+      url,
+    },
+  })
+}
+
 export function deleteFileUploadsApi(ids: string[]): Promise<Result> {
   return request(`/upload/file`, {
     method: 'DELETE',

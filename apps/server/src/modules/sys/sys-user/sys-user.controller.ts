@@ -1,6 +1,8 @@
 import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
+import { User } from '@/common/decorators/user.decorator';
 import { ActionEnum } from '@/common/enums/action.enum';
+import type { CurrentUserType } from '@/common/types/auth.type';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
@@ -74,7 +76,7 @@ export class SysUserController {
   @Action({ title: '删除用户', action: ActionEnum.REMOVE })
   @Permission('sys:user:remove')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sysUserService.remove(id);
+  remove(@Param('id') id: string, @User() user: CurrentUserType) {
+    return this.sysUserService.remove(id, user.id);
   }
 }

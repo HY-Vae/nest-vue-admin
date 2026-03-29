@@ -4,8 +4,13 @@ import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
 import type { CreateUserType, UserDetailType } from '@/views/sys/user/user.type'
-import type { FormInstance } from 'element-plus'
+import type { FormInstance, UploadInstance, UploadProps } from 'element-plus'
+import { UPLOAD_API } from '@/constants/constant.ts'
+import { Plus, CircleClose } from '@element-plus/icons-vue'
 import { computed, ref, watch, type PropType } from 'vue'
+import { deleteFileUploadByUrlApi } from '@/views/upload/file/service'
+import { useRequest } from 'vue-request'
+
 const props = defineProps({
   action: {
     type: String as PropType<ActionEnum>,
@@ -53,6 +58,9 @@ const userForm = ref<CreateUserType>({
   userType: '',
 })
 
+// 待删除的头像URL列表
+const pendingDeleteAvatars = ref<string[]>([])
+
 const rules = {
   userName: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
@@ -68,12 +76,32 @@ const rules = {
   remark: [{ max: 255, message: '长度不能超过255个字符', trigger: 'change' }],
 }
 const cancel = () => {
+  // 取消时清空待删除列表
+  pendingDeleteAvatars.value = []
   visible.value = false
   emits('cancel')
 }
+
+// 删除文件的请求
+const { runAsync: runDeleteFile } = useRequest(
+  (url: string) => deleteFileUploadByUrlApi(url),
+  { manual: true }
+)
+
 const confirm = () => {
-  userFormRef.value?.validate((valid) => {
+  userFormRef.value?.validate(async (valid) => {
     if (valid) {
+      // 处理待删除的头像
+      if (pendingDeleteAvatars.value.length > 0) {
+        for (const url of pendingDeleteAvatars.value) {
+          try {
+            await runDeleteFile(url)
+          } catch (e) {
+            console.error('删除头像失败:', e)
+          }
+        }
+        pendingDeleteAvatars.value = []
+      }
       emits('confirm', userForm.value)
     }
   })
@@ -93,6 +121,7 @@ const closeDialog = () => {
     userName: '',
     userType: '',
   }
+  pendingDeleteAvatars.value = []
 }
 
 const title = computed(() => {
@@ -121,6 +150,60 @@ watch(
     }
   },
 )
+
+// 头像上传相关
+const uploadRef = ref<UploadInstance>()
+const uploadLoading = ref(false)
+
+const headers = computed(() => {
+  return {
+    Authorization: `Bearer ${localStorage.getItem('token')}`,
+  }
+})
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  const isImage = rawFile.type.startsWith('image/')
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件!')
+    return false
+  }
+  const isLt2M = rawFile.size / 1024 / 1024 < 2
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB!')
+    return false
+  }
+  uploadLoading.value = true
+  return true
+}
+
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response: any) => {
+  uploadLoading.value = false
+  if (response.code === 200) {
+    // 如果有旧头像，加入待删除列表
+    if (userForm.value.avatar) {
+      pendingDeleteAvatars.value.push(userForm.value.avatar)
+    }
+    // 保存新的头像URL
+    userForm.value.avatar = response.data.url
+    ElMessage.success('头像上传成功')
+  } else {
+    ElMessage.error(response.message || '上传失败')
+  }
+}
+
+const handleAvatarError = () => {
+  uploadLoading.value = false
+  ElMessage.error('头像上传失败')
+}
+
+// 删除头像
+const handleRemoveAvatar = () => {
+  // 如果有头像，加入待删除列表
+  if (userForm.value.avatar) {
+    pendingDeleteAvatars.value.push(userForm.value.avatar)
+  }
+  userForm.value.avatar = ''
+}
 </script>
 
 <template>
@@ -141,6 +224,41 @@ watch(
       :rules="rules"
     >
       <el-row :gutter="12">
+        <!-- 头像上传 -->
+        <el-col :span="24">
+          <el-form-item label="头像" :label-width="formLabelWidth">
+            <div class="avatar-upload-container">
+              <el-upload
+                ref="uploadRef"
+                class="avatar-uploader"
+                :action="UPLOAD_API"
+                :headers="headers"
+                :show-file-list="false"
+                :before-upload="beforeAvatarUpload"
+                :on-success="handleAvatarSuccess"
+                :on-error="handleAvatarError"
+              >
+                <div class="avatar-wrapper">
+                  <img v-if="userForm.avatar" :src="userForm.avatar" class="avatar" />
+                  <el-icon v-else class="avatar-uploader-icon" :class="{ 'is-loading': uploadLoading }">
+                    <Plus v-if="!uploadLoading" />
+                    <span v-else class="loading-spinner"></span>
+                  </el-icon>
+                  <!-- 删除按钮 - 悬浮在右上角 -->
+                  <div
+                    v-if="userForm.avatar"
+                    class="avatar-delete-btn"
+                    @click.stop.prevent="handleRemoveAvatar"
+                  >
+                    <el-icon :size="14"><CircleClose /></el-icon>
+                  </div>
+                </div>
+              </el-upload>
+            </div>
+            <div class="el-upload__tip">只能上传图片，且不超过 2MB</div>
+          </el-form-item>
+        </el-col>
+
         <el-col v-bind="formSpan">
           <el-form-item label="用户名" :label-width="formLabelWidth" prop="userName">
             <el-input v-model="userForm.userName" autocomplete="off" />
@@ -181,15 +299,6 @@ watch(
         </el-col>
         <el-col v-bind="formSpan">
           <el-form-item label="用户角色" :label-width="formLabelWidth" prop="menus">
-            <!--            <el-select-->
-            <!--              multiple-->
-            <!--              collapse-tags-->
-            <!--              collapse-tags-tooltip-->
-            <!--              show-checkbox-->
-            <!--              v-model="userForm.roleIds"-->
-            <!--            >-->
-            <!--              <el-option v-for="item in roleOptions" :label="item.label" :value="item.value" />-->
-            <!--            </el-select>-->
             <el-tree-select
               multiple
               collapse-tags
@@ -230,4 +339,95 @@ watch(
   </el-dialog>
 </template>
 
-<style scoped></style>
+<style scoped>
+.avatar-upload-container {
+  display: inline-block;
+}
+
+.avatar-uploader :deep(.el-upload) {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader :deep(.el-upload:hover) {
+  border-color: var(--el-color-primary);
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: visible;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  display: block;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.avatar-delete-btn {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 22px;
+  height: 22px;
+  background-color: #f56c6c;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.avatar-wrapper:hover .avatar-delete-btn {
+  opacity: 1;
+}
+
+.avatar-delete-btn:hover {
+  transform: scale(1.1);
+  background-color: #f78989;
+}
+
+.el-upload__tip {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  margin-top: 7px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--el-color-primary);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>

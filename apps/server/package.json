@@ -96,7 +96,12 @@
     "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig.json"
+        }
+      ]
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
@@ -104,12 +109,10 @@
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
     "roots": [
-      "<rootDir>/src/",
-      "<rootDir>/libs/"
+      "<rootDir>/src/"
     ],
     "moduleNameMapper": {
-      "^@app/config(|/.*)$": "<rootDir>/libs/config/src/$1",
-      "^@app/utils(|/.*)$": "<rootDir>/libs/utils/src/$1"
+      "^@/(.*)$": "<rootDir>/src/$1"
     }
   }
 }

@@ -59,55 +59,59 @@
     </el-card>
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="primary" :icon="Plus" v-auth="['sys:dept:create']" @click="addSysDept"
+        <el-button type="primary" :icon="Plus" v-auth="'sys:dept:create'" @click="addSysDept"
           >新增</el-button
         >
-        <el-button
-          type="danger"
-          :icon="Delete"
-          v-auth="['sys:dept:removes']"
-          :disabled="!selectedSysDeptIds.length"
-          @click="delSysDepts(DeleteEnum.Multiple)"
-        >
-          批量删除
-        </el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
-        <el-table :data="tableData" border row-key="id" @selection-change="sysDeptSelectionChange">
-          <el-table-column type="selection" width="55" align="center" />
+        <el-table
+          :data="tableData"
+          border
+          row-key="id"
+          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+          default-expand-all
+        >
+          <el-table-column label="部门名称" prop="deptName" min-width="180" />
 
-          <el-table-column label="部门名称" align="center" prop="deptName" />
+          <el-table-column label="部门编码" align="center" prop="deptCode" width="120" />
 
-          <el-table-column label="部门编码" align="center" prop="deptCode" />
+          <el-table-column label="排序" align="center" prop="sort" width="80" />
 
-          <el-table-column label="启用状态" align="center" prop="status">
+          <el-table-column label="启用状态" align="center" prop="status" width="100">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}
             </template>
           </el-table-column>
 
-          <el-table-column label="创建人" align="center" prop="createBy" />
+          <el-table-column label="创建人" align="center" prop="createBy" width="100" />
 
-          <el-table-column label="创建时间" align="center" width="180">
+          <el-table-column label="创建时间" align="center" width="170">
             <template #default="scope">
               <span>{{ transTime(scope.row.createdAt) }}</span>
             </template>
           </el-table-column>
 
-          <el-table-column label="操作" width="110">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="scope">
               <el-button
                 type="primary"
-                v-auth="['sys:dept:update']"
+                v-auth="'sys:dept:create'"
+                link
+                @click="addChildSysDept(scope.row)"
+                >新增</el-button
+              >
+              <el-button
+                type="primary"
+                v-auth="'sys:dept:update'"
                 link
                 @click="updateSysDept(scope.row)"
                 >修改</el-button
               >
               <el-button
                 type="danger"
-                v-auth="['sys:dept:remove']"
+                v-auth="'sys:dept:remove'"
                 link
-                @click="delSysDepts(DeleteEnum.Single, scope.row)"
+                @click="delSysDept(scope.row)"
                 >删除</el-button
               >
             </template>
@@ -117,25 +121,13 @@
           </template>
         </el-table>
       </div>
-
-      <el-row justify="end">
-        <el-pagination
-          class="table-pagination"
-          v-model:current-page="searchSysDeptForm.current"
-          v-model:page-size="searchSysDeptForm.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </el-row>
     </el-card>
-    <sysDept-dialog
+    <sys-dept-dialog
       :action="action"
       :loading="actionLoading"
       :detailLoading="detailLoading"
       :current="currentSysDept"
+      :deptTree="tableData"
       v-model="visible"
       @cancel="cancelDialog"
       @confirm="runActionSysDept"
@@ -143,19 +135,19 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
+import { ActionEnum } from '@/enums/common.ts'
 import { transTime } from '@/utils/util.ts'
-import { Delete, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import { useRequest } from 'vue-request'
 import {
   addSysDeptApi,
-  deleteSysDeptsApi,
+  deleteSysDeptApi,
   getSysDeptApi,
   getSysDeptOneApi,
   updateSysDeptApi,
 } from './service.ts'
-import type { CreateSysDeptType, SysDeptListType, UpdateSysDeptType } from './sysDept.type.ts'
+import type { CreateSysDeptType, SysDeptListType, UpdateSysDeptType } from './sysDept.type'
 import SysDeptDialog from './SysDeptDialog.vue'
 
 import { useDict } from '@/hooks/dict.hook.ts'
@@ -180,12 +172,9 @@ const searchSysDeptForm = ref({
   deptName: undefined,
   deptCode: undefined,
   status: undefined,
-  current: 1,
-  pageSize: 20,
 })
 
 const onSysDeptSearch = () => {
-  searchSysDeptForm.value.current = 1
   runGetSysDept()
 }
 
@@ -194,14 +183,11 @@ const onSysDeptReset = () => {
     deptName: undefined,
     deptCode: undefined,
     status: undefined,
-    current: 1,
-    pageSize: 20,
   }
   runGetSysDept()
 }
 
 const tableData = ref<SysDeptListType[]>([])
-const total = ref(0)
 
 const { loading: queryLoading, run: runGetSysDept } = useRequest(
   () => {
@@ -214,18 +200,9 @@ const { loading: queryLoading, run: runGetSysDept } = useRequest(
     loadingKeep: 500,
     onSuccess: (res) => {
       tableData.value = res.data.list
-      total.value = res.data.total
     },
   },
 )
-
-const handleSizeChange = () => {
-  runGetSysDept()
-}
-
-const handleCurrentChange = () => {
-  runGetSysDept()
-}
 
 const visible = ref<boolean>(false)
 const action = ref<ActionEnum>(ActionEnum.Add)
@@ -233,27 +210,40 @@ const action = ref<ActionEnum>(ActionEnum.Add)
 const addSysDept = () => {
   action.value = ActionEnum.Add
   currentSysDept.value = undefined
+  parentId.value = undefined
+  visible.value = true
+}
+
+const addChildSysDept = (row: SysDeptListType) => {
+  action.value = ActionEnum.Add
+  currentSysDept.value = undefined
+  parentId.value = row.id
   visible.value = true
 }
 
 const cancelDialog = () => {}
 
+const parentId = ref<string | undefined>(undefined)
+
 const { loading: actionLoading, run: runActionSysDept } = useRequest(
   (values: CreateSysDeptType | UpdateSysDeptType) => {
     if (action.value === ActionEnum.Add) {
-      return addSysDeptApi(values as CreateSysDeptType)
+      const createData = { ...values, parentId: parentId.value } as CreateSysDeptType
+      return addSysDeptApi(createData)
     }
     return updateSysDeptApi(values as UpdateSysDeptType)
   },
   {
     loadingKeep: 500,
-    onSuccess: (res) => {
+    onSuccess: () => {
       visible.value = false
       const message = action.value === ActionEnum.Add ? '新增部门成功' : '修改部门成功'
       ElMessage.success(message)
+      runGetSysDept()
     },
   },
 )
+
 const currentSysDept = ref<SysDeptListType | undefined>(undefined)
 const { loading: detailLoading, run: runGetSysDeptOne } = useRequest(getSysDeptOneApi, {
   loadingKeep: 500,
@@ -264,25 +254,17 @@ const { loading: detailLoading, run: runGetSysDeptOne } = useRequest(getSysDeptO
 
 const updateSysDept = (row: SysDeptListType) => {
   action.value = ActionEnum.Edit
+  parentId.value = undefined
   visible.value = true
   runGetSysDeptOne(row.id)
 }
 
-const { runAsync: runDeleteSysDepts } = useRequest(deleteSysDeptsApi, {
+const { runAsync: runDeleteSysDept } = useRequest(deleteSysDeptApi, {
   loadingKeep: 500,
 })
 
-const delSysDepts = (action: DeleteEnum, row?: SysDeptListType) => {
-  let message = '此操作将永久删除该部门, 是否继续?'
-  let ids: string[] = []
-  if (action === DeleteEnum.Single && row != undefined) {
-    ids = [row.id]
-  }
-  if (action === DeleteEnum.Multiple) {
-    message = `此操作将永久批量删除当前${selectedSysDeptIds.value.length}个部门, 是否继续?`
-    ids = selectedSysDeptIds.value
-  }
-  ElMessageBox.confirm(message, '提示', {
+const delSysDept = (row: SysDeptListType) => {
+  ElMessageBox.confirm('此操作将永久删除该部门, 是否继续?', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
@@ -290,9 +272,8 @@ const delSysDepts = (action: DeleteEnum, row?: SysDeptListType) => {
       if (action === 'confirm') {
         instance.confirmButtonLoading = true
         instance.confirmButtonText = '正在删除...'
-        runDeleteSysDepts(ids)
+        runDeleteSysDept(row.id)
           .then(() => {
-            selectedSysDeptIds.value = []
             instance.confirmButtonLoading = false
             instance.confirmButtonText = '确定'
             done()
@@ -310,13 +291,8 @@ const delSysDepts = (action: DeleteEnum, row?: SysDeptListType) => {
     runGetSysDept()
   })
 }
-
-const selectedSysDeptIds = ref<string[]>([])
-const sysDeptSelectionChange = (sysDepts: SysDeptListType[]) => {
-  selectedSysDeptIds.value = sysDepts.map((sysDept) => sysDept.id)
-}
 </script>
 <style scoped lang="scss">
-.sysDept-container {
+.page-container {
 }
 </style>

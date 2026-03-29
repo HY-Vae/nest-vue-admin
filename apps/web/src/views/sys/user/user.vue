@@ -44,7 +44,18 @@
           <el-table-column type="index" label="序号" width="80" />
           <el-table-column prop="userName" label="用户名" />
           <el-table-column prop="nickName" label="昵称" />
-          <el-table-column prop="avatar" label="头像" />
+          <el-table-column label="头像" width="70" align="center">
+            <template #default="scope">
+              <el-avatar
+                v-if="scope.row.avatar"
+                :src="scope.row.avatar"
+                :size="36"
+              />
+              <el-avatar v-else :size="36" class="avatar-placeholder">
+                {{ scope.row.nickName?.charAt(0)?.toUpperCase() || 'U' }}
+              </el-avatar>
+            </template>
+          </el-table-column>
           <el-table-column prop="status" label="用户状态">
             <template #default="scope">
               {{ getDictLabel(enableStatusOptions, scope.row.status) }}

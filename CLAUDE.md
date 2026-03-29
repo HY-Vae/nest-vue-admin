@@ -64,3 +64,11 @@ throw new ApiException('错误信息');  // 业务错误
 2. **Red** → 编写失败测试（Mock Prisma/Redis）
 3. **Green** → 最小实现代码通过测试
 4. **Refactor** → 优化结构 + 关键注释
+
+## 字典表使用
+
+当需要状态、类型等枚举数据时，**必须使用字典表**，不要在代码中硬编码。
+
+## 前端
+1. 表单元素增加clearable属性，下拉框数据增加filterable，textarea的时候增加字数显示，
+2. 当类型为字符串的时候，应该增加长度的限制，长度为prisma Model中的长度定义

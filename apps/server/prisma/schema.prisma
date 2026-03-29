@@ -174,8 +174,14 @@ model SysDept {
   deptName  String    @unique @map("dept_name") @db.VarChar(30)
   /// 部门编码
   deptCode  String    @unique @map("dept_code") @db.VarChar(20)
+  /// 父级部门ID
+  parentId  String?   @map("parent_id") @db.VarChar(36)
+  /// 排序
+  sort      Int       @default(0) @map("sort")
   /// 启用状态
   status    String    @map("status") @db.VarChar(191)
+  /// 备注
+  remark    String?   @map("remark") @db.VarChar(255)
   /// 创建人
   createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
@@ -184,6 +190,11 @@ model SysDept {
   updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
   updatedAt DateTime? @updatedAt @map("updated_at")
+
+  /// 父级部门
+  parent    SysDept?  @relation("DeptTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  /// 子部门
+  children  SysDept[] @relation("DeptTree")
 
   @@map("sys_dept")
 }

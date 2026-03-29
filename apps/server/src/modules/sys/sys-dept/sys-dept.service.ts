@@ -1,3 +1,4 @@
+import { ApiException } from '@/common/exceptions/api.exception';
 import { generateUUid } from '@/utils/util';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -6,7 +7,7 @@ import {
   CreateSysDeptDto,
   GetSysDeptListDto,
   UpdateSysDeptDto,
-} from './dto/req-sysDept.dto';
+} from './dto/req-sys-dept.dto';
 
 @Injectable()
 export class SysDeptService {
@@ -14,17 +15,29 @@ export class SysDeptService {
 
   /* 新增 */
   async create(createSysDeptDto: CreateSysDeptDto) {
+    const { parentId, ...other } = createSysDeptDto;
+
+    // 校验父级部门是否存在
+    if (parentId) {
+      const parent = await this.prisma.sysDept.findUnique({
+        where: { id: parentId },
+      });
+      if (!parent) {
+        throw new ApiException('父级部门不存在');
+      }
+    }
+
     return this.prisma.sysDept.create({
       data: {
-        ...createSysDeptDto,
+        ...other,
         id: generateUUid(),
+        parentId: parentId || null,
       },
     });
   }
 
-  /* 列表查询 */
+  /* 列表查询（返回树形结构） */
   async findAll(query: GetSysDeptListDto) {
-    const { skip, take } = query;
     const where: Prisma.SysDeptWhereInput = {};
 
     if (query.deptName != undefined) {
@@ -41,56 +54,80 @@ export class SysDeptService {
       where.status = query.status;
     }
 
-    const listPromise = this.prisma.sysDept.findMany({
+    // 查询所有部门
+    const list = await this.prisma.sysDept.findMany({
       where,
-      skip,
-      take,
+      orderBy: { sort: 'asc' },
     });
-    const totalPromise = this.prisma.sysDept.count({
-      where,
-    });
-    const [list, total] = await Promise.all([listPromise, totalPromise]);
+
+    // 构建树形结构
+    const tree = this.buildTree(list);
+
     return {
-      list,
-      total,
+      list: tree,
+      total: list.length,
     };
+  }
+
+  /* 构建树形结构 */
+  private buildTree(
+    list: any[],
+    parentId: string | null = null,
+  ): any[] {
+    return list
+      .filter((item) => item.parentId === parentId)
+      .map((item) => ({
+        ...item,
+        children: this.buildTree(list, item.id),
+      }));
   }
 
   /* 通过id查询 */
   async findOne(id: string) {
     return this.prisma.sysDept.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
   /* 更新 */
   async update(id: string, updateSysDeptDto: UpdateSysDeptDto) {
-    return await this.prisma.sysDept.update({
-      where: {
-        id,
+    const { parentId, ...other } = updateSysDeptDto;
+
+    // 校验：父级不能是自己
+    if (parentId === id) {
+      throw new ApiException('父级部门不能是自己');
+    }
+
+    return this.prisma.sysDept.update({
+      where: { id },
+      data: {
+        ...other,
+        parentId: parentId || null,
       },
-      data: updateSysDeptDto,
     });
   }
 
   /* 删除 */
   async remove(id: string) {
-    return await this.prisma.sysDept.delete({
-      where: {
-        id,
-      },
+    // 检查是否有子部门
+    const childCount = await this.prisma.sysDept.count({
+      where: { parentId: id },
+    });
+
+    if (childCount > 0) {
+      throw new ApiException('该部门下存在子部门，无法删除');
+    }
+
+    return this.prisma.sysDept.delete({
+      where: { id },
     });
   }
 
   /* 批量删除 */
   async removes(ids: string[]) {
-    return await this.prisma.sysDept.deleteMany({
+    return this.prisma.sysDept.deleteMany({
       where: {
-        id: {
-          in: ids,
-        },
+        id: { in: ids },
       },
     });
   }

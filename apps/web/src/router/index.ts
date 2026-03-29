@@ -65,6 +65,14 @@ const router = createRouter({
     //   component: () => import('../views/tool/gen/gen.vue'),
     // },
     {
+      path: '/no-permission',
+      name: 'NoPermission',
+      component: () => import('../views/error/NoPermission.vue'),
+      meta: {
+        title: '无权限',
+      },
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting

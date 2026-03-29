@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import Avatar from '@/components/header/Avatar.vue'
 import router from '@/router'
+import { useUserStore } from '@/stores/modules/user.ts'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const userStore = useUserStore()
 
 const handleCommadn = (command: string) => {
   switch (command) {
     case 'layout':
-      localStorage.removeItem('token')
+      userStore.logout()
       const fullPath = route.fullPath
       router.push(`/auth/login?redirect=${fullPath}`)
       return

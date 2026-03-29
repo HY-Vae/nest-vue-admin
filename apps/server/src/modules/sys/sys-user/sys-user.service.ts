@@ -134,7 +134,26 @@ export class SysUserService {
     return user;
   }
 
-  async remove(id: string) {
+  async remove(id: string, currentUserId: string) {
+    // 不能删除自己
+    if (id === currentUserId) {
+      throw new ApiException('不能删除自己');
+    }
+
+    const user = await this.prisma.sysUser.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new ApiException('用户不存在');
+    }
+
+    // 不能删除超级管理员
+    if (user.userName === 'admin') {
+      throw new ApiException('不能删除超级管理员');
+    }
+
+    // 检查角色关联
     const role = await this.prisma.sysRole.findFirst({
       where: {
         users: {
@@ -147,6 +166,7 @@ export class SysUserService {
     if (role) {
       throw new ApiException('该用户已分配角色，请先解除角色分配');
     }
+
     return this.prisma.sysUser.delete({
       where: {
         id,

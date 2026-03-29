@@ -7,8 +7,8 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import {
@@ -21,7 +21,7 @@ import {
   CreateSysDeptDto,
   GetSysDeptListDto,
   UpdateSysDeptDto,
-} from './dto/req-sysDept.dto';
+} from './dto/req-sys-dept.dto';
 import { SysDeptService } from './sys-dept.service';
 
 @ApiTags('部门')
@@ -61,7 +61,7 @@ export class SysDeptController {
   }
 
   /* 更新 */
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({
     summary: '更新部门',
   })

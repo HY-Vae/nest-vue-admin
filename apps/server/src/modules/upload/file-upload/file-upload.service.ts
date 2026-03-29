@@ -115,4 +115,23 @@ export class FileUploadService {
       },
     });
   }
+
+  /* 根据url删除 */
+  async removeByUrl(url: string) {
+    const file = await this.prisma.fileUpload.findFirst({
+      where: { url },
+    });
+
+    if (!file) {
+      throw new ApiException('文件不存在');
+    }
+    // 用 key 删除文件
+    await this.store.delete(file.key);
+    // 删除数据库记录
+    await this.prisma.fileUpload.delete({
+      where: {
+        id: file.id,
+      },
+    });
+  }
 }

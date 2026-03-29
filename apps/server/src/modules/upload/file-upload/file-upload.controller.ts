@@ -87,6 +87,16 @@ export class FileUploadController {
     return this.fileUploadService.update(id, updateFileUploadDto);
   }
 
+  /* 根据url删除 - 必须放在 :id 路由之前 */
+  @Delete('by-url')
+  @ApiOperation({
+    summary: '根据url删除附件',
+  })
+  @Permission('upload:file:remove')
+  async removeByUrl(@Body('url') url: string) {
+    return this.fileUploadService.removeByUrl(url);
+  }
+
   /* 单个删除 */
   @Delete(':id')
   @ApiOperation({
