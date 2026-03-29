@@ -111,7 +111,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { addMenuApi, deleteMenuApi, getMenuApi, getMenuOneApi, updateMenuApi } from '@/api/menu.ts'
+import { addMenuApi, deleteMenuApi, getMenuApi, getMenuOneApi, updateMenuApi } from './service.ts'
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'

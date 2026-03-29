@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getRoleOptionsApi } from '@/api/role.ts'
+import { getRoleOptionsApi } from '@/views/sys/role/service.ts'
 import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'

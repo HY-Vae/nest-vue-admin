@@ -6,7 +6,7 @@ import type {
   MenuListType,
   QueryMenuType,
   UpdateMenuType,
-} from '@/views/sys/menu/menu.type'
+} from './menu.type'
 
 export function getMenuApi(params: QueryMenuType): Promise<ListResult<MenuListType>> {
   return request('/sys/menu', {

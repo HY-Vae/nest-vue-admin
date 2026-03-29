@@ -101,7 +101,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { addRoleApi, deleteRoleApi, getRoleApi, getRoleOneApi, updateRoleApi } from '@/api/role.ts'
+import { addRoleApi, deleteRoleApi, getRoleApi, getRoleOneApi, updateRoleApi } from './service.ts'
 import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
