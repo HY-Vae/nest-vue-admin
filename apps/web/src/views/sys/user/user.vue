@@ -122,9 +122,10 @@ import type {
 } from '@/views/sys/user/user.type'
 import UserDialog from '@/views/sys/user/UserDialog.vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { addUserApi, deleteUserApi, getUserApi, getUserOneApi, updateUserApi } from './service.ts'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -141,25 +142,26 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchUserForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   name: '',
   status: '',
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchUserForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchUserForm)
 
 const onUserSearch = () => {
-  searchUserForm.value.current = 1
+  searchUserForm.current = 1
   runGetUser()
 }
 
 const onUserReset = () => {
-  searchUserForm.value = {
-    name: '',
-    status: '',
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetUser()
 }
 
@@ -169,7 +171,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetUser } = useRequest(
   () => {
     return getUserApi({
-      ...searchUserForm.value,
+      ...searchUserForm,
     })
   },
   {

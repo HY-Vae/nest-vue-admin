@@ -109,8 +109,9 @@ import { transTime } from '@/utils/util.ts'
 import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
 import RoleDialog from '@/views/sys/role/RoleDialog.vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -127,25 +128,26 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchRoleForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   name: '',
   status: '',
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchRoleForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchRoleForm)
 
 const onRoleSearch = () => {
-  searchRoleForm.value.current = 1
+  searchRoleForm.current = 1
   runGetRole()
 }
 
 const onRoleReset = () => {
-  searchRoleForm.value = {
-    name: '',
-    status: '',
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetRole()
 }
 
@@ -155,7 +157,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetRole } = useRequest(
   () => {
     return getRoleApi({
-      ...searchRoleForm.value,
+      ...searchRoleForm,
     })
   },
   {

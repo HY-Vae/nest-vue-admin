@@ -42,6 +42,8 @@ const handleClickOutside = (e: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  // 页面刷新后滚动到激活的 tab
+  scrollToActiveTab()
 })
 
 onUnmounted(() => {

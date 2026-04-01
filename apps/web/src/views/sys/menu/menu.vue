@@ -124,8 +124,9 @@ import type {
 } from '@/views/sys/menu/menu.type'
 import MenuDialog from '@/views/sys/menu/MenuDialog.vue'
 import { Plus } from '@element-plus/icons-vue'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -142,25 +143,26 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchMenuForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   name: '',
   status: '',
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchMenuForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchMenuForm)
 
 const onMenuSearch = () => {
-  searchMenuForm.value.current = 1
+  searchMenuForm.current = 1
   runGetMenu()
 }
 
 const onMenuReset = () => {
-  searchMenuForm.value = {
-    name: '',
-    status: '',
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetMenu()
 }
 
@@ -170,7 +172,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetMenu } = useRequest(
   () => {
     return getMenuApi({
-      ...searchMenuForm.value,
+      ...searchMenuForm,
     })
   },
   {

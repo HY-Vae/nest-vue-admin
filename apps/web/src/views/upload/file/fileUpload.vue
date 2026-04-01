@@ -164,7 +164,7 @@
 import { ActionEnum, DeleteEnum } from '@/enums/common.ts'
 import { transTime } from '@/utils/util.ts'
 import { Delete, UploadFilled } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import type { FileUploadListType } from './fileUpload.type'
 import FileUploadDialog from './FileUploadDialog.vue'
@@ -174,6 +174,7 @@ import {
   getFileUploadApi,
   getFileUploadOneApi,
 } from './service'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const searchSpan = ref({
   xs: 24,
@@ -183,16 +184,22 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchFileUploadForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   name: undefined,
   tag: undefined,
   mime: undefined,
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchFileUploadForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchFileUploadForm)
 
 const onFileUploadSearch = () => {
-  searchFileUploadForm.value.current = 1
+  searchFileUploadForm.current = 1
   runGetFileUpload()
 }
 
@@ -213,13 +220,7 @@ const formatBytes = (bytes: number, decimals: number = 2): string => {
 }
 
 const onFileUploadReset = () => {
-  searchFileUploadForm.value = {
-    name: undefined,
-    tag: undefined,
-    mime: undefined,
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetFileUpload()
 }
 
@@ -229,7 +230,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetFileUpload } = useRequest(
   () => {
     return getFileUploadApi({
-      ...searchFileUploadForm.value,
+      ...searchFileUploadForm,
     })
   },
   {

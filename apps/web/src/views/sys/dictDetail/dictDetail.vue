@@ -126,7 +126,7 @@ import type {
 } from '@/views/sys/dictDetail/dictDetail.type'
 import DictDetailDialog from '@/views/sys/dictDetail/DictDetailDialog.vue'
 import { Delete, Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { useRoute } from 'vue-router'
 import {
@@ -137,6 +137,7 @@ import {
   getDictDetailOneApi,
   updateDictDetailApi,
 } from './service.ts'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -155,25 +156,26 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchDictDetailForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   label: '',
   status: '',
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchDictDetailForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchDictDetailForm)
 
 const onDictDetailSearch = () => {
-  searchDictDetailForm.value.current = 1
+  searchDictDetailForm.current = 1
   runGetDictDetail()
 }
 
 const onDictDetailReset = () => {
-  searchDictDetailForm.value = {
-    label: '',
-    status: '',
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetDictDetail()
 }
 
@@ -183,7 +185,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetDictDetail } = useRequest(
   () => {
     return getDictDetailApi({
-      ...searchDictDetailForm.value,
+      ...searchDictDetailForm,
       sysDictCode: route.params.code as string,
     })
   },

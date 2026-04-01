@@ -138,7 +138,7 @@
 import { ActionEnum } from '@/enums/common.ts'
 import { transTime } from '@/utils/util.ts'
 import { Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import {
   addSysDeptApi,
@@ -152,6 +152,7 @@ import SysDeptDialog from './SysDeptDialog.vue'
 
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -168,22 +169,24 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchSysDeptForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   deptName: undefined,
   deptCode: undefined,
   status: undefined,
-})
+}
+
+const searchSysDeptForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchSysDeptForm)
 
 const onSysDeptSearch = () => {
   runGetSysDept()
 }
 
 const onSysDeptReset = () => {
-  searchSysDeptForm.value = {
-    deptName: undefined,
-    deptCode: undefined,
-    status: undefined,
-  }
+  resetSearchParams(initialSearchForm)
   runGetSysDept()
 }
 
@@ -192,7 +195,7 @@ const tableData = ref<SysDeptListType[]>([])
 const { loading: queryLoading, run: runGetSysDept } = useRequest(
   () => {
     return getSysDeptApi({
-      ...searchSysDeptForm.value,
+      ...searchSysDeptForm,
     })
   },
   {

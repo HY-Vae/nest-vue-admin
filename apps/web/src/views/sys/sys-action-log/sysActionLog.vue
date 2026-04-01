@@ -149,13 +149,14 @@
 </template>
 <script setup lang="ts">
 import { transTime } from '@/utils/util.ts'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { getSysActionLogApi } from './service'
 import type { SysActionLogListType } from './sysActionLog.type'
 
 import { useDict } from '@/hooks/dict.hook'
 import type { SelectOptionItem } from '@/types/global'
+import { useSearchParams } from '@/composables/useSearchParams'
 
 const { getDictOptions, getDictLabel } = useDict()
 
@@ -174,35 +175,30 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchSysActionLogForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   title: undefined,
   action: undefined,
   ip: undefined,
   address: undefined,
   userName: undefined,
   status: undefined,
-
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchSysActionLogForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchSysActionLogForm)
 
 const onSysActionLogSearch = () => {
-  searchSysActionLogForm.value.current = 1
+  searchSysActionLogForm.current = 1
   runGetSysActionLog()
 }
 
 const onSysActionLogReset = () => {
-  searchSysActionLogForm.value = {
-    title: undefined,
-    action: undefined,
-    ip: undefined,
-    address: undefined,
-    userName: undefined,
-    status: undefined,
-
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetSysActionLog()
 }
 
@@ -212,7 +208,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetSysActionLog } = useRequest(
   () => {
     return getSysActionLogApi({
-      ...searchSysActionLogForm.value,
+      ...searchSysActionLogForm,
     })
   },
   {

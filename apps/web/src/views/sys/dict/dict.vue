@@ -116,9 +116,11 @@ import { transTime } from '@/utils/util.ts'
 import type { CreateDictType, DictListType, UpdateDictType } from '@/views/sys/dict/dict.type'
 import DictDialog from '@/views/sys/dict/DictDialog.vue'
 import { Plus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import { addDictApi, deleteDictApi, getDictApi, getDictOneApi, updateDictApi } from './service.ts'
+import { useSearchParams } from '@/composables/useSearchParams'
+
 const { getDictOptions, getDictLabel } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
@@ -133,25 +135,26 @@ const searchSpan = ref({
   xl: 4,
 })
 
-const searchDictForm = ref({
+// 初始搜索条件
+const initialSearchForm = {
   name: '',
   status: '',
   current: 1,
   pageSize: 20,
-})
+}
+
+const searchDictForm = reactive({ ...initialSearchForm })
+
+// 搜索条件保存恢复
+const { reset: resetSearchParams } = useSearchParams(searchDictForm)
 
 const onDictSearch = () => {
-  searchDictForm.value.current = 1
+  searchDictForm.current = 1
   runGetDict()
 }
 
 const onDictReset = () => {
-  searchDictForm.value = {
-    name: '',
-    status: '',
-    current: 1,
-    pageSize: 20,
-  }
+  resetSearchParams(initialSearchForm)
   runGetDict()
 }
 
@@ -161,7 +164,7 @@ const total = ref(0)
 const { loading: queryLoading, run: runGetDict } = useRequest(
   () => {
     return getDictApi({
-      ...searchDictForm.value,
+      ...searchDictForm,
     })
   },
   {
