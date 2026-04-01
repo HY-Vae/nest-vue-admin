@@ -1,0 +1,154 @@
+/* 暗黑模式样式 */
+html.dark {
+  color-scheme: dark;
+
+  /* 全局背景 */
+  --el-bg-color: #141414;
+  --el-bg-color-page: #0a0a0a;
+  --el-bg-color-overlay: #1d1d1d;
+
+  /* 文字颜色 */
+  --el-text-color-primary: #e5eaf3;
+  --el-text-color-regular: #cfd3dc;
+  --el-text-color-secondary: #a3a6ad;
+  --el-text-color-placeholder: #8d9095;
+  --el-text-color-disabled: #6c6e72;
+
+  /* 边框颜色 */
+  --el-border-color: #4c4d4f;
+  --el-border-color-light: #414243;
+  --el-border-color-lighter: #363637;
+  --el-border-color-extra-light: #2b2b2c;
+  --el-border-color-dark: #58585b;
+  --el-border-color-darker: #636466;
+
+  /* 填充颜色 */
+  --el-fill-color: #303030;
+  --el-fill-color-light: #262727;
+  --el-fill-color-lighter: #1d1d1d;
+  --el-fill-color-extra-light: #191919;
+  --el-fill-color-dark: #18181c;
+  --el-fill-color-darker: #141414;
+  --el-fill-color-blank: #141414;
+
+  /* 遮罩 */
+  --el-mask-color: rgba(0, 0, 0, 0.8);
+  --el-mask-color-extra-light: rgba(0, 0, 0, 0.3);
+
+  /* 盒子阴影 */
+  --el-box-shadow: 0px 12px 32px 4px rgba(0, 0, 0, 0.36), 0px 8px 20px rgba(0, 0, 0, 0.72);
+  --el-box-shadow-light: 0px 0px 12px rgba(0, 0, 0, 0.72);
+  --el-box-shadow-lighter: 0px 0px 6px rgba(0, 0, 0, 0.72);
+  --el-box-shadow-dark: 0px 16px 48px 16px rgba(0, 0, 0, 0.72), 0px 12px 32px rgba(0, 0, 0, 0.72), 0px 8px 16px -8px rgba(0, 0, 0, 0.72);
+
+  /* 自定义布局样式 */
+  .nva-container {
+    .aside {
+      background: #1d1d1d;
+    }
+  }
+
+  /* Tabs 组件暗黑模式 */
+  .tabs-container {
+    background: #1d1d1d;
+    border-bottom-color: #363637;
+
+    .el-tag {
+      &.el-tag--info {
+        background-color: #262727;
+        border-color: #414243;
+        color: #cfd3dc;
+      }
+    }
+  }
+
+  /* Header 暗黑模式 */
+  .header {
+    background: #1d1d1d;
+  }
+
+  /* 卡片暗黑模式 */
+  .el-card {
+    --el-card-bg-color: #1d1d1d;
+  }
+
+  /* 表格暗黑模式 */
+  .el-table {
+    --el-table-bg-color: #1d1d1d;
+    --el-table-tr-bg-color: #1d1d1d;
+    --el-table-header-bg-color: #262727;
+    --el-table-header-text-color: #cfd3dc;
+    --el-table-text-color: #cfd3dc;
+    --el-table-row-hover-bg-color: #262727;
+    --el-table-border-color: #363637;
+  }
+
+  /* 表单暗黑模式 */
+  .el-form-item__label {
+    color: #cfd3dc;
+  }
+
+  /* 对话框暗黑模式 */
+  .el-dialog {
+    --el-dialog-bg-color: #1d1d1d;
+  }
+
+  /* 抽屉暗黑模式 */
+  .el-drawer {
+    --el-drawer-bg-color: #1d1d1d;
+  }
+
+  /* 下拉菜单暗黑模式 */
+  .el-dropdown-menu {
+    --el-dropdown-menu-box-shadow: var(--el-box-shadow-light);
+  }
+
+  /* 分页暗黑模式 */
+  .el-pagination {
+    --el-pagination-bg-color: #1d1d1d;
+    --el-pagination-text-color: #cfd3dc;
+    --el-pagination-button-disabled-bg-color: #262727;
+  }
+
+  /* 输入框暗黑模式 */
+  .el-input__wrapper {
+    background-color: #1d1d1d;
+    box-shadow: 0 0 0 1px #414243 inset;
+  }
+
+  .el-textarea__inner {
+    background-color: #1d1d1d;
+    box-shadow: 0 0 0 1px #414243 inset;
+  }
+
+  .el-select-dropdown {
+    background-color: #1d1d1d;
+  }
+
+  /* 树形控件暗黑模式 */
+  .el-tree {
+    --el-tree-bg-color: transparent;
+    --el-tree-text-color: #cfd3dc;
+  }
+
+  /* 菜单暗黑模式 */
+  .el-menu {
+    --el-menu-bg-color: #1d1d1d;
+    --el-menu-text-color: #cfd3dc;
+    --el-menu-hover-bg-color: #262727;
+  }
+}
+
+/* 浅色模式样式 */
+html:not(.dark) {
+  /* Tabs 组件浅色模式 */
+  .tabs-container {
+    background: #fff;
+    border-bottom-color: #e4e7ed;
+  }
+
+  /* Header 浅色模式 */
+  .header {
+    background: #fff;
+  }
+}

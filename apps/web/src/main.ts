@@ -1,8 +1,10 @@
 import './assets/base.css'
 import './assets/main.scss'
 import './assets/tailwind.css'
+import './assets/theme.scss'
 
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
 import { setGlobalOptions } from 'vue-request'
 
@@ -22,7 +24,9 @@ app.config.errorHandler = (err) => {
   console.log(err)
 }
 
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')

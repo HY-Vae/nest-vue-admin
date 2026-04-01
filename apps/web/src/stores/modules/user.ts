@@ -1,5 +1,6 @@
 import { getRoutesApi, getUserInfoApi } from '@/api/auth.ts'
 import router from '@/router'
+import { useTabsStore } from '@/stores/modules/tabs'
 import type { CurrentUserType } from '@/types/user.ts'
 import { transMenuRouter } from '@/utils/route.ts'
 import type { MenuListType } from '@/views/sys/menu/menu.type'
@@ -57,6 +58,10 @@ export const useUserStore = defineStore('user', () => {
     // 清除状态
     currentUser.value = undefined
     menus.value = []
+    // 清除 tabs
+    const tabsStore = useTabsStore()
+    tabsStore.tabs = []
+    tabsStore.activeTab = ''
     // 清除 token
     localStorage.removeItem('token')
   }

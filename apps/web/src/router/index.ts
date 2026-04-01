@@ -3,6 +3,21 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory('/'),
   routes: [
+    {
+      path: '/redirect/:path(.*)',
+      name: 'Redirect',
+      component: {
+        beforeRouteEnter(to, from, next) {
+          next((vm) => {
+            vm.$router.replace('/' + to.params.path)
+          })
+        },
+        render: () => null,
+      },
+      meta: {
+        hidden: true,
+      },
+    },
     // {
     //   path: '/',
     //   redirect: '/about',
