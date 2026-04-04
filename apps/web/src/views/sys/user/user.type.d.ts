@@ -2,8 +2,10 @@ export interface QueryUserType {
   userName?: string
   nickName?: string
   status?: string
-  page?: number
-  size?: number
+  deptId?: string
+  postId?: string
+  current?: number
+  pageSize?: number
 }
 
 export interface UserListType {
@@ -16,6 +18,9 @@ export interface UserListType {
   sex: string
   status: string
   userType: string | null
+  deptId: string | null
+  postId: string | null
+  postName?: string | null
   remark: string | null
   createBy?: string | null
   createdAt?: Date
@@ -37,6 +42,8 @@ export interface CreateUserType {
   sex: string
   status: string
   userType: string
+  deptId?: string | null
+  postId?: string | null
   remark: string
   roleIds: string[]
 }

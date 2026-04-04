@@ -25,12 +25,16 @@ model SysUser {
   sex       String?   @default("0") @db.Char(1)
   status    String?   @default("0") @db.Char(1)
   userType  String?   @map("user_type") @db.VarChar(2)
+  deptId    String?   @map("dept_id") @db.VarChar(36)
+  postId    String?   @map("post_id") @db.VarChar(36)
   remark    String?   @db.VarChar(255)
   createBy  String?   @map("create_by") @db.VarChar(64)
   createdAt DateTime  @default(now()) @map("created_at")
   updateBy  String?   @map("update_by") @db.VarChar(64)
   updatedAt DateTime  @updatedAt @map("updated_at")
   roles     SysRole[]
+  dept      SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  post      SysPost?  @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: NoAction)
 
   @@map("sys_user")
 }
@@ -117,6 +121,7 @@ model SysMenuBtn {
   sysMenu   SysMenu?  @relation(fields: [sysMenuId], references: [id], onDelete: Cascade)
   roles     SysRole[]
 
+  @@unique([auth, sysMenuId])
   @@map("sys_menu_btn")
 }
 
@@ -157,7 +162,7 @@ model SysDictDetail {
 model Temp {
   id        String    @id @map("id") @db.VarChar(36)
   name      String    @map("name") @db.VarChar(20)
-  code      String    @map("code") @db.VarChar(20)
+  code      String    @unique @map("code") @db.VarChar(20)
   tempPath  String    @map("temp_path") @db.VarChar(30)
   createBy  String?   @map("create_by") @db.VarChar(30)
   createdAt DateTime? @default(now()) @map("created_at")
@@ -176,6 +181,10 @@ model SysDept {
   deptCode  String    @unique @map("dept_code") @db.VarChar(20)
   /// 父级部门ID
   parentId  String?   @map("parent_id") @db.VarChar(36)
+  /// 联系电话
+  phone     String?   @map("phone") @db.VarChar(11)
+  /// 邮箱
+  email     String?   @map("email") @db.VarChar(50)
   /// 排序
   sort      Int       @default(0) @map("sort")
   /// 启用状态
@@ -195,8 +204,46 @@ model SysDept {
   parent    SysDept?  @relation("DeptTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   /// 子部门
   children  SysDept[] @relation("DeptTree")
+  /// 部门用户
+  users     SysUser[]
+  /// 部门岗位
+  posts     SysPost[]
 
   @@map("sys_dept")
+}
+
+model SysPost {
+  /// id
+  id        String    @id @db.VarChar(36)
+  /// 岗位名称
+  name      String    @db.VarChar(30)
+  /// 岗位编码
+  code      String    @unique @db.VarChar(30)
+  /// 所属部门ID（null表示公司通用岗位）
+  deptId    String?   @map("dept_id") @db.VarChar(36)
+  /// 是否负责人岗位
+  isLeader  Boolean   @default(false) @map("is_leader")
+  /// 排序
+  sort      Int       @default(0)
+  /// 启用状态
+  status    String    @db.Char(1)
+  /// 备注
+  remark    String?   @db.VarChar(255)
+  /// 创建人
+  createBy  String?   @map("create_by") @db.VarChar(64)
+  /// 创建时间
+  createdAt DateTime  @default(now()) @map("created_at")
+  /// 修改人
+  updateBy  String?   @map("update_by") @db.VarChar(64)
+  /// 修改时间
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  /// 所属部门
+  dept      SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  /// 岗位用户
+  users     SysUser[]
+
+  @@map("sys_post")
 }
 
 model SysActionLog {

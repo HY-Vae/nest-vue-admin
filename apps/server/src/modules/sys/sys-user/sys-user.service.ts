@@ -61,6 +61,19 @@ export class SysUserService {
     if (query.status) {
       where.status = query.status;
     }
+    if (query.deptId) {
+      // 如果 includeChildren 为 true，查询该部门及其所有子部门的用户
+      if (query.includeChildren) {
+        // 获取所有子部门 ID
+        const childDeptIds = await this.getAllChildDeptIds(query.deptId);
+        where.deptId = { in: [query.deptId, ...childDeptIds] };
+      } else {
+        where.deptId = query.deptId;
+      }
+    }
+    if (query.postId) {
+      where.postId = query.postId;
+    }
 
     const listPromise = this.prisma.sysUser.findMany({
       where,
@@ -69,6 +82,22 @@ export class SysUserService {
       omit: {
         password: true,
       },
+      include: {
+        dept: {
+          select: { id: true, deptName: true, sort: true, parentId: true },
+        },
+        post: {
+          select: { id: true, name: true, isLeader: true },
+        },
+      },
+      orderBy: [
+        // 父部门（parentId=null）排前面
+        { dept: { parentId: { sort: 'asc', nulls: 'first' } } },
+        // 同级按部门 sort 排序
+        { dept: { sort: 'asc' } },
+        // 部门内负责人优先
+        { post: { isLeader: 'desc' } },
+      ],
     });
     const totalPromise = this.prisma.sysUser.count({
       where,
@@ -80,6 +109,20 @@ export class SysUserService {
     };
   }
 
+  /* 递归获取所有子部门 ID */
+  private async getAllChildDeptIds(parentId: string): Promise<string[]> {
+    const children = await this.prisma.sysDept.findMany({
+      where: { parentId },
+      select: { id: true },
+    });
+    const ids = children.map((c) => c.id);
+    for (const id of ids) {
+      const childIds = await this.getAllChildDeptIds(id);
+      ids.push(...childIds);
+    }
+    return ids;
+  }
+
   async findOne(id: string) {
     const user = await this.prisma.sysUser.findUnique({
       where: {
@@ -87,6 +130,9 @@ export class SysUserService {
       },
       include: {
         roles: true,
+        post: {
+          select: { id: true, name: true },
+        },
       },
       omit: {
         password: true,
@@ -95,11 +141,13 @@ export class SysUserService {
     if (!user) {
       return null;
     }
-    const { roles, ...other } = user;
+    const { roles, post, ...other } = user;
     const roleIds = roles.map((role) => role.id);
     return {
       ...other,
       roleIds,
+      postId: post?.id || null,
+      postName: post?.name || null,
     };
   }
 
@@ -132,6 +180,27 @@ export class SysUserService {
     });
     await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, id));
     return user;
+  }
+
+  /* 获取用户选项列表（用于下拉选择） */
+  async getOptions() {
+    const users = await this.prisma.sysUser.findMany({
+      where: {
+        status: '0', // 只返回启用状态的用户
+      },
+      select: {
+        id: true,
+        nickName: true,
+        userName: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return users.map((user) => ({
+      value: user.id,
+      label: user.nickName || user.userName,
+    }));
   }
 
   async remove(id: string, currentUserId: string) {

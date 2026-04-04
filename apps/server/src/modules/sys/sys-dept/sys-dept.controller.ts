@@ -49,6 +49,16 @@ export class SysDeptController {
     return this.sysDeptService.findAll(getSysDeptListDto);
   }
 
+  /* 组织架构树（部门 + 岗位） */
+  @Get('org-tree')
+  @ApiOperation({
+    summary: '查询组织架构树',
+  })
+  @Permission('sys:dept:list')
+  async findOrgTree() {
+    return this.sysDeptService.findOrgTree();
+  }
+
   /* 通过id查询 */
   @Get(':id')
   @ApiOperation({

@@ -6,6 +6,7 @@ import { SysUserModule } from '@/modules/sys/sys-user/sys-user.module';
 import { Module } from '@nestjs/common';
 import { SysActionLogModule } from './sys-action-log/sys-action-log.module';
 import { SysDeptModule } from './sys-dept/sys-dept.module';
+import { SysPostModule } from './sys-post/sys-post.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SysDeptModule } from './sys-dept/sys-dept.module';
     SysDictDetailModule,
     SysDeptModule,
     SysActionLogModule,
+    SysPostModule,
   ],
 })
 export class SysModule {}

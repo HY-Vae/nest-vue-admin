@@ -49,6 +49,14 @@ export class SysUserController {
   }
 
   @ApiOperation({
+    summary: '获取用户选项列表',
+  })
+  @Get('options')
+  getOptions() {
+    return this.sysUserService.getOptions();
+  }
+
+  @ApiOperation({
     summary: '查询用户详情',
   })
   @Permission('sys:user:detail')

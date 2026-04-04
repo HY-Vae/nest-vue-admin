@@ -1,7 +1,8 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class GetSysUserListDto extends PaginationDto {
   @ApiProperty({ description: '用户名', required: false })
@@ -14,9 +15,26 @@ export class GetSysUserListDto extends PaginationDto {
   @IsString()
   phone?: string;
 
+  @ApiProperty({ description: '状态', required: false })
   @IsString()
   @IsOptional()
   status?: string;
+
+  @ApiProperty({ description: '部门ID', required: false })
+  @IsString()
+  @IsOptional()
+  deptId?: string;
+
+  @ApiProperty({ description: '是否包含子部门', required: false, default: false })
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  @IsBoolean()
+  includeChildren?: boolean;
+
+  @ApiProperty({ description: '岗位ID', required: false })
+  @IsString()
+  @IsOptional()
+  postId?: string;
 }
 
 export class CreateSysUserDto {
@@ -41,10 +59,6 @@ export class CreateSysUserDto {
   @ApiProperty({ description: '昵称', example: '系统管理员' })
   @IsString()
   nickName: string;
-
-  // @ApiProperty({ description: '密码', example: '123456' })
-  // @IsString()
-  // password: string;
 
   @ApiProperty({
     description: '手机号',
@@ -81,6 +95,22 @@ export class CreateSysUserDto {
   @IsOptional()
   @IsString()
   userType?: string;
+
+  @ApiProperty({
+    description: '部门ID',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  deptId?: string;
+
+  @ApiProperty({
+    description: '岗位ID',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  postId?: string;
 
   @ApiProperty({ description: '备注', required: false })
   @IsOptional()

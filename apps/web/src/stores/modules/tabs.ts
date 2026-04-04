@@ -1,6 +1,6 @@
-import type { RouteLocationNormalized } from 'vue-router'
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+import type { RouteLocationNormalized } from 'vue-router'
 
 export interface TabItem {
   path: string
@@ -44,17 +44,13 @@ export const useTabsStore = defineStore(
       // 固定的 tab 不允许关闭
       if (tab.affix) return null
 
-      // 只剩最后一个可关闭的 tab 时不允许关闭
-      const closableTabs = tabs.value.filter((t) => !t.affix)
-      if (closableTabs.length <= 1) return null
-
       tabs.value.splice(index, 1)
 
       if (activeTab.value === path) {
         // 优先跳转到固定 tab，否则跳转到相邻 tab
         const affixTab = tabs.value.find((t) => t.affix)
         const nextTab = tabs.value[index] || tabs.value[index - 1]
-        return nextTab ? nextTab.path : (affixTab?.path || null)
+        return nextTab ? nextTab.path : affixTab?.path || null
       }
       return null
     }

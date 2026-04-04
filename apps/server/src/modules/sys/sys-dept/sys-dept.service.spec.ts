@@ -14,7 +14,13 @@ describe('SysDeptService', () => {
       findMany: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      deleteMany: jest.fn(),
       count: jest.fn(),
+    },
+    sysUser: {
+      groupBy: jest.fn(),
+      count: jest.fn(),
+      findMany: jest.fn(),
     },
   };
 
@@ -125,6 +131,12 @@ describe('SysDeptService', () => {
       ];
 
       prisma.sysDept.findMany.mockResolvedValue(mockDepts as any);
+      prisma.sysUser.groupBy.mockResolvedValue([
+        { deptId: 'dept-1', _count: { id: 5 } },
+        { deptId: 'dept-2', _count: { id: 3 } },
+      ] as any);
+      // Mock for leaders query
+      prisma.sysUser.findMany.mockResolvedValue([]);
 
       const result = await service.findAll({} as any);
 
@@ -139,12 +151,19 @@ describe('SysDeptService', () => {
     it('有子部门时应该禁止删除', async () => {
       prisma.sysDept.count.mockResolvedValue(2); // 有 2 个子部门
 
-      await expect(service.remove('dept-1')).rejects.toThrow(ApiException);
       await expect(service.remove('dept-1')).rejects.toThrow('该部门下存在子部门，无法删除');
     });
 
-    it('无子部门时应该成功删除', async () => {
-      prisma.sysDept.count.mockResolvedValue(0);
+    it('部门下有用户时应该禁止删除', async () => {
+      prisma.sysDept.count.mockResolvedValueOnce(0); // 无子部门
+      prisma.sysUser.count.mockResolvedValueOnce(3); // 有 3 个用户
+
+      await expect(service.remove('dept-1')).rejects.toThrow('该部门下存在用户，无法删除');
+    });
+
+    it('无子部门且无用户时应该成功删除', async () => {
+      prisma.sysDept.count.mockResolvedValueOnce(0); // 无子部门
+      prisma.sysUser.count.mockResolvedValueOnce(0); // 无用户
       prisma.sysDept.delete.mockResolvedValue({
         id: 'dept-1',
         deptName: '总公司',

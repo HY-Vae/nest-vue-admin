@@ -47,6 +47,18 @@ export class CreateSysDeptDto {
   @IsOptional()
   parentId?: string;
 
+  @ApiPropertyOptional({ description: '联系电话' })
+  @MaxLength(11)
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiPropertyOptional({ description: '邮箱' })
+  @MaxLength(50)
+  @IsString()
+  @IsOptional()
+  email?: string;
+
   @ApiPropertyOptional({ description: '排序', default: 0 })
   @IsInt()
   @Min(0)

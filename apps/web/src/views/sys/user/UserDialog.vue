@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { getRoleOptionsApi } from '@/views/sys/role/service.ts'
+import { getDeptOptionsApi } from '@/views/sys/dept/service.ts'
+import { getSysPostOptionsApi } from '@/views/sys/post/service.ts'
 import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
-import type { SelectOptionItem } from '@/types/global.ts'
+import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import type { CreateUserType, UserDetailType } from '@/views/sys/user/user.type'
 import type { FormInstance, UploadInstance, UploadProps } from 'element-plus'
 import { UPLOAD_API } from '@/constants/constant.ts'
@@ -56,6 +58,8 @@ const userForm = ref<CreateUserType>({
   status: '0',
   userName: '',
   userType: '',
+  deptId: null,
+  postId: null,
 })
 
 // 待删除的头像URL列表
@@ -120,6 +124,8 @@ const closeDialog = () => {
     status: '0',
     userName: '',
     userType: '',
+    deptId: null,
+    postId: null,
   }
   pendingDeleteAvatars.value = []
 }
@@ -128,10 +134,23 @@ const title = computed(() => {
   return props.action === ActionEnum.Add ? '添加用户' : '编辑用户'
 })
 const roleOptions = ref<SelectOptionItem[]>([])
+const deptOptions = ref<SelectTreeItem[]>([])
+const postOptions = ref<SelectOptionItem[]>([])
 const sexStatusOptions = ref<SelectOptionItem[]>([])
+
+// 加载岗位选项（根据部门ID过滤）
+const loadPostOptions = (deptId?: string | null) => {
+  getSysPostOptionsApi(deptId || undefined).then((res) => {
+    postOptions.value = res.data
+  })
+}
+
 const openUser = () => {
   getRoleOptionsApi().then((res) => {
     roleOptions.value = res.data
+  })
+  getDeptOptionsApi().then((res) => {
+    deptOptions.value = res.data
   })
   getDictOptions('enableStatus').then((res) => {
     enableStatusOptions.value = res
@@ -140,6 +159,14 @@ const openUser = () => {
   getDictOptions('sexStatus').then((res) => {
     sexStatusOptions.value = res
   })
+  // 加载岗位选项
+  loadPostOptions(userForm.value.deptId)
+}
+
+// 部门切换时清空岗位并重新加载
+const handleDeptChange = (deptId: string | null) => {
+  userForm.value.postId = null
+  loadPostOptions(deptId)
 }
 
 watch(
@@ -147,6 +174,8 @@ watch(
   (val) => {
     if (val != undefined && !props.detailLoading) {
       userForm.value = val as CreateUserType
+      // 编辑模式下，加载对应部门的岗位选项
+      loadPostOptions(val.deptId)
     }
   },
 )
@@ -267,6 +296,37 @@ const handleRemoveAvatar = () => {
         <el-col v-bind="formSpan">
           <el-form-item label="昵称" :label-width="formLabelWidth" prop="nickName">
             <el-input v-model="userForm.nickName" autocomplete="off" />
+          </el-form-item>
+        </el-col>
+        <el-col v-bind="formSpan">
+          <el-form-item label="所属部门" :label-width="formLabelWidth" prop="deptId">
+            <el-tree-select
+              v-model="userForm.deptId"
+              :data="deptOptions"
+              placeholder="请选择所属部门"
+              check-strictly
+              clearable
+              style="width: 100%"
+              @change="handleDeptChange"
+            />
+          </el-form-item>
+        </el-col>
+        <el-col v-bind="formSpan">
+          <el-form-item label="岗位" :label-width="formLabelWidth" prop="postId">
+            <el-select
+              v-model="userForm.postId"
+              placeholder="请选择岗位"
+              clearable
+              filterable
+              style="width: 100%"
+            >
+              <el-option
+                v-for="item in postOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col v-bind="formSpan">

@@ -27,9 +27,8 @@ const selectedTabItem = computed(() => {
 // 是否可以关闭当前选中的 tab
 const canCloseSelectedTab = computed(() => {
   if (!selectedTabItem.value) return false
-  if (selectedTabItem.value.affix) return false
-  const closableTabs = tabsStore.tabs.filter((t) => !t.affix)
-  return closableTabs.length > 1
+  // 固定的 tab 不允许关闭
+  return !selectedTabItem.value.affix
 })
 
 // 点击空白处关闭右键菜单

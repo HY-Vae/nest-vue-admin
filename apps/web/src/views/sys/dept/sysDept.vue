@@ -75,6 +75,10 @@
 
           <el-table-column label="部门编码" align="center" prop="deptCode" width="120" />
 
+          <el-table-column label="负责人" align="center" prop="leaderName" width="100" />
+
+          <el-table-column label="联系电话" align="center" prop="phone" width="120" />
+
           <el-table-column label="排序" align="center" prop="sort" width="80" />
 
           <el-table-column label="启用状态" align="center" prop="status" width="100">
@@ -83,7 +87,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="创建人" align="center" prop="createBy" width="100" />
+          <el-table-column label="人数" align="center" prop="userCount" width="80" />
 
           <el-table-column label="创建时间" align="center" width="170">
             <template #default="scope">
