@@ -1,13 +1,19 @@
 import { CurrentUserType } from '@/common/types/auth.type';
-import { Inject, Injectable, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, Inject, Injectable, PipeTransform } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
+
+interface RequestWithUser {
+  user?: CurrentUserType;
+}
 
 @Injectable()
 export class CreateDtoPipe implements PipeTransform {
-  constructor(@Inject(REQUEST) private readonly request: any) {}
-  transform(value: any, metadata: any) {
-    const user: CurrentUserType = this.request.user;
-    value.createBy = user.nickName;
+  constructor(@Inject(REQUEST) private readonly request: RequestWithUser) {}
+  transform<T extends { createBy?: string }>(value: T, metadata: ArgumentMetadata): T {
+    const user = this.request.user;
+    if (user) {
+      value.createBy = user.nickName;
+    }
     return value;
   }
 }

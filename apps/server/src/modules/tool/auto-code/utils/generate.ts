@@ -355,7 +355,7 @@ export default async function generateCRUD(config: GenerateConfig) {
   console.log(`✅ ${config.name} 模块生成成功`);
 }
 
-export async function renderTemplate(templateName, data) {
+export async function renderTemplate(templateName: string, data: object) {
   const basePath = path.resolve(process.cwd(), 'src/modules/tool/auto-code');
   const templateContent = fs.readFileSync(
     path.resolve(basePath, 'templ', templateName),

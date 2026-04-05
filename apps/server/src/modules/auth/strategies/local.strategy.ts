@@ -3,6 +3,8 @@ import { LoginReqDto } from '@/modules/auth/dto/req-auth.dto';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-local';
+import { Request } from 'express';
+import { CurrentUserType } from '@/common/types/auth.type';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -15,10 +17,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(
-    request: any,
+    request: Request,
     username: string,
     password: string,
-  ): Promise<any> {
+  ): Promise<CurrentUserType> {
     const body: LoginReqDto = request.body;
     //   1. 验证验证码
     await this.authService.checkCaptcha(body.captchaId, body.captcha);

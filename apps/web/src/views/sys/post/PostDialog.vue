@@ -103,15 +103,7 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      sysPostForm.value = {
-        name: val.name,
-        code: val.code,
-        deptId: val.deptId || null,
-        isLeader: val.isLeader,
-        sort: val.sort || 0,
-        status: val.status,
-        remark: val.remark || '',
-      }
+      sysPostForm.value = { ...val }
     }
   },
 )

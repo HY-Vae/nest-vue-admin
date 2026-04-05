@@ -176,11 +176,13 @@ import { useRequest } from 'vue-request'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
 import { getSysDeptApi } from '@/views/sys/dept/service'
+import type { SysDeptListType } from '@/views/sys/dept/sysDept.type'
 import { getSysPostApi } from '@/views/sys/post/service'
+import type { SysPostListType } from '@/views/sys/post/post.type'
 import { getUserApi, getUserOneApi, addUserApi, updateUserApi, deleteUserApi } from './service'
 import { ActionEnum } from '@/enums/common'
 import UserDialog from './UserDialog.vue'
-import type { CreateUserType, UpdateUserType, UserDetailType } from './user.type'
+import type { CreateUserType, UpdateUserType, UserDetailType, UserListType, QueryUserType } from './user.type'
 import { useSearchParams } from '@/composables/useSearchParams'
 
 const router = useRouter()
@@ -192,27 +194,27 @@ const enableStatusOptions = ref<SelectOptionItem[]>([])
 // 部门树
 const treeRef = ref()
 const filterText = ref('')
-const deptTreeData = ref<any[]>([])
-const selectedDept = ref<any | null>(null)
+const deptTreeData = ref<SysDeptListType[]>([])
+const selectedDept = ref<SysDeptListType | null>(null)
 const currentNodeKey = ref<string>('')
 
 // 岗位选项
 const postOptions = ref<SelectOptionItem[]>([])
 
 // 初始搜索条件
-const initialSearchForm = {
-  deptId: undefined as string | undefined,
-  postId: undefined as string | undefined,
-  userName: undefined as string | undefined,
-  status: undefined as string | undefined,
+const initialSearchForm: QueryUserType = {
+  deptId: undefined,
+  postId: undefined,
+  userName: undefined,
+  status: undefined,
   includeChildren: true,
   current: 1,
   pageSize: 10,
 }
 
 // 用户列表
-const searchForm = ref({ ...initialSearchForm })
-const userList = ref<any[]>([])
+const searchForm = ref<QueryUserType>({ ...initialSearchForm })
+const userList = ref<UserListType[]>([])
 const userTotal = ref(0)
 const userLoading = ref(false)
 
@@ -232,31 +234,46 @@ const treeProps = {
   children: 'children',
 }
 
+// 选中部门并加载数据
+const selectDept = async (dept: SysDeptListType) => {
+  selectedDept.value = dept
+  searchForm.value.deptId = dept.id
+  searchForm.value.includeChildren = true
+  currentNodeKey.value = dept.id
+  await loadPostOptions()
+  loadUsers()
+  await nextTick()
+  treeRef.value?.setCurrentKey(dept.id)
+}
+
 // 初始化
 onMounted(async () => {
   enableStatusOptions.value = await getDictOptions('enableStatus')
   await loadDeptTree()
 
-  // 如果有保存的部门ID，选中该部门
-  if (searchForm.value.deptId) {
-    currentNodeKey.value = searchForm.value.deptId
-    await loadPostOptions()
-    loadUsers()
-    await nextTick()
-    treeRef.value?.setCurrentKey(searchForm.value.deptId)
-  } else if (deptTreeData.value.length > 0) {
+  const deptId = searchForm.value.deptId
+  if (deptId) {
+    // 恢复之前选中的部门
+    const dept = findDeptById(deptTreeData.value, deptId)
+    if (dept) {
+      await selectDept(dept)
+    }
+  } else if (deptTreeData.value[0]) {
     // 默认选中第一个部门
-    const firstDept = deptTreeData.value[0]
-    selectedDept.value = firstDept
-    searchForm.value.deptId = firstDept.id
-    searchForm.value.includeChildren = true
-    currentNodeKey.value = firstDept.id
-    await loadPostOptions()
-    loadUsers()
-    await nextTick()
-    treeRef.value?.setCurrentKey(firstDept.id)
+    await selectDept(deptTreeData.value[0])
   }
 })
+
+// 递归查找部门
+const findDeptById = (list: SysDeptListType[], id: string): SysDeptListType | undefined => {
+  for (const dept of list) {
+    if (dept.id === id) return dept
+    if (dept.children) {
+      const found = findDeptById(dept.children, id)
+      if (found) return found
+    }
+  }
+}
 
 // 加载部门树
 const loadDeptTree = async () => {
@@ -266,15 +283,12 @@ const loadDeptTree = async () => {
 
 // 加载岗位选项
 const loadPostOptions = async () => {
-  const params: any = { pageSize: 1000 }
-
-  if (searchForm.value.deptId) {
-    params.deptId = searchForm.value.deptId
-    params.includeChildren = searchForm.value.includeChildren
-  }
-
-  const res = await getSysPostApi(params)
-  postOptions.value = res.data.list.map((item: any) => ({
+  const { deptId, includeChildren } = searchForm.value
+  const res = await getSysPostApi({
+    pageSize: 1000,
+    ...(deptId && { deptId, includeChildren }),
+  })
+  postOptions.value = res.data.list.map((item: SysPostListType) => ({
     value: item.id,
     label: item.name,
   }))
@@ -285,45 +299,24 @@ watch(filterText, (val) => {
   treeRef.value?.filter(val)
 })
 
-const filterNode = (value: string, data: any) => {
+const filterNode = (value: string, data: unknown) => {
   if (!value) return true
-  return data.deptName?.includes(value)
+  const node = data as SysDeptListType
+  return node.deptName?.includes(value)
 }
 
 // 点击树节点
-const handleNodeClick = async (data: any) => {
-  selectedDept.value = data
-  currentNodeKey.value = data.id
-  searchForm.value.deptId = data.id
+const handleNodeClick = async (data: SysDeptListType) => {
   searchForm.value.postId = undefined
-  // 默认包含子部门
-  searchForm.value.includeChildren = true
   searchForm.value.current = 1
-  // 加载岗位选项
-  await loadPostOptions()
-  loadUsers()
+  await selectDept(data)
 }
 
 // 加载用户列表
 const loadUsers = async () => {
   userLoading.value = true
   try {
-    const params: any = {
-      userName: searchForm.value.userName,
-      status: searchForm.value.status,
-      current: searchForm.value.current,
-      pageSize: searchForm.value.pageSize,
-    }
-
-    if (searchForm.value.deptId) {
-      params.deptId = searchForm.value.deptId
-      params.includeChildren = searchForm.value.includeChildren
-    }
-    if (searchForm.value.postId) {
-      params.postId = searchForm.value.postId
-    }
-
-    const res = await getUserApi(params)
+    const res = await getUserApi(searchForm.value)
     userList.value = res.data.list
     userTotal.value = res.data.total
   } finally {
@@ -360,7 +353,7 @@ const { run: runGetUserOne } = useRequest(getUserOneApi, {
   },
 })
 
-const editUser = (row: any) => {
+const editUser = (row: UserListType) => {
   dialogAction.value = ActionEnum.Edit
   runGetUserOne(row.id)
   dialogVisible.value = true
@@ -369,15 +362,20 @@ const editUser = (row: any) => {
 // 删除用户
 const { runAsync: runDeleteUser } = useRequest(deleteUserApi, { manual: true })
 
-const deleteUser = (row: any) => {
+const deleteUser = (row: UserListType) => {
   ElMessageBox.confirm(`确定删除用户「${row.nickName}」吗？`, '提示', {
     type: 'warning',
   }).then(async () => {
     await runDeleteUser(row.id)
     ElMessage.success('删除成功')
-    loadUsers()
-    loadDeptTree()
+    refreshData()
   })
+}
+
+// 刷新数据（用户列表和部门树）
+const refreshData = () => {
+  loadUsers()
+  loadDeptTree()
 }
 
 // 提交用户表单
@@ -395,8 +393,7 @@ const handleSubmit = async (values: CreateUserType | UpdateUserType) => {
       ElMessage.success('修改成功')
     }
     dialogVisible.value = false
-    loadUsers()
-    loadDeptTree()
+    refreshData()
   } finally {
     dialogLoading.value = false
   }

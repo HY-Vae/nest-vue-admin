@@ -205,7 +205,15 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true
 }
 
-const handleAvatarSuccess: UploadProps['onSuccess'] = (response: any) => {
+interface UploadResponse {
+  code: number
+  message: string
+  data: {
+    url: string
+  }
+}
+
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response: UploadResponse) => {
   uploadLoading.value = false
   if (response.code === 200) {
     // 如果有旧头像，加入待删除列表

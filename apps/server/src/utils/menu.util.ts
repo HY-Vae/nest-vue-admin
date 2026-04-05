@@ -1,6 +1,8 @@
 import { SelectTreeItem } from '@/common/types/common.type';
+import type { MenuTreeNode } from './util';
+
 export function simplifyMenuTree(
-  originalTree: any[],
+  originalTree: MenuTreeNode[],
 ): SelectTreeItem<number>[] {
   return originalTree.map((item) => ({
     value: item.id,

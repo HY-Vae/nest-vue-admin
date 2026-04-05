@@ -28,6 +28,7 @@ export interface SysDeptListType {
   updateBy?: string
   updatedAt?: Date
   userCount?: number
+  totalUserCount?: number
   children?: SysDeptListType[]
 }
 

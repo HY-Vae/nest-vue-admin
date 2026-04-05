@@ -1,4 +1,5 @@
 import { ApiException } from '@/common/exceptions/api.exception';
+import { CurrentUserType } from '@/common/types/auth.type';
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
@@ -13,7 +14,7 @@ export class LocalAuthGuard extends AuthGuard('local') {
   ): boolean | Promise<boolean> | Observable<boolean> {
     return super.canActivate(context);
   }
-  handleRequest(err, user) {
+  handleRequest<TUser = CurrentUserType>(err: Error | null, user: TUser | false): TUser {
     if (err || !user) {
       throw err || new ApiException('用户名或密码错误');
     }

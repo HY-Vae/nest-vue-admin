@@ -105,7 +105,8 @@ export class SysPostService {
     // 构建用户查询条件
     // 当指定部门时：部门岗位只统计该部门用户，通用岗位也只统计该部门用户
     // 当不指定部门时：统计所有用户
-    let userCounts: { postId: string | null; _count: { id: number } }[];
+    type UserCountResult = { postId: string | null; _count: { id: number } };
+    let userCounts: UserCountResult[];
 
     if (query.deptId !== undefined && query.deptId !== '') {
       // 指定了具体部门，需要分别处理部门岗位和通用岗位的用户统计
@@ -118,13 +119,13 @@ export class SysPostService {
           by: ['postId'],
           where: { postId: { in: deptPostIds }, deptId: query.deptId },
           _count: { id: true },
-        }),
+        }) as unknown as UserCountResult[],
         // 通用岗位：统计该部门的用户
         this.prisma.sysUser.groupBy({
           by: ['postId'],
           where: { postId: { in: commonPostIds }, deptId: query.deptId },
           _count: { id: true },
-        }),
+        }) as unknown as UserCountResult[],
       ]);
 
       userCounts = [...deptCounts, ...commonCounts];
@@ -134,14 +135,14 @@ export class SysPostService {
         by: ['postId'],
         where: { postId: { in: postIds } },
         _count: { id: true },
-      });
+      }) as unknown as UserCountResult[];
     } else {
       // 不指定部门，统计所有用户
       userCounts = await this.prisma.sysUser.groupBy({
         by: ['postId'],
         where: { postId: { in: postIds } },
         _count: { id: true },
-      });
+      }) as unknown as UserCountResult[];
     }
 
     const userCountMap = new Map(

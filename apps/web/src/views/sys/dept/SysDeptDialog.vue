@@ -130,16 +130,7 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      sysDeptForm.value = {
-        deptName: val.deptName,
-        deptCode: val.deptCode,
-        parentId: val.parentId || null,
-        phone: val.phone || '',
-        email: val.email || '',
-        sort: val.sort || 0,
-        status: val.status,
-        remark: val.remark || '',
-      }
+      sysDeptForm.value = { ...val }
     }
   },
 )

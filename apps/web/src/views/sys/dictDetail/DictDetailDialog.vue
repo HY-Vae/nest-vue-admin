@@ -93,7 +93,10 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      dictDetailForm.value = val
+      dictDetailForm.value = {
+        ...val,
+        sysDictCode: dictDetailForm.value.sysDictCode,
+      }
     }
   },
 )

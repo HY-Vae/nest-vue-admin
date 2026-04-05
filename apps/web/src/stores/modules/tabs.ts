@@ -42,7 +42,7 @@ export const useTabsStore = defineStore(
 
       const tab = tabs.value[index]
       // 固定的 tab 不允许关闭
-      if (tab.affix) return null
+      if (tab?.affix) return null
 
       tabs.value.splice(index, 1)
 

@@ -5,6 +5,7 @@ import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import type { CreateRoleType, RoleListType } from '@/views/sys/role/role.type'
 import type { FormInstance } from 'element-plus'
+import { ElTreeSelect } from 'element-plus'
 import { computed, ref, watch, type PropType } from 'vue'
 const props = defineProps({
   action: {
@@ -97,9 +98,9 @@ const openRole = () => {
   })
 }
 
-const getAllChildrenIds = (nodeData: any, ids: number[] = []) => {
+const getAllChildrenIds = (nodeData: SelectTreeItem<number>, ids: number[] = []) => {
   if (nodeData.children && nodeData.children.length > 0) {
-    nodeData.children.forEach((child: any) => {
+    nodeData.children.forEach((child) => {
       ids.push(child.value)
       getAllChildrenIds(child, ids)
     })
@@ -141,7 +142,11 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      roleForm.value = val
+      roleForm.value = {
+        ...val,
+        menus: 'menus' in val ? (val.menus as number[]) : [],
+        menuBtns: 'menuBtns' in val ? (val.menuBtns as number[]) : [],
+      }
     }
   },
 )

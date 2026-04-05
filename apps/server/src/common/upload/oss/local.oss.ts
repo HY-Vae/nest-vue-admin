@@ -1,12 +1,10 @@
 import { LocalFileConfig } from '@/common/types/config.type';
 import { IUploadResult, IUploadService } from '@/common/types/upload.type';
-import OSS from 'ali-oss';
 import dayjs from 'dayjs';
 import fs from 'node:fs';
 import path from 'node:path';
 
 export class LocalOssService implements IUploadService {
-  private client: OSS;
   constructor(private readonly localConfig: LocalFileConfig) {}
 
   getFileStorePath() {

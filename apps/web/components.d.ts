@@ -67,7 +67,6 @@ declare module 'vue' {
     SideMenuItem: typeof import('./src/components/sideMenu/sideMenuItem.vue')['default']
     TabsView: typeof import('./src/components/tabs/TabsView.vue')['default']
     TheHeader: typeof import('./src/components/header/TheHeader.vue')['default']
-    ThemeSetting: typeof import('./src/components/theme/ThemeSetting.vue')['default']
     TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
     WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
   }
@@ -133,7 +132,6 @@ declare global {
   const SideMenuItem: typeof import('./src/components/sideMenu/sideMenuItem.vue')['default']
   const TabsView: typeof import('./src/components/tabs/TabsView.vue')['default']
   const TheHeader: typeof import('./src/components/header/TheHeader.vue')['default']
-  const ThemeSetting: typeof import('./src/components/theme/ThemeSetting.vue')['default']
   const TheWelcome: typeof import('./src/components/TheWelcome.vue')['default']
   const WelcomeItem: typeof import('./src/components/WelcomeItem.vue')['default']
 }

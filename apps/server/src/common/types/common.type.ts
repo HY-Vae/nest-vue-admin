@@ -1,4 +1,4 @@
-export interface CommonResultType<T = any> {
+export interface CommonResultType<T = unknown> {
   code: number;
   message: string;
   data: T;

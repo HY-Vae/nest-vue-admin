@@ -15,7 +15,7 @@ import { EnableStatusEnum } from '@/common/enums/common.enum';
 import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { JwtConfigType } from '@/common/types/config.type';
 import { simplifyMenuTree } from '@/utils/menu.util';
-import { buildMenuTree, generateRedisKey, generateUUid } from '@/utils/util';
+import { buildMenuTree, generateRedisKey, generateUUid, MenuTreeNode } from '@/utils/util';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -171,7 +171,7 @@ export class AuthService {
     return buildMenuTree(menus, undefined);
   }
 
-  getFirstPage(routes: any[]) {
+  getFirstPage(routes: MenuTreeNode[]): MenuTreeNode | null {
     if (!routes.length) {
       return null;
     }

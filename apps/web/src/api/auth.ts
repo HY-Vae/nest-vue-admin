@@ -4,7 +4,14 @@ import request from '@/utils/request.ts'
 import type { MenuListType } from '@/views/sys/menu/menu.type'
 import type { PermissionType } from '@/views/sys/role/role.type'
 
-export function loginApi(data) {
+export interface LoginReqType {
+  userName: string
+  password: string
+  captcha: string
+  captchaId: string
+}
+
+export function loginApi(data: LoginReqType) {
   return request('/auth/login', {
     method: 'POST',
     data,

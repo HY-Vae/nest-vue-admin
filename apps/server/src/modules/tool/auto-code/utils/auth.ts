@@ -1,6 +1,17 @@
 import { CreateSysMenuDto } from '@/modules/sys/sys-menu/dto/req-sys-menu.dto';
 import { GenerateConfig } from './generate';
 
+interface BtnAuthItem {
+  name: string;
+  auth: string;
+}
+
+interface BtnItem {
+  parentId: number;
+  name: string;
+  auth: string;
+}
+
 export function createMenuBody(config: GenerateConfig): CreateSysMenuDto {
   const paths = config.routePath.split('/');
   return {
@@ -24,7 +35,7 @@ export function createMenuBody(config: GenerateConfig): CreateSysMenuDto {
   };
 }
 
-export function createBtnAuthMap(authPrefix: string, nameZh: string) {
+export function createBtnAuthMap(authPrefix: string, nameZh: string): BtnAuthItem[] {
   return [
     {
       name: `新增${nameZh}`,
@@ -61,8 +72,8 @@ export function createBtns(
   authPrefix: string,
   nameZh: string,
   parentId: number,
-): any[] {
-  return createBtnAuthMap(authPrefix, nameZh).map((item, index) => ({
+): BtnItem[] {
+  return createBtnAuthMap(authPrefix, nameZh).map((item) => ({
     parentId,
     name: item.name,
     auth: item.auth,

@@ -48,20 +48,3 @@ export function getUserOptionsApi(): Promise<Result<SelectOptionItem[]>> {
     method: 'GET',
   })
 }
-
-// ========== 组织架构页面专用接口 ==========
-
-// 获取组织架构部门树（带用户数量）
-export function getOrgDeptTreeApi(): Promise<Result<any[]>> {
-  return request('/sys/dept', {
-    method: 'GET',
-  })
-}
-
-// 获取组织架构岗位列表（带用户数量）
-export function getOrgPostListApi(deptId?: string): Promise<Result<any[]>> {
-  return request('/sys/post', {
-    method: 'GET',
-    params: { deptId, pageSize: 1000 },
-  })
-}

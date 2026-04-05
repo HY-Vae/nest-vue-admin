@@ -8,6 +8,13 @@ import {
   GetSysDeptListDto,
   UpdateSysDeptDto,
 } from './dto/req-sys-dept.dto';
+import type {
+  DeptTreeNode,
+  DeptWithPosts,
+  DeptWithUserCount,
+  OrgTreeNode,
+  PostNode,
+} from './interfaces/sys-dept.interface';
 
 @Injectable()
 export class SysDeptService {
@@ -41,14 +48,10 @@ export class SysDeptService {
     const where: Prisma.SysDeptWhereInput = {};
 
     if (query.deptName != undefined) {
-      where.deptName = {
-        contains: query.deptName,
-      };
+      where.deptName = { contains: query.deptName };
     }
     if (query.deptCode != undefined) {
-      where.deptCode = {
-        contains: query.deptCode,
-      };
+      where.deptCode = { contains: query.deptCode };
     }
     if (query.status != undefined) {
       where.status = query.status;
@@ -62,46 +65,39 @@ export class SysDeptService {
 
     const deptIds = list.map((d) => d.id);
 
-    // 查询每个部门的人数
-    const deptUserCounts = await this.prisma.sysUser.groupBy({
-      by: ['deptId'],
-      _count: { id: true },
-      where: { deptId: { in: deptIds } },
-    });
+    // 如果没有部门，直接返回空树
+    if (deptIds.length === 0) {
+      return { list: [], total: 0 };
+    }
 
-    // 查询每个部门的负责人（岗位 isLeader=true 的用户）
-    const leaders = await this.prisma.sysUser.findMany({
-      where: {
-        deptId: { in: deptIds },
-        post: { isLeader: true },
-      },
-      select: {
-        id: true,
-        nickName: true,
-        userName: true,
-        deptId: true,
-      },
-    });
+    // 并行查询用户数和负责人
+    const [deptUserCounts, leaders] = await Promise.all([
+      // 查询每个部门的人数
+      this.prisma.sysUser.groupBy({
+        by: ['deptId'],
+        _count: { id: true },
+        where: { deptId: { in: deptIds } },
+      }),
+      // 查询每个部门的负责人
+      this.prisma.sysUser.findMany({
+        where: { deptId: { in: deptIds }, post: { isLeader: true } },
+        select: { id: true, nickName: true, userName: true, deptId: true },
+      }),
+    ]);
 
-    // 转换为 Map 方便查询
+    // 构建 Map
     const userCountMap = new Map(
       deptUserCounts.map((item) => [item.deptId, item._count.id]),
     );
-
-    // 负责人 Map（每个部门可能有多个负责人）
     const leaderMap = new Map<string, { id: string; name: string }[]>();
     for (const leader of leaders) {
-      if (!leaderMap.has(leader.deptId!)) {
-        leaderMap.set(leader.deptId!, []);
-      }
-      leaderMap.get(leader.deptId!)!.push({
-        id: leader.id,
-        name: leader.nickName || leader.userName,
-      });
+      const arr = leaderMap.get(leader.deptId!) || [];
+      arr.push({ id: leader.id, name: leader.nickName || leader.userName });
+      leaderMap.set(leader.deptId!, arr);
     }
 
     // 为每个部门添加人数和负责人信息
-    const listWithCount = list.map((item) => {
+    const listWithCount: DeptWithUserCount[] = list.map((item) => {
       const deptLeaders = leaderMap.get(item.id) || [];
       return {
         ...item,
@@ -111,23 +107,18 @@ export class SysDeptService {
       };
     });
 
-    // 构建树形结构
+    // 构建树形结构并计算总人数
     const tree = this.buildTree(listWithCount);
-
-    // 计算每个部门的总人数（包含子部门）
     this.calculateTotalUserCount(tree);
 
-    return {
-      list: tree,
-      total: list.length,
-    };
+    return { list: tree, total: list.length };
   }
 
   /* 构建树形结构 */
   private buildTree(
-    list: any[],
+    list: DeptWithUserCount[],
     parentId: string | null = null,
-  ): any[] {
+  ): DeptTreeNode[] {
     return list
       .filter((item) => item.parentId === parentId)
       .map((item) => ({
@@ -137,7 +128,7 @@ export class SysDeptService {
   }
 
   /* 计算每个部门的总人数（包含子部门） */
-  private calculateTotalUserCount(nodes: any[]): number {
+  private calculateTotalUserCount(nodes: DeptTreeNode[]): number {
     let total = 0;
     for (const node of nodes) {
       // 先递归计算子部门
@@ -255,108 +246,93 @@ export class SysDeptService {
 
   /* 获取组织架构树（部门 + 岗位） */
   async findOrgTree() {
-    // 查询所有部门
-    const depts = await this.prisma.sysDept.findMany({
-      where: { status: '0' },
-      orderBy: { sort: 'asc' },
-      select: {
-        id: true,
-        deptName: true,
-        deptCode: true,
-        parentId: true,
-        sort: true,
-        status: true,
-      },
-    });
+    // 并行查询部门和岗位
+    const [depts, posts] = await Promise.all([
+      this.prisma.sysDept.findMany({
+        where: { status: '0' },
+        orderBy: { sort: 'asc' },
+        select: {
+          id: true,
+          deptName: true,
+          deptCode: true,
+          parentId: true,
+          sort: true,
+          status: true,
+        },
+      }),
+      this.prisma.sysPost.findMany({
+        where: { status: '0' },
+        orderBy: [{ deptId: 'asc' }, { sort: 'asc' }],
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          deptId: true,
+          isLeader: true,
+          sort: true,
+        },
+      }),
+    ]);
 
     const deptIds = depts.map((d) => d.id);
+    const postIds = posts.map((p) => p.id);
 
-    // 查询每个部门的人数
-    const deptUserCounts = await this.prisma.sysUser.groupBy({
-      by: ['deptId'],
-      _count: { id: true },
-      where: { deptId: { in: deptIds } },
-    });
+    // 如果没有部门或岗位，直接返回空树
+    if (deptIds.length === 0 || postIds.length === 0) {
+      return [];
+    }
 
+    // 并行查询用户数
+    const [deptUserCounts, postUserCounts] = await Promise.all([
+      // 部门用户数
+      this.prisma.sysUser.groupBy({
+        by: ['deptId'],
+        _count: { id: true },
+        where: { deptId: { in: deptIds } },
+      }),
+      // 岗位用户数（按 postId + deptId 分组，用于统计每个岗位在各部门的人数）
+      this.prisma.sysUser.groupBy({
+        by: ['postId', 'deptId'],
+        _count: { id: true },
+        where: { postId: { in: postIds }, deptId: { in: deptIds } },
+      }),
+    ]);
+
+    // 构建 Map
     const userCountMap = new Map(
       deptUserCounts.map((item) => [item.deptId, item._count.id]),
     );
-
-    // 查询所有岗位（按部门分组）
-    const posts = await this.prisma.sysPost.findMany({
-      where: { status: '0' },
-      orderBy: [{ deptId: 'asc' }, { sort: 'asc' }],
-      select: {
-        id: true,
-        name: true,
-        code: true,
-        deptId: true,
-        isLeader: true,
-        sort: true,
-      },
-    });
-
-    // 查询每个岗位的人数（按部门过滤）
-    const postIds = posts.map((p) => p.id);
-    const postUserCounts = await this.prisma.sysUser.groupBy({
-      by: ['postId', 'deptId'],
-      _count: { id: true },
-      where: { postId: { in: postIds }, deptId: { in: deptIds } },
-    });
-
-    // 构建岗位用户数 Map: key = `${postId}_${deptId}`
+    // key: `postId_deptId`，value: 用户数
     const postUserCountMap = new Map(
-      postUserCounts.map((item) => [`${item.postId}_${item.deptId}`, item._count.id]),
+      postUserCounts.map((item) => [
+        `${item.postId}_${item.deptId}`,
+        item._count.id,
+      ]),
     );
 
-    // 查询通用岗位（deptId=null）的用户数
+    // 通用岗位（deptId=null）
     const commonPosts = posts.filter((p) => !p.deptId);
-    const commonPostIds = commonPosts.map((p) => p.id);
-    const commonPostUserCounts = await this.prisma.sysUser.groupBy({
-      by: ['postId'],
-      where: { postId: { in: commonPostIds }, deptId: { in: deptIds } },
-      _count: { id: true },
-    });
 
-    const commonPostUserCountMap = new Map(
-      commonPostUserCounts.map((item) => [item.postId, item._count.id]),
-    );
-
-    // 为每个部门添加岗位列表
-    const deptWithPosts = depts.map((dept) => {
-      // 该部门的专属岗位
-      const deptPosts = posts
+    // 为每个部门构建岗位列表
+    const deptWithPosts: DeptWithPosts[] = depts.map((dept) => {
+      // 部门专属岗位
+      const deptPosts: PostNode[] = posts
         .filter((p) => p.deptId === dept.id)
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          code: p.code,
-          isLeader: p.isLeader,
-          sort: p.sort,
-          userCount: postUserCountMap.get(`${p.id}_${dept.id}`) || 0,
-          nodeType: 'post' as const,
-        }));
-
-      // 该部门使用的通用岗位（有人使用的才显示）
-      const usedCommonPosts = commonPosts
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          code: p.code,
-          isLeader: p.isLeader,
-          sort: p.sort,
-          userCount: commonPostUserCountMap.get(p.id) || 0,
-          nodeType: 'post' as const,
-          isCommon: true,
-        }))
-        .filter((p) => {
-          // 只显示该部门有人使用的通用岗位
-          const count = postUserCountMap.get(`${p.id}_${dept.id}`) || 0;
-          return count > 0;
-        })
         .map((p) => ({
           ...p,
           userCount: postUserCountMap.get(`${p.id}_${dept.id}`) || 0,
+          nodeType: 'post' as const,
+          isCommon: false,
+        }));
+
+      // 通用岗位（该部门有人使用的才显示）
+      const usedCommonPosts: PostNode[] = commonPosts
+        .filter((p) => (postUserCountMap.get(`${p.id}_${dept.id}`) || 0) > 0)
+        .map((p) => ({
+          ...p,
+          userCount: postUserCountMap.get(`${p.id}_${dept.id}`) || 0,
+          nodeType: 'post' as const,
+          isCommon: true,
         }));
 
       return {
@@ -367,19 +343,25 @@ export class SysDeptService {
       };
     });
 
-    // 构建树形结构（部门 + 岗位作为子节点）
-    const buildOrgTree = (parentId: string | null = null): any[] => {
+    // 构建树形结构
+    const buildOrgTree = (parentId: string | null = null): OrgTreeNode[] => {
       return deptWithPosts
         .filter((dept) => dept.parentId === parentId)
         .map((dept) => {
           const childDepts = buildOrgTree(dept.id);
           // 岗位排序：负责人优先，然后按 sort 升序
-          const childPosts = (dept.posts || []).sort((a, b) => {
-            if (a.isLeader !== b.isLeader) {
-              return a.isLeader ? -1 : 1;
-            }
-            return (a.sort || 0) - (b.sort || 0);
-          });
+          const childPosts: OrgTreeNode[] = dept.posts
+            .sort((a, b) => {
+              if (a.isLeader !== b.isLeader) return a.isLeader ? -1 : 1;
+              return (a.sort || 0) - (b.sort || 0);
+            })
+            .map((p) => ({
+              ...p,
+              parentId: null,
+              sort: p.sort || 0,
+              status: '0',
+              children: [],
+            }));
 
           return {
             id: dept.id,
@@ -389,34 +371,32 @@ export class SysDeptService {
             sort: dept.sort,
             status: dept.status,
             userCount: dept.userCount,
-            nodeType: 'dept',
-            // 子节点：先子部门，后岗位
+            nodeType: 'dept' as const,
             children: [...childDepts, ...childPosts],
           };
         });
     };
 
     const tree = buildOrgTree();
-
-    // 计算每个部门的总人数（包含子部门）
-    const calculateTotalUserCount = (nodes: any[]): number => {
-      let total = 0;
-      for (const node of nodes) {
-        if (node.nodeType === 'dept') {
-          const childrenTotal = node.children?.length
-            ? calculateTotalUserCount(
-                node.children.filter((c: any) => c.nodeType === 'dept'),
-              )
-            : 0;
-          node.totalUserCount = (node.userCount || 0) + childrenTotal;
-          total += node.totalUserCount;
-        }
-      }
-      return total;
-    };
-
-    calculateTotalUserCount(tree);
+    this.calculateOrgTotalUserCount(tree);
 
     return tree;
+  }
+
+  /* 计算组织架构树的总人数 */
+  private calculateOrgTotalUserCount(nodes: OrgTreeNode[]): number {
+    let total = 0;
+    for (const node of nodes) {
+      if (node.nodeType === 'dept') {
+        const childrenTotal = node.children?.length
+          ? this.calculateOrgTotalUserCount(
+              node.children.filter((c) => c.nodeType === 'dept'),
+            )
+          : 0;
+        node.totalUserCount = (node.userCount || 0) + childrenTotal;
+        total += node.totalUserCount;
+      }
+    }
+    return total;
   }
 }
