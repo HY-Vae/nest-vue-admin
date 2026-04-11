@@ -59,10 +59,8 @@ export class ActionInterceptor implements NestInterceptor {
     };
 
     return next.handle().pipe(
-      // A. 处理成功情况
       tap({
         next: (data) => {
-          console.log('end');
           this.prisma.sysActionLog
             .create({
               data: {
@@ -72,19 +70,23 @@ export class ActionInterceptor implements NestInterceptor {
               },
             })
             .catch((e) => {
-              console.error('日志存储失败:', e.message);
+              this.logger.error('日志存储失败:', e.message);
             });
         },
         error: (err) => {
-          this.prisma.sysActionLog.create({
-            data: {
-              ...logBase,
-              result: null,
-              status: '1', // 假设 '0' 代表失败
-              errorInfo:
-                err instanceof Error ? err.message : JSON.stringify(err),
-            },
-          });
+          this.prisma.sysActionLog
+            .create({
+              data: {
+                ...logBase,
+                result: null,
+                status: '1',
+                errorInfo:
+                  err instanceof Error ? err.message : JSON.stringify(err),
+              },
+            })
+            .catch((e) => {
+              this.logger.error('错误日志存储失败:', e.message);
+            });
         },
       }),
     );

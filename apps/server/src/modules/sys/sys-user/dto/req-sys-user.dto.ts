@@ -25,7 +25,11 @@ export class GetSysUserListDto extends PaginationDto {
   @IsOptional()
   deptId?: string;
 
-  @ApiProperty({ description: '是否包含子部门', required: false, default: false })
+  @ApiProperty({
+    description: '是否包含子部门',
+    required: false,
+    default: false,
+  })
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
   @IsBoolean()
@@ -124,3 +128,40 @@ export class CreateSysUserDto {
 }
 
 export class UpdateSysUserDto extends PartialType(CreateSysUserDto) {}
+
+export class UpdateProfileDto {
+  @ApiProperty({ description: '头像地址', required: false })
+  @IsOptional()
+  @IsString()
+  avatar?: string;
+
+  @ApiProperty({ description: '昵称', required: false })
+  @IsOptional()
+  @IsString()
+  nickName?: string;
+
+  @ApiProperty({ description: '邮箱', required: false })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiProperty({ description: '手机号', required: false })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @ApiProperty({ description: '性别(0男 1女 2未知)', required: false })
+  @IsOptional()
+  @IsString()
+  sex?: string;
+}
+
+export class UpdatePasswordDto {
+  @ApiProperty({ description: '旧密码' })
+  @IsString()
+  oldPassword: string;
+
+  @ApiProperty({ description: '新密码' })
+  @IsString()
+  newPassword: string;
+}

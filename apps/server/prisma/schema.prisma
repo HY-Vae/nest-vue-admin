@@ -32,9 +32,11 @@ model SysUser {
   createdAt DateTime  @default(now()) @map("created_at")
   updateBy  String?   @map("update_by") @db.VarChar(64)
   updatedAt DateTime  @updatedAt @map("updated_at")
-  roles     SysRole[]
-  dept      SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  post      SysPost?  @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  roles       SysRole[]
+  dept        SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  post        SysPost?  @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  noticeReads SysNoticeRead[]
+  todos       SysTodo[]
 
   @@map("sys_user")
 }
@@ -277,6 +279,31 @@ model SysActionLog {
   @@map("sys_action_log")
 }
 
+model SysLoginLog {
+  /// id
+  id        Int      @id @default(autoincrement())
+  /// 用户名
+  userName  String   @map("user_name") @db.VarChar(30)
+  /// 用户ID（登录成功时有值）
+  userId    String?  @map("user_id") @db.VarChar(36)
+  /// 登录IP
+  ip        String?  @db.VarChar(50)
+  /// 登录地点
+  location  String?  @db.VarChar(100)
+  /// 浏览器
+  browser   String?  @db.VarChar(50)
+  /// 操作系统
+  os        String?  @db.VarChar(50)
+  /// 登录状态 (0成功 1失败)
+  status    String   @db.Char(1)
+  /// 失败原因
+  message   String?  @db.VarChar(255)
+  /// 登录时间
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("sys_login_log")
+}
+
 model AutoCode {
   /// id
   id        Int       @id @default(autoincrement())
@@ -331,4 +358,80 @@ model FileUpload {
   updatedAt DateTime? @updatedAt @map("updated_at")
 
   @@map("file_upload")
+}
+
+model SysNotice {
+  /// id
+  id        String           @id @db.VarChar(36)
+  /// 标题
+  title     String           @db.VarChar(100)
+  /// 内容
+  content   String           @db.Text
+  /// 类型 (notice公告 warning警告)
+  type      String           @default("notice") @db.VarChar(10)
+  /// 状态 (0正常 1关闭)
+  status    String           @default("0") @db.Char(1)
+  /// 创建人
+  createBy  String?          @map("create_by") @db.VarChar(64)
+  /// 创建时间
+  createdAt DateTime         @default(now()) @map("created_at")
+  /// 修改人
+  updateBy  String?          @map("update_by") @db.VarChar(64)
+  /// 修改时间
+  updatedAt DateTime         @updatedAt @map("updated_at")
+  /// 阅读记录
+  reads     SysNoticeRead[]
+
+  @@map("sys_notice")
+}
+
+model SysNoticeRead {
+  /// id
+  id        String    @id @db.VarChar(36)
+  /// 通知ID
+  noticeId  String    @map("notice_id") @db.VarChar(36)
+  /// 用户ID
+  userId    String    @map("user_id") @db.VarChar(36)
+  /// 阅读时间
+  readAt    DateTime  @default(now()) @map("read_at")
+
+  notice    SysNotice @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  user      SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([noticeId, userId])
+  @@map("sys_notice_read")
+}
+
+/// 待办事项
+model SysTodo {
+  /// id
+  id          String    @id @db.VarChar(36)
+  /// 标题
+  title       String    @db.VarChar(200)
+  /// 内容
+  content     String    @db.Text
+  /// 业务类型：approval审批, confirm确认, review审核
+  bizType     String    @db.VarChar(20)
+  /// 优先级：urgent紧急, high高, normal普通, low低
+  priority    String    @default("normal") @db.VarChar(10)
+  /// 状态：pending待处理, completed已完成, cancelled已取消
+  status      String    @default("pending") @db.VarChar(20)
+  /// 关联链接（跳转处理页面）
+  link        String?   @db.VarChar(255)
+  /// 关联业务ID（审批单ID等）
+  bizId       String?   @map("biz_id") @db.VarChar(36)
+  /// 目标用户ID
+  userId      String    @map("user_id") @db.VarChar(36)
+  /// 创建人
+  createBy    String?   @map("create_by") @db.VarChar(64)
+  /// 创建时间
+  createdAt   DateTime  @default(now()) @map("created_at")
+  /// 完成人
+  completeBy  String?   @map("complete_by") @db.VarChar(36)
+  /// 完成时间
+  completedAt DateTime? @map("completed_at")
+
+  user        SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sys_todo")
 }

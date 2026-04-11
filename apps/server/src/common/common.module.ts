@@ -1,4 +1,4 @@
-import { Global, Module, ValidationPipe } from '@nestjs/common';
+import { Global, Logger, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { CacheModeEnum } from '@/common/enums/config.enum';
@@ -18,6 +18,8 @@ import { PrismaModule } from 'nestjs-prisma';
 import { PermissionGuard } from './guards/permission.guard';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { PrismaConfigService } from './prismaService/prismaConfigService';
+
+const logger = new Logger('CacheModule');
 
 @Global()
 @Module({
@@ -74,17 +76,17 @@ import { PrismaConfigService } from './prismaService/prismaConfigService';
           client
             .connect()
             .then(() => {
-              console.log('Redis connected successfully');
+              logger.log('Redis connected successfully');
             })
             .catch((error) => {
-              console.error('Redis connection failed:', error);
+              logger.error('Redis connection failed:', error);
             });
           stores.push(redisStore);
         } else {
           const memoryStore = new Keyv({
             store: new CacheableMemory({ ttl: 60000, lruSize: 5000 }),
           });
-          console.log('cache is using Memory Cache');
+          logger.log('Cache is using Memory Cache');
           stores.push(memoryStore);
         }
 

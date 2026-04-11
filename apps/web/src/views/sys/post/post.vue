@@ -99,7 +99,9 @@
 
           <el-table-column label="启用状态" align="center" prop="status" width="100">
             <template #default="scope">
-              {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+                {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              </el-tag>
             </template>
           </el-table-column>
 

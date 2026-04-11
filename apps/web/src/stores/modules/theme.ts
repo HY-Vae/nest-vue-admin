@@ -21,6 +21,7 @@ export const useThemeStore = defineStore(
   () => {
     const isDark = ref(false)
     const primaryColor = ref('#409eff')
+    const isCollapse = ref(false)
 
     const toggleDark = () => {
       isDark.value = !isDark.value
@@ -28,6 +29,10 @@ export const useThemeStore = defineStore(
 
     const setPrimaryColor = (color: string) => {
       primaryColor.value = color
+    }
+
+    const toggleCollapse = () => {
+      isCollapse.value = !isCollapse.value
     }
 
     const applyTheme = () => {
@@ -82,16 +87,18 @@ export const useThemeStore = defineStore(
     return {
       isDark,
       primaryColor,
+      isCollapse,
       presetColors,
       toggleDark,
       setPrimaryColor,
+      toggleCollapse,
       applyTheme,
     }
   },
   {
     persist: {
       key: 'admin-theme',
-      pick: ['isDark', 'primaryColor'],
+      pick: ['isDark', 'primaryColor', 'isCollapse'],
     },
   },
 )

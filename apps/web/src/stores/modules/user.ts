@@ -1,5 +1,6 @@
-import { getRoutesApi, getUserInfoApi } from '@/api/auth.ts'
+import { getRoutesApi, getUserInfoApi, logoutApi } from '@/api/auth.ts'
 import router from '@/router'
+import { useSearchParamsStore } from '@/stores/modules/searchParams'
 import { useTabsStore } from '@/stores/modules/tabs'
 import type { CurrentUserType } from '@/types/user.ts'
 import { transMenuRouter } from '@/utils/route.ts'
@@ -49,7 +50,13 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // 退出登录时清除状态
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // 调用服务端退出接口
+      await logoutApi()
+    } catch {
+      // API 调用失败也继续清理本地状态
+    }
     // 清除动态添加的路由
     addedRouteNames.value.forEach((name) => {
       router.removeRoute(name)
@@ -62,6 +69,9 @@ export const useUserStore = defineStore('user', () => {
     const tabsStore = useTabsStore()
     tabsStore.tabs = []
     tabsStore.activeTab = ''
+    // 清除搜索条件
+    const searchParamsStore = useSearchParamsStore()
+    searchParamsStore.clearAllParams()
     // 清除 token
     localStorage.removeItem('token')
   }

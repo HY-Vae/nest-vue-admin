@@ -126,7 +126,6 @@ export function createWebTempNew(options: GenerateConfig) {
       const webPath = path.resolve(process.cwd(), '../web/src');
       // 获取生成的两个文件路径
       const viewPath = path.join(webPath, 'views', options.webPath, fName);
-      console.log('viewPath', viewPath);
       writeFileSync(viewPath, result);
     }
   });
@@ -260,7 +259,6 @@ async function formatCode(content: string): Promise<string> {
   const options =
     (await prettier.resolveConfig(path.join(process.cwd(), '.prettierrc'))) ||
     {};
-  console.log('options', options);
   return prettier.format(content, {
     ...options,
     parser: 'typescript',
@@ -276,7 +274,6 @@ async function formatWebCode(
     (await prettier.resolveConfig(
       path.join(webConfigPath, '.prettierrc.json'),
     )) || {};
-  console.log('web options', options);
   return prettier.format(content, {
     ...options,
     parser,
@@ -337,20 +334,9 @@ export async function generateServerFiles(config: GenerateConfig, temp: Temp) {
 export default async function generateCRUD(config: GenerateConfig) {
   createWebTemp(config);
 
-  // // 4. 生成目录结构
-  // const outputDir = path.join(process.cwd(), 'src', config.camelCase);
-  // if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
-
-  // 5. 写入文件
-
-  console.log('123');
   // 6.追加model 文件
-  child_process.exec('npm run db:g', (...arg) => {
-    console.log('generate arg', arg);
-  });
-  child_process.exec('npm run format', (...arg) => {
-    console.log('format arg', arg);
-  });
+  child_process.exec('npm run db:g');
+  child_process.exec('npm run format');
 
   console.log(`✅ ${config.name} 模块生成成功`);
 }

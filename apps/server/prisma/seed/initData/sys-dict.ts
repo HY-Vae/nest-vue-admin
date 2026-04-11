@@ -54,6 +54,17 @@ const dicts: Dict[] = [
       { label: '请求失败', value: '1', sort: 1, status: '0', createBy: 'nva' },
     ],
   },
+  {
+    name: '登录状态',
+    code: 'loginStatus',
+    sort: 4,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '登录成功', value: '0', sort: 0, status: '0', createBy: 'nva' },
+      { label: '登录失败', value: '1', sort: 1, status: '0', createBy: 'nva' },
+    ],
+  },
 ];
 
 export async function initDicts(prisma: PrismaClient) {

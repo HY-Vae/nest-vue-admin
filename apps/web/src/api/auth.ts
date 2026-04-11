@@ -44,3 +44,9 @@ export function getAllPermissionsApi(): Promise<Result<PermissionType>> {
     method: 'GET',
   })
 }
+
+export function logoutApi(): Promise<Result<null>> {
+  return request('/auth/logout', {
+    method: 'POST',
+  })
+}

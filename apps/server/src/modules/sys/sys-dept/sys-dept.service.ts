@@ -1,6 +1,8 @@
+import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { ApiException } from '@/common/exceptions/api.exception';
-import { generateUUid } from '@/utils/util';
-import { Injectable } from '@nestjs/common';
+import { generateRedisKey, generateUUid } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import {
@@ -18,7 +20,10 @@ import type {
 
 @Injectable()
 export class SysDeptService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   /* 新增 */
   async create(createSysDeptDto: CreateSysDeptDto) {
@@ -183,13 +188,26 @@ export class SysDeptService {
       throw new ApiException('父级部门不能是自己');
     }
 
-    return this.prisma.sysDept.update({
+    const dept = await this.prisma.sysDept.update({
       where: { id },
       data: {
         ...other,
         parentId: parentId || null,
       },
     });
+
+    // 清除该部门下所有用户的缓存
+    const users = await this.prisma.sysUser.findMany({
+      where: { deptId: id },
+      select: { id: true },
+    });
+    for (const user of users) {
+      await this.cacheManager.del(
+        generateRedisKey(REDIS_KEYS.USER_INFO, user.id),
+      );
+    }
+
+    return dept;
   }
 
   /* 删除 */

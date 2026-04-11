@@ -9,6 +9,8 @@ import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysUserDto,
   GetSysUserListDto,
+  UpdatePasswordDto,
+  UpdateProfileDto,
   UpdateSysUserDto,
 } from './dto/req-sys-user.dto';
 
@@ -241,5 +243,68 @@ export class SysUserService {
         id,
       },
     });
+  }
+
+  /* 获取当前用户个人信息 */
+  async getProfile(userId: string) {
+    const user = await this.prisma.sysUser.findUnique({
+      where: { id: userId },
+      omit: { password: true },
+      include: {
+        dept: {
+          select: { id: true, deptName: true },
+        },
+        post: {
+          select: { id: true, name: true },
+        },
+        roles: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+    if (!user) {
+      throw new ApiException('用户不存在');
+    }
+    return user;
+  }
+
+  /* 更新个人信息 */
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const user = await this.prisma.sysUser.update({
+      where: { id: userId },
+      data: updateProfileDto,
+      omit: { password: true },
+    });
+    await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId));
+    return user;
+  }
+
+  /* 修改密码 */
+  async updatePassword(userId: string, updatePasswordDto: UpdatePasswordDto) {
+    const user = await this.prisma.sysUser.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new ApiException('用户不存在');
+    }
+
+    const isMatch = await bcrypt.compare(
+      updatePasswordDto.oldPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new ApiException('旧密码错误');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const password = await bcrypt.hash(updatePasswordDto.newPassword, salt);
+
+    await this.prisma.sysUser.update({
+      where: { id: userId },
+      data: { password },
+    });
+
+    await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId));
+    return null;
   }
 }

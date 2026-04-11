@@ -108,15 +108,11 @@
 
           <el-table-column label="姓名" align="center" prop="userName" />
 
-          <el-table-column label="请求参数" align="center" prop="params" show-overflow-tooltip />
-
-          <el-table-column label="响应结果" align="center" prop="result" show-overflow-tooltip />
-
-          <el-table-column label="错误信息" align="center" prop="errorInfo" show-overflow-tooltip />
-
           <el-table-column label="状态" align="center" prop="status">
             <template #default="scope">
-              {{ getDictLabel(requestStatusOptions, scope.row.status) }}
+              <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+                {{ getDictLabel(requestStatusOptions, scope.row.status) }}
+              </el-tag>
             </template>
           </el-table-column>
 
@@ -125,6 +121,14 @@
           <el-table-column label="创建时间" align="center" width="180">
             <template #default="scope">
               <span>{{ transTime(scope.row.createdAt) }}</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="操作" align="center" width="100">
+            <template #default="scope">
+              <el-button type="primary" link @click="handleViewDetail(scope.row)">
+                查看详情
+              </el-button>
             </template>
           </el-table-column>
           <template #empty>
@@ -145,6 +149,63 @@
         />
       </el-row>
     </el-card>
+
+    <!-- 详情弹窗 -->
+    <el-dialog v-model="detailVisible" title="操作日志详情" width="700px">
+      <el-descriptions :column="2" border v-if="currentDetail">
+        <el-descriptions-item label="标题" :span="2">
+          {{ currentDetail.title }}
+        </el-descriptions-item>
+        <el-descriptions-item label="操作类型">
+          {{ currentDetail.action }}
+        </el-descriptions-item>
+        <el-descriptions-item label="请求方式">
+          {{ currentDetail.method }}
+        </el-descriptions-item>
+        <el-descriptions-item label="IP">
+          {{ currentDetail.ip }}
+        </el-descriptions-item>
+        <el-descriptions-item label="地址">
+          {{ currentDetail.address }}
+        </el-descriptions-item>
+        <el-descriptions-item label="用户ID">
+          {{ currentDetail.userId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="姓名">
+          {{ currentDetail.userName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="状态">
+          <el-tag :type="currentDetail.status === '0' ? 'success' : 'danger'">
+            {{ getDictLabel(requestStatusOptions, currentDetail.status) }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="创建时间">
+          {{ transTime(currentDetail.createdAt) }}
+        </el-descriptions-item>
+      </el-descriptions>
+
+      <el-tabs v-if="currentDetail" class="detail-tabs">
+        <el-tab-pane label="请求参数">
+          <div class="detail-content">
+            <pre>{{ formatJson(currentDetail.params) || '无' }}</pre>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="响应结果">
+          <div class="detail-content">
+            <pre>{{ formatJson(currentDetail.result) || '无' }}</pre>
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="错误信息" v-if="currentDetail.errorInfo">
+          <div class="detail-content error">
+            <pre>{{ currentDetail.errorInfo }}</pre>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 <script setup lang="ts">
@@ -228,8 +289,54 @@ const handleSizeChange = () => {
 const handleCurrentChange = () => {
   runGetSysActionLog()
 }
+
+// 详情弹窗
+const detailVisible = ref(false)
+const currentDetail = ref<SysActionLogListType | null>(null)
+
+const handleViewDetail = (row: SysActionLogListType) => {
+  currentDetail.value = row
+  detailVisible.value = true
+}
+
+// 格式化 JSON 显示
+const formatJson = (str: string | null | undefined) => {
+  if (!str) return ''
+  try {
+    const obj = typeof str === 'string' ? JSON.parse(str) : str
+    return JSON.stringify(obj, null, 2)
+  } catch {
+    return str
+  }
+}
 </script>
 <style scoped lang="scss">
 .sysActionLog-container {
+}
+
+.detail-tabs {
+  margin-top: 16px;
+}
+
+.detail-content {
+  max-height: 300px;
+  overflow: auto;
+  background-color: var(--el-fill-color-light);
+  border-radius: 4px;
+  padding: 12px;
+
+  pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 13px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    line-height: 1.5;
+  }
+
+  &.error {
+    background-color: var(--el-color-danger-light-9);
+    color: var(--el-color-danger);
+  }
 }
 </style>

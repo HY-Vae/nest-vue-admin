@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as bcrypt from 'bcryptjs';
 import { WinstonModule } from 'nest-winston';
 import path, { join } from 'path';
 import { AppModule } from './app.module';
@@ -45,10 +44,8 @@ async function bootstrap() {
   }
 
   await app.listen(port);
-  const salt = await bcrypt.genSalt();
-  const password = await bcrypt.hash('123456', salt);
-  console.log(password);
+  // 启动日志使用 console 是标准做法，此时 Logger 可能未完全初始化
   console.log(`服务启动成功，端口：http://127.0.0.1:${port}`);
-  console.log(`文档地址：http://127.0.0.1:3333/document`);
+  console.log(`文档地址：http://127.0.0.1:${port}/document`);
 }
 bootstrap();

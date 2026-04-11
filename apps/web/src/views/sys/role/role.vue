@@ -46,7 +46,9 @@
           <el-table-column prop="key" align="center" label="角色值" />
           <el-table-column prop="status" align="center" label="角色状态">
             <template #default="scope">
-              {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+                {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="sort" align="center" label="排序" />

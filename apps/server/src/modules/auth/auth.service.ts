@@ -15,7 +15,12 @@ import { EnableStatusEnum } from '@/common/enums/common.enum';
 import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { JwtConfigType } from '@/common/types/config.type';
 import { simplifyMenuTree } from '@/utils/menu.util';
-import { buildMenuTree, generateRedisKey, generateUUid, MenuTreeNode } from '@/utils/util';
+import {
+  buildMenuTree,
+  generateRedisKey,
+  generateUUid,
+  MenuTreeNode,
+} from '@/utils/util';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -240,6 +245,12 @@ export class AuthService {
       where: {
         id: id,
       },
+      include: {
+        dept: {
+          select: { id: true, deptName: true, deptCode: true },
+        },
+        post: true,
+      },
     });
     if (!user) throw new ApiException('用户不存在');
     // 获取菜单、获取按钮权限
@@ -252,8 +263,11 @@ export class AuthService {
     } else {
       permissions = await this.getPermissions(roleIds);
     }
+    const { dept, post, ...userData } = user;
     const currentUser: CurrentUserType = {
-      ...user,
+      ...userData,
+      dept,
+      post,
       isSuper,
       permissions,
     };
@@ -275,5 +289,14 @@ export class AuthService {
       user = await this.findOne(userId);
     }
     return user;
+  }
+
+  async logout(userId: string) {
+    // 清除用户信息缓存
+    await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId));
+    // 清除用户 token 缓存
+    await this.cacheManager.del(
+      generateRedisKey(REDIS_KEYS.USER_TOKEN, userId),
+    );
   }
 }

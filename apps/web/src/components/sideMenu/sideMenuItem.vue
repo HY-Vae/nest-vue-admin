@@ -12,19 +12,28 @@ const props = defineProps({
   <template v-if="menu.children?.length">
     <el-sub-menu :index="menu.name" v-if="!menu.hidden">
       <template #title>
-        <!--        <el-icon><location /></el-icon>-->
-        <Icon :icon="menu.meta.icon" v-if="menu.meta.icon" :size="20" class="mr-[4px]!" />
-        <span class="">{{ menu.meta?.title }}</span>
+        <el-icon :size="22">
+          <Icon :icon="menu.meta.icon" :size="22" v-if="menu.meta.icon" class="menu-icon" />
+        </el-icon>
+        <span>{{ menu.meta?.title }}</span>
       </template>
       <side-menu-item v-for="item in menu.children" :key="item.id" :menu="item" />
     </el-sub-menu>
   </template>
   <template v-else>
     <el-menu-item :index="menu.name" v-if="!menu.hidden">
-      <Icon :icon="menu.meta.icon" v-if="menu.meta.icon" :size="20" class="mr-[4px]!" />
-      {{ menu.meta?.title }}
+      <el-icon :size="22">
+        <Icon :icon="menu.meta.icon" :size="22" v-if="menu.meta.icon" class="menu-icon" />
+      </el-icon>
+      <template #title>
+        <span>{{ menu.meta?.title }}</span>
+      </template>
     </el-menu-item>
   </template>
 </template>
 
-<style scoped></style>
+<style scoped>
+.menu-icon {
+  transition: color 0.25s ease;
+}
+</style>

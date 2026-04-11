@@ -356,13 +356,14 @@ const handleRemoveAvatar = () => {
         </el-col>
         <el-col v-bind="formSpan">
           <el-form-item label="用户状态" :label-width="formLabelWidth" prop="status">
-            <el-select v-model="userForm.status" placeholder="请选择用户状态">
-              <el-option
-                v-for="item in enableStatusOptions"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
+            <el-switch
+              v-model="userForm.status"
+              active-value="0"
+              inactive-value="1"
+              active-text="启用"
+              inactive-text="停用"
+              inline-prompt
+            />
           </el-form-item>
         </el-col>
         <el-col v-bind="formSpan">

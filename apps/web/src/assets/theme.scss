@@ -137,6 +137,71 @@ html.dark {
     --el-menu-text-color: #cfd3dc;
     --el-menu-hover-bg-color: #262727;
   }
+
+  /* 空状态暗黑模式 */
+  .el-empty {
+    --el-empty-fill-color-0: #363637;
+    --el-empty-fill-color-1: #3a3a3c;
+    --el-empty-fill-color-2: #3e3e40;
+    --el-empty-fill-color-3: #424244;
+    --el-empty-fill-color-4: #464648;
+    --el-empty-fill-color-5: #4a4a4c;
+    --el-empty-fill-color-6: #4e4e50;
+    --el-empty-fill-color-7: #525254;
+    --el-empty-fill-color-8: #565658;
+    --el-empty-fill-color-9: #5a5a5c;
+  }
+
+  /* 消息中心暗黑模式 */
+  .message-center {
+    .message-item {
+      background-color: #262727;
+      border-color: #363637;
+
+      &:hover {
+        background-color: #303030;
+        border-color: var(--el-color-primary);
+      }
+
+      &.unread {
+        background-color: rgba(64, 158, 255, 0.15);
+        border-color: rgba(64, 158, 255, 0.4);
+      }
+    }
+
+    .menu-item {
+      &.active {
+        background-color: rgba(64, 158, 255, 0.15);
+      }
+    }
+  }
+
+  /* 通知弹窗暗黑模式 */
+  .notice-popover {
+    background-color: #1d1d1d;
+
+    .notice-item {
+      background-color: transparent;
+      border-color: #363637;
+
+      &:hover {
+        background-color: #262727;
+        border-color: #414243;
+      }
+
+      &.is-unread {
+        background-color: rgba(64, 158, 255, 0.15);
+        border-color: rgba(64, 158, 255, 0.4);
+      }
+    }
+  }
+
+  /* 通知详情弹窗暗黑模式 */
+  .notice-detail-dialog {
+    .el-dialog__body {
+      background-color: #1d1d1d;
+    }
+  }
 }
 
 /* 浅色模式样式 */

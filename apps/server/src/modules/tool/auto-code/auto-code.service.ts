@@ -97,7 +97,7 @@ export class AutoCodeService {
       menuBody.parentId = parentMenu.id;
     }
     await this.prisma.$transaction(async (tx) => {
-      let { menuBtns, meta, parameters = [], path, ...others } = menuBody;
+      const { menuBtns, meta, parameters = [], path, ...others } = menuBody;
       const menuPath = posix.join(parentMenu?.path || '/', path);
       await tx.sysMenu.create({
         data: {
@@ -162,7 +162,7 @@ export class AutoCodeService {
       menuBody.parentId = parentMenu.id;
     }
     await this.prisma.$transaction(async (tx) => {
-      let { menuBtns, parameters = [], meta, ...others } = menuBody;
+      const { menuBtns, parameters = [], meta, ...others } = menuBody;
       await tx.sysMenu.create({
         data: {
           ...others,

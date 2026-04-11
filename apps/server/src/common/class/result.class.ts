@@ -1,7 +1,10 @@
 import { CommonResultType } from '../types/common.type';
 
 export class Result {
-  static success<T>(data: T, message: string = '操作成功'): CommonResultType<T> {
+  static success<T>(
+    data: T,
+    message: string = '操作成功',
+  ): CommonResultType<T> {
     return {
       code: 200,
       data,

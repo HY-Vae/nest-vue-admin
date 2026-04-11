@@ -58,4 +58,13 @@ export class AuthController {
   findOne(@User() user: CurrentUserType) {
     return user;
   }
+
+  @ApiOperation({
+    summary: '退出登录',
+  })
+  @Post('logout')
+  async logout(@User() user: CurrentUserType) {
+    await this.authService.logout(user.id);
+    return null;
+  }
 }

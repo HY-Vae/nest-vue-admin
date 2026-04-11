@@ -1,5 +1,10 @@
 import { CurrentUserType } from '@/common/types/auth.type';
-import { ArgumentMetadata, Inject, Injectable, PipeTransform } from '@nestjs/common';
+import {
+  ArgumentMetadata,
+  Inject,
+  Injectable,
+  PipeTransform,
+} from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 
 interface RequestWithUser {
@@ -9,7 +14,10 @@ interface RequestWithUser {
 @Injectable()
 export class CreateDtoPipe implements PipeTransform {
   constructor(@Inject(REQUEST) private readonly request: RequestWithUser) {}
-  transform<T extends { createBy?: string }>(value: T, metadata: ArgumentMetadata): T {
+  transform<T extends { createBy?: string }>(
+    value: T,
+    metadata: ArgumentMetadata,
+  ): T {
     const user = this.request.user;
     if (user) {
       value.createBy = user.nickName;

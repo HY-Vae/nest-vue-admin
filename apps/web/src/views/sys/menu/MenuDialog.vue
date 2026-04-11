@@ -353,10 +353,14 @@ watch(
           <el-row :gutter="24">
             <el-col :span="6">
               <el-form-item label="菜单状态" :label-width="formLabelWidth" prop="status">
-                <el-select v-model="menuForm.status" placeholder="请选择菜单状态">
-                  <el-option label="正常" value="0" />
-                  <el-option label="异常" value="1" />
-                </el-select>
+                <el-switch
+                  v-model="menuForm.status"
+                  active-value="0"
+                  inactive-value="1"
+                  active-text="启用"
+                  inactive-text="停用"
+                  inline-prompt
+                />
               </el-form-item>
             </el-col>
             <el-col :span="6">

@@ -1,10 +1,10 @@
+import { CurrentUserType } from '@/common/types/auth.type';
 import { AuthService } from '@/modules/auth/auth.service';
 import { LoginReqDto } from '@/modules/auth/dto/req-auth.dto';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-local';
 import { Request } from 'express';
-import { CurrentUserType } from '@/common/types/auth.type';
+import { Strategy } from 'passport-local';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {

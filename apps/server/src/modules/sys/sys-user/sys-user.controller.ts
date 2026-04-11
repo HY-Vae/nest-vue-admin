@@ -2,9 +2,9 @@ import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
 import { User } from '@/common/decorators/user.decorator';
 import { ActionEnum } from '@/common/enums/action.enum';
-import type { CurrentUserType } from '@/common/types/auth.type';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
+import type { CurrentUserType } from '@/common/types/auth.type';
 import {
   Body,
   Controller,
@@ -19,6 +19,8 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysUserDto,
   GetSysUserListDto,
+  UpdatePasswordDto,
+  UpdateProfileDto,
   UpdateSysUserDto,
 } from './dto/req-sys-user.dto';
 import { SysUserService } from './sys-user.service';
@@ -54,6 +56,36 @@ export class SysUserController {
   @Get('options')
   getOptions() {
     return this.sysUserService.getOptions();
+  }
+
+  @ApiOperation({
+    summary: '获取当前用户个人信息',
+  })
+  @Get('profile')
+  getProfile(@User() user: CurrentUserType) {
+    return this.sysUserService.getProfile(user.id);
+  }
+
+  @ApiOperation({
+    summary: '更新个人信息',
+  })
+  @Patch('profile')
+  updateProfile(
+    @User() user: CurrentUserType,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.sysUserService.updateProfile(user.id, updateProfileDto);
+  }
+
+  @ApiOperation({
+    summary: '修改密码',
+  })
+  @Patch('password')
+  updatePassword(
+    @User() user: CurrentUserType,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    return this.sysUserService.updatePassword(user.id, updatePasswordDto);
   }
 
   @ApiOperation({

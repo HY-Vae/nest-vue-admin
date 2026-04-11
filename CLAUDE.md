@@ -72,3 +72,6 @@ throw new ApiException('错误信息');  // 业务错误
 ## 前端
 1. 表单元素增加clearable属性，下拉框数据增加filterable，textarea的时候增加字数显示，
 2. 当类型为字符串的时候，应该增加长度的限制，长度为prisma Model中的长度定义
+3. 使用 `storeToRefs` 解构 Pinia store 的状态，避免在模板中多层嵌套访问（如 `userStore.currentUser` → `currentUser`）
+4. 样式统一使用 CSS/SCSS 类控制，避免内联 style，便于维护
+5. 对象操作优先使用扩展运算符 `...obj` 或 `Object.assign`，避免逐字段赋值

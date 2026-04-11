@@ -1,5 +1,5 @@
 import { GenCodeType } from '@/common/types/config.type';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { dotCase, pascalCase } from 'change-case';
 import child_process from 'node:child_process';
@@ -10,6 +10,7 @@ import { Node, Project, SyntaxKind } from 'ts-morph';
 
 @Injectable()
 export class GenService {
+  private readonly logger = new Logger(GenService.name);
   private genConfig: GenCodeType;
   constructor(private readonly configService: ConfigService) {
     this.genConfig = this.configService.get('genCode') as GenCodeType;
@@ -82,9 +83,9 @@ export class GenService {
       }
       child_process.exec('npm run format', (err) => {
         if (err) {
-          console.error('格式化代码时出错：', err);
+          this.logger.error('格式化代码时出错：', err);
         } else {
-          console.log('代码格式化成功！');
+          this.logger.log('代码格式化成功！');
         }
       });
     }
@@ -151,7 +152,7 @@ export class GenService {
       return element.getText() === nextModuleName;
     });
     if (existingModule) {
-      console.log(`模块 ${nextModuleName} 已存在，无需重复添加`);
+      this.logger.log(`模块 ${nextModuleName} 已存在，无需重复添加`);
       return;
     }
 

@@ -124,15 +124,14 @@ watch(
         <el-input v-model="dictDetailForm.value" autocomplete="off" />
       </el-form-item>
       <el-form-item label="字典状态" :label-width="formLabelWidth" prop="status">
-        <el-select v-model="dictDetailForm.status" placeholder="请选择字典状态">
-          <el-option
-            v-for="item in enableStatusOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option>
-        </el-select>
+        <el-switch
+          v-model="dictDetailForm.status"
+          active-value="0"
+          inactive-value="1"
+          active-text="启用"
+          inactive-text="停用"
+          inline-prompt
+        />
       </el-form-item>
       <el-form-item label="排序" :label-width="formLabelWidth" prop="sort">
         <el-input-number

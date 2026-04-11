@@ -179,26 +179,6 @@ export async function initMenus(prisma: PrismaClient) {
     ],
   });
 
-  // 组织架构
-  await upsertMenu(prisma, {
-    name: 'org-user',
-    parentId: sysRoot.id,
-    path: '/sys/org-user',
-    auth: 'sys:org-user',
-    component: 'views/sys/user/orgUser.vue',
-    hidden: false,
-    sort: 0.5,
-    status: '0',
-    meta: { title: '组织架构', icon: 'ri:organization-chart', closeTab: true },
-    btns: [
-      { name: '新增用户', auth: 'sys:user:create' },
-      { name: '删除用户', auth: 'sys:user:remove' },
-      { name: '编辑用户', auth: 'sys:user:update' },
-      { name: '查询用户列表', auth: 'sys:user:list' },
-      { name: '查询用户详情', auth: 'sys:user:detail' },
-    ],
-  });
-
   // 操作日志
   await upsertMenu(prisma, {
     name: 'sys-action-log',
@@ -212,6 +192,25 @@ export async function initMenus(prisma: PrismaClient) {
     btns: [
       { name: '查询操作日志列表', auth: 'sys:sys-action-log:list' },
       { name: '查询操作日志详情', auth: 'sys:sys-action-log:detail' },
+    ],
+  });
+
+  // 通知公告
+  await upsertMenu(prisma, {
+    name: 'sys-notice',
+    parentId: sysRoot.id,
+    path: '/sys/notice',
+    auth: 'sys:notice',
+    component: 'views/sys/notice/notice.vue',
+    sort: 7,
+    status: '0',
+    meta: { title: '通知公告', icon: 'ri:notification-3-line', closeTab: true },
+    btns: [
+      { name: '新增通知公告', auth: 'sys:notice:create' },
+      { name: '删除通知公告', auth: 'sys:notice:remove' },
+      { name: '编辑通知公告', auth: 'sys:notice:update' },
+      { name: '查询通知公告列表', auth: 'sys:notice:list' },
+      { name: '查询通知公告详情', auth: 'sys:notice:detail' },
     ],
   });
 
@@ -355,6 +354,51 @@ export async function initMenus(prisma: PrismaClient) {
       { name: '查询附件上传列表', auth: 'upload:file:list' },
       { name: '查询附件上传详情', auth: 'upload:file:detail' },
     ],
+  });
+
+  // ========== 消息中心 ==========
+
+  // 消息中心根菜单
+  const messageRoot = await prisma.sysMenu.upsert({
+    where: { name: 'message-center' },
+    update: {
+      path: '/message-center',
+      auth: 'message-center',
+      component: 'views/layout/basic.vue',
+      sort: 1,
+      status: '0',
+    },
+    create: {
+      path: '/message-center',
+      name: 'message-center',
+      auth: 'message-center',
+      component: 'views/layout/basic.vue',
+      sort: 1,
+      status: '0',
+    },
+  });
+
+  await prisma.sysMenuMeta.upsert({
+    where: { sysMenuId: messageRoot.id },
+    update: { title: '消息中心', icon: 'ri:message-2-line', closeTab: true },
+    create: {
+      title: '消息中心',
+      icon: 'ri:message-2-line',
+      closeTab: true,
+      sysMenuId: messageRoot.id,
+    },
+  });
+
+  // 消息中心页面
+  await upsertMenu(prisma, {
+    name: 'message-list',
+    parentId: messageRoot.id,
+    path: '/message-center/list',
+    auth: 'message-center:list',
+    component: 'views/message-center/index.vue',
+    sort: 0,
+    status: '0',
+    meta: { title: '消息列表', icon: '', closeTab: true },
   });
 
   // 欢迎页面

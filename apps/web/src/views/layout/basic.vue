@@ -3,11 +3,15 @@ import TabsView from '@/components/tabs/TabsView.vue'
 import TheHeader from '@/components/header/TheHeader.vue'
 import SideMenu from '@/components/sideMenu/index.vue'
 import { useTabsStore } from '@/stores/modules/tabs'
+import { useThemeStore } from '@/stores/modules/theme'
+import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const tabsStore = useTabsStore()
+const themeStore = useThemeStore()
+const { isCollapse } = storeToRefs(themeStore)
 
 watch(
   () => route.path,
@@ -20,10 +24,10 @@ watch(
 
 <template>
   <div class="nva-container">
-    <div class="aside">
+    <div class="aside" :class="{ 'is-collapse': isCollapse }">
       <div class="logo">
         <img src="@/assets/logo.svg" alt="logo" class="logo-img" />
-        <span class="logo-text">Admin</span>
+        <span class="logo-text" v-show="!isCollapse">Admin</span>
       </div>
       <side-menu />
     </div>
@@ -51,24 +55,40 @@ watch(
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--el-border-color-lighter);
+    transition: width 0.3s ease, flex 0.3s ease;
+
+    &.is-collapse {
+      width: 64px;
+      flex: 0 0 64px;
+
+      .logo {
+        justify-content: center;
+        padding: 0;
+      }
+    }
 
     .logo {
       height: 50px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 8px;
       flex-shrink: 0;
+      padding-left: 20px;
+      transition: all 0.3s ease;
 
       .logo-img {
         width: 28px;
         height: 28px;
+        flex-shrink: 0;
       }
 
       .logo-text {
         font-size: 18px;
         font-weight: 600;
         color: var(--el-color-primary);
+        white-space: nowrap;
+        overflow: hidden;
       }
     }
   }

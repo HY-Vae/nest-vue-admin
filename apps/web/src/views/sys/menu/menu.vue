@@ -15,9 +15,13 @@
           </el-col>
           <el-col v-bind="searchSpan">
             <el-form-item label="菜单状态">
-              <el-select v-model="searchMenuForm.status" placeholder="请选择菜单状态" clearable>
-                <el-option label="Zone one" value="shanghai" />
-                <el-option label="Zone two" value="beijing" />
+              <el-select v-model="searchMenuForm.status" placeholder="请选择菜单状态" clearable filterable>
+                <el-option
+                  v-for="item in enableStatusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -45,7 +49,13 @@
           </el-table-column>
           <el-table-column prop="name" label="菜单值" />
           <el-table-column prop="path" label="路径" />
-          <el-table-column prop="status" label="菜单状态" />
+          <el-table-column prop="status" label="菜单状态">
+            <template #default="scope">
+              <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+                {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="sort" label="排序" />
           <el-table-column prop="createBy" label="创建人" />
           <el-table-column prop="createdAt" label="创建时间">

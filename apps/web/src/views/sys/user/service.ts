@@ -7,7 +7,19 @@ import type {
   UserDetailType,
   UserListType,
 } from '@/views/sys/user/user.type'
-import type { OrgQueryUserType, OrgUserListType } from './orgUser.type'
+
+export interface UpdateProfileType {
+  avatar?: string
+  nickName?: string
+  email?: string
+  phone?: string
+  sex?: string
+}
+
+export interface UpdatePasswordType {
+  oldPassword: string
+  newPassword: string
+}
 
 export function getUserApi(params: QueryUserType): Promise<ListResult<UserListType>> {
   return request('/sys/user', {
@@ -46,5 +58,28 @@ export function deleteUserApi(id: string): Promise<Result> {
 export function getUserOptionsApi(): Promise<Result<SelectOptionItem[]>> {
   return request('/sys/user/options', {
     method: 'GET',
+  })
+}
+
+// 获取当前用户个人信息
+export function getProfileApi(): Promise<Result<UserDetailType>> {
+  return request('/sys/user/profile', {
+    method: 'GET',
+  })
+}
+
+// 更新个人信息
+export function updateProfileApi(data: UpdateProfileType): Promise<Result> {
+  return request('/sys/user/profile', {
+    method: 'PATCH',
+    data,
+  })
+}
+
+// 修改密码
+export function updatePasswordApi(data: UpdatePasswordType): Promise<Result> {
+  return request('/sys/user/password', {
+    method: 'PATCH',
+    data,
   })
 }

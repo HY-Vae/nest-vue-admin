@@ -6,7 +6,7 @@ import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import type { CreateRoleType, RoleListType } from '@/views/sys/role/role.type'
 import type { FormInstance } from 'element-plus'
 import { ElTreeSelect } from 'element-plus'
-import { computed, ref, watch, type PropType } from 'vue'
+import { computed, nextTick, ref, watch, type PropType } from 'vue'
 const props = defineProps({
   action: {
     type: String as PropType<ActionEnum>,
@@ -90,8 +90,10 @@ const menuTree = ref<SelectTreeItem[]>([])
 const apiTree = ref<SelectTreeItem[]>([])
 const openRole = () => {
   getAllPermissionsApi().then((res) => {
-    menuTree.value = res.data.menuTree
-    apiTree.value = res.data.apiTree
+    nextTick(() => {
+      menuTree.value = res.data.menuTree
+      apiTree.value = res.data.apiTree
+    })
   })
   getDictOptions('enableStatus').then((res) => {
     enableStatusOptions.value = res
@@ -170,12 +172,18 @@ watch(
         <el-input v-model="roleForm.key" autocomplete="off" />
       </el-form-item>
       <el-form-item label="角色状态" :label-width="formLabelWidth" prop="status">
-        <el-select v-model="roleForm.status" placeholder="请选择角色状态">
-          <el-option v-for="item in enableStatusOptions" :label="item.label" :value="item.value" />
-        </el-select>
+        <el-switch
+          v-model="roleForm.status"
+          active-value="0"
+          inactive-value="1"
+          active-text="启用"
+          inactive-text="停用"
+          inline-prompt
+        />
       </el-form-item>
       <el-form-item label="菜单权限" :label-width="formLabelWidth" prop="menus">
         <el-tree-select
+          v-if="menuTree.length > 0"
           multiple
           collapse-tags
           check-strictly
@@ -191,14 +199,14 @@ watch(
           :render-after-expand="false"
         />
       </el-form-item>
-      <el-form-item label="接口权限" :label-width="formLabelWidth" prop="menus">
+      <el-form-item label="接口权限" :label-width="formLabelWidth" prop="menuBtns">
         <el-tree-select
+          v-if="apiTree.length > 0"
           multiple
           collapse-tags
           collapse-tags-tooltip
           show-checkbox
           v-model="roleForm.menuBtns"
-          treeRef="menuRef"
           :data="apiTree"
           highlight-current
           auto-expand-parent

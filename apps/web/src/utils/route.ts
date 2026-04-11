@@ -12,6 +12,7 @@ export const transMenuRouter = (menus: MenuListType[]): RouteRecordRaw[] => {
         path: '/',
         name: 'home',
         component: () => import('../views/layout/basic.vue'),
+        meta: { hidden: true },
         children: [
           {
             path: item.path,

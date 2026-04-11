@@ -88,6 +88,22 @@ const router = createRouter({
       },
     },
     {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/layout/basic.vue'),
+      children: [
+        {
+          path: '',
+          name: 'profile-index',
+          component: () => import('../views/profile/index.vue'),
+          meta: {
+            title: '个人中心',
+            closeTab: true,
+          },
+        },
+      ],
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting

@@ -20,10 +20,10 @@ const avatarStr = computed(() => {
     <el-avatar
       v-if="currentUser?.avatar"
       :src="currentUser.avatar"
-      :size="40"
+      :size="32"
       class="user-avatar"
     />
-    <el-avatar v-else :size="40" class="user-avatar avatar-placeholder">
+    <el-avatar v-else :size="32" class="user-avatar avatar-placeholder">
       {{ avatarStr }}
     </el-avatar>
     <div class="flex items-center ml-2">
@@ -41,7 +41,7 @@ const avatarStr = computed(() => {
 }
 
 .avatar-placeholder {
-  background-color: #409eff;
+  background-color: var(--el-color-primary);
   color: #fff;
   font-weight: bold;
 }

@@ -1,9 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { SysDeptService } from './sys-dept.service';
-import { PrismaService } from 'nestjs-prisma';
 import { ApiException } from '@/common/exceptions/api.exception';
-import type { DeptTreeNode } from './interfaces/sys-dept.interface';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from 'nestjs-prisma';
 import type { GetSysDeptListDto } from './dto/req-sys-dept.dto';
+import type { DeptTreeNode } from './interfaces/sys-dept.interface';
+import { SysDeptService } from './sys-dept.service';
 
 /* Mock 类型定义 */
 type MockMethod = jest.Mock;
@@ -61,6 +62,12 @@ describe('SysDeptService', () => {
     },
   };
 
+  const mockCacheManager = {
+    del: jest.fn(),
+    get: jest.fn(),
+    set: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -69,11 +76,15 @@ describe('SysDeptService', () => {
           provide: PrismaService,
           useValue: mockPrismaService,
         },
+        {
+          provide: CACHE_MANAGER,
+          useValue: mockCacheManager,
+        },
       ],
     }).compile();
 
     service = module.get<SysDeptService>(SysDeptService);
-    prisma = module.get(PrismaService) as unknown as MockPrisma;
+    prisma = module.get(PrismaService);
   });
 
   afterEach(() => {
@@ -154,17 +165,57 @@ describe('SysDeptService', () => {
 
       mockPrismaService.sysDept.findUnique.mockResolvedValue(null);
 
-      await expect(service.create(createDto as any)).rejects.toThrow(ApiException);
-      await expect(service.create(createDto as any)).rejects.toThrow('父级部门不存在');
+      await expect(service.create(createDto as any)).rejects.toThrow(
+        ApiException,
+      );
+      await expect(service.create(createDto as any)).rejects.toThrow(
+        '父级部门不存在',
+      );
     });
   });
 
   describe('findAll (树形结构)', () => {
     it('应该返回树形结构的部门列表', async () => {
       const mockDepts = [
-        { id: 'dept-1', deptName: '总公司', deptCode: 'HQ', parentId: null, sort: 0, status: '1', remark: null, createBy: null, createdAt: new Date(), updateBy: null, updatedAt: new Date() },
-        { id: 'dept-2', deptName: '技术部', deptCode: 'TECH', parentId: 'dept-1', sort: 1, status: '1', remark: null, createBy: null, createdAt: new Date(), updateBy: null, updatedAt: new Date() },
-        { id: 'dept-3', deptName: '产品部', deptCode: 'PRODUCT', parentId: 'dept-1', sort: 2, status: '1', remark: null, createBy: null, createdAt: new Date(), updateBy: null, updatedAt: new Date() },
+        {
+          id: 'dept-1',
+          deptName: '总公司',
+          deptCode: 'HQ',
+          parentId: null,
+          sort: 0,
+          status: '1',
+          remark: null,
+          createBy: null,
+          createdAt: new Date(),
+          updateBy: null,
+          updatedAt: new Date(),
+        },
+        {
+          id: 'dept-2',
+          deptName: '技术部',
+          deptCode: 'TECH',
+          parentId: 'dept-1',
+          sort: 1,
+          status: '1',
+          remark: null,
+          createBy: null,
+          createdAt: new Date(),
+          updateBy: null,
+          updatedAt: new Date(),
+        },
+        {
+          id: 'dept-3',
+          deptName: '产品部',
+          deptCode: 'PRODUCT',
+          parentId: 'dept-1',
+          sort: 2,
+          status: '1',
+          remark: null,
+          createBy: null,
+          createdAt: new Date(),
+          updateBy: null,
+          updatedAt: new Date(),
+        },
       ];
 
       mockPrismaService.sysDept.findMany.mockResolvedValue(mockDepts as any);
@@ -188,14 +239,18 @@ describe('SysDeptService', () => {
     it('有子部门时应该禁止删除', async () => {
       mockPrismaService.sysDept.count.mockResolvedValue(2); // 有 2 个子部门
 
-      await expect(service.remove('dept-1')).rejects.toThrow('该部门下存在子部门，无法删除');
+      await expect(service.remove('dept-1')).rejects.toThrow(
+        '该部门下存在子部门，无法删除',
+      );
     });
 
     it('部门下有用户时应该禁止删除', async () => {
       mockPrismaService.sysDept.count.mockResolvedValueOnce(0); // 无子部门
       mockPrismaService.sysUser.count.mockResolvedValueOnce(3); // 有 3 个用户
 
-      await expect(service.remove('dept-1')).rejects.toThrow('该部门下存在用户，无法删除');
+      await expect(service.remove('dept-1')).rejects.toThrow(
+        '该部门下存在用户，无法删除',
+      );
     });
 
     it('无子部门且无用户时应该成功删除', async () => {
@@ -228,8 +283,12 @@ describe('SysDeptService', () => {
         deptName: '总公司',
       } as any);
 
-      await expect(service.update('dept-1', updateDto as any)).rejects.toThrow(ApiException);
-      await expect(service.update('dept-1', updateDto as any)).rejects.toThrow('父级部门不能是自己');
+      await expect(service.update('dept-1', updateDto as any)).rejects.toThrow(
+        ApiException,
+      );
+      await expect(service.update('dept-1', updateDto as any)).rejects.toThrow(
+        '父级部门不能是自己',
+      );
     });
   });
 });

@@ -53,7 +53,9 @@
           </el-table-column>
           <el-table-column align="center" label="字典状态">
             <template #default="scope">
-              {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              <el-tag :type="scope.row.status === '0' ? 'success' : 'danger'">
+                {{ getDictLabel(enableStatusOptions, scope.row.status) }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column align="center" prop="sort" label="排序" />

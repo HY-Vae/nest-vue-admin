@@ -1,6 +1,8 @@
+import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { ApiException } from '@/common/exceptions/api.exception';
-import { generateUUid } from '@/utils/util';
-import { Injectable } from '@nestjs/common';
+import { generateRedisKey, generateUUid } from '@/utils/util';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import {
@@ -11,7 +13,10 @@ import {
 
 @Injectable()
 export class SysPostService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   /* 新增 */
   async create(createSysPostDto: CreateSysPostDto) {
@@ -63,16 +68,10 @@ export class SysPostService {
         // 包含子部门：查询该部门及其所有子部门的岗位 + 通用岗位
         const childDeptIds = await this.getAllChildDeptIds(query.deptId);
         const deptIds = [query.deptId, ...childDeptIds];
-        where.OR = [
-          { deptId: { in: deptIds } },
-          { deptId: null },
-        ];
+        where.OR = [{ deptId: { in: deptIds } }, { deptId: null }];
       } else {
         // 不包含子部门：只查询该部门岗位 + 通用岗位
-        where.OR = [
-          { deptId: query.deptId },
-          { deptId: null },
-        ];
+        where.OR = [{ deptId: query.deptId }, { deptId: null }];
       }
     }
     if (query.status) {
@@ -101,6 +100,11 @@ export class SysPostService {
 
     // 查询每个岗位的用户数量
     const postIds = list.map((item) => item.id);
+
+    // 如果没有岗位，直接返回空列表
+    if (postIds.length === 0) {
+      return { list: [], total: 0 };
+    }
 
     // 构建用户查询条件
     // 当指定部门时：部门岗位只统计该部门用户，通用岗位也只统计该部门用户
@@ -131,22 +135,24 @@ export class SysPostService {
       userCounts = [...deptCounts, ...commonCounts];
     } else if (query.deptId === '') {
       // 查询公司通用岗位（deptId=null），统计所有使用该岗位的用户
-      userCounts = await this.prisma.sysUser.groupBy({
+      userCounts = (await this.prisma.sysUser.groupBy({
         by: ['postId'],
         where: { postId: { in: postIds } },
         _count: { id: true },
-      }) as unknown as UserCountResult[];
+      })) as unknown as UserCountResult[];
     } else {
       // 不指定部门，统计所有用户
-      userCounts = await this.prisma.sysUser.groupBy({
+      userCounts = (await this.prisma.sysUser.groupBy({
         by: ['postId'],
         where: { postId: { in: postIds } },
         _count: { id: true },
-      }) as unknown as UserCountResult[];
+      })) as unknown as UserCountResult[];
     }
 
     const userCountMap = new Map(
-      userCounts.filter((item) => item.postId).map((item) => [item.postId!, item._count.id]),
+      userCounts
+        .filter((item) => item.postId)
+        .map((item) => [item.postId!, item._count.id]),
     );
 
     // 添加 userCount 字段
@@ -204,7 +210,7 @@ export class SysPostService {
       }
     }
 
-    return this.prisma.sysPost.update({
+    const post = await this.prisma.sysPost.update({
       where: { id },
       data: {
         ...other,
@@ -212,6 +218,19 @@ export class SysPostService {
         deptId: deptId || null,
       },
     });
+
+    // 清除该岗位下所有用户的缓存
+    const users = await this.prisma.sysUser.findMany({
+      where: { postId: id },
+      select: { id: true },
+    });
+    for (const user of users) {
+      await this.cacheManager.del(
+        generateRedisKey(REDIS_KEYS.USER_INFO, user.id),
+      );
+    }
+
+    return post;
   }
 
   /* 删除 */

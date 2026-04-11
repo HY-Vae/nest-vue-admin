@@ -6,6 +6,7 @@ import { initDicts } from './initData/sys-dict';
 import { initMenus } from './initData/sys-menu';
 import { initUser } from './initData/sys-user';
 import { initTemps } from './initData/temp';
+import { initMessages } from './initData/sys-message';
 
 const prisma = new PrismaClient();
 
@@ -42,6 +43,7 @@ async function main() {
   await initMenus(prisma);
   await initDicts(prisma);
   await initTemps(prisma);
+  await initMessages(prisma);
 
   console.log('\n✅ 所有测试数据初始化完成！');
 }

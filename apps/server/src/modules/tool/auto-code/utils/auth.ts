@@ -35,7 +35,10 @@ export function createMenuBody(config: GenerateConfig): CreateSysMenuDto {
   };
 }
 
-export function createBtnAuthMap(authPrefix: string, nameZh: string): BtnAuthItem[] {
+export function createBtnAuthMap(
+  authPrefix: string,
+  nameZh: string,
+): BtnAuthItem[] {
   return [
     {
       name: `新增${nameZh}`,
