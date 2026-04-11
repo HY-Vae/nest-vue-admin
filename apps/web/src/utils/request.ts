@@ -44,6 +44,10 @@ request.interceptors.response.use(
   },
   (error) => {
     console.log('res', error)
+    if (error.response?.status === 429) {
+      ElMessage.error('请求过于频繁，请稍后再试')
+      return Promise.reject(error)
+    }
     const { message } = error.response.data
     let errMsg = message || error.message
     if (Array.isArray(message)) {

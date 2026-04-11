@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import TabsView from '@/components/tabs/TabsView.vue'
 import TheHeader from '@/components/header/TheHeader.vue'
 import SideMenu from '@/components/sideMenu/index.vue'
+import TabsView from '@/components/tabs/TabsView.vue'
 import { useTabsStore } from '@/stores/modules/tabs'
 import { useThemeStore } from '@/stores/modules/theme'
 import { storeToRefs } from 'pinia'
@@ -12,6 +12,7 @@ const route = useRoute()
 const tabsStore = useTabsStore()
 const themeStore = useThemeStore()
 const { isCollapse } = storeToRefs(themeStore)
+const { contentFullscreen } = storeToRefs(tabsStore)
 
 watch(
   () => route.path,
@@ -24,15 +25,15 @@ watch(
 
 <template>
   <div class="nva-container">
-    <div class="aside" :class="{ 'is-collapse': isCollapse }">
+    <div v-show="!contentFullscreen" class="aside" :class="{ 'is-collapse': isCollapse }">
       <div class="logo">
         <img src="@/assets/logo.svg" alt="logo" class="logo-img" />
-        <span class="logo-text" v-show="!isCollapse">Admin</span>
+        <span class="logo-text" v-show="!isCollapse">Nest-Vue-Admin</span>
       </div>
       <side-menu />
     </div>
     <div class="main">
-      <the-header />
+      <the-header v-show="!contentFullscreen" />
       <tabs-view />
       <div class="content">
         <div class="router-view">
@@ -55,7 +56,9 @@ watch(
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--el-border-color-lighter);
-    transition: width 0.3s ease, flex 0.3s ease;
+    transition:
+      width 0.3s ease,
+      flex 0.3s ease;
 
     &.is-collapse {
       width: 64px;
@@ -74,7 +77,7 @@ watch(
       justify-content: flex-start;
       gap: 8px;
       flex-shrink: 0;
-      padding-left: 20px;
+      padding: 0 6px;
       transition: all 0.3s ease;
 
       .logo-img {

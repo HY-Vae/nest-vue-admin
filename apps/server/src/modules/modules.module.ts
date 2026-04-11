@@ -1,10 +1,11 @@
 import { AuthModule } from '@/modules/auth/auth.module';
+import { HealthModule } from '@/modules/monitor/health/health.module';
 import { SysModule } from '@/modules/sys/sys.module';
 import { ToolModule } from '@/modules/tool/tool.module';
 import { Module } from '@nestjs/common';
 import { UploadModule } from './upload/upload.module';
 
 @Module({
-  imports: [SysModule, AuthModule, ToolModule, UploadModule],
+  imports: [SysModule, AuthModule, ToolModule, UploadModule, HealthModule],
 })
 export class ModulesModule {}

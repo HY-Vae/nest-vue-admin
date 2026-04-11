@@ -17,6 +17,7 @@ export const useTabsStore = defineStore(
     const tabs = ref<TabItem[]>([])
     const activeTab = ref('')
     const isRouterAlive = ref(true)
+    const contentFullscreen = ref(false)
 
     const currentTab = computed(() => tabs.value.find((tab) => tab.path === activeTab.value))
 
@@ -93,10 +94,15 @@ export const useTabsStore = defineStore(
       }
     }
 
+    const toggleContentFullscreen = () => {
+      contentFullscreen.value = !contentFullscreen.value
+    }
+
     return {
       tabs,
       activeTab,
       isRouterAlive,
+      contentFullscreen,
       currentTab,
       addTab,
       closeTab,
@@ -106,6 +112,7 @@ export const useTabsStore = defineStore(
       closeAllTabs,
       refresh,
       toggleAffixTab,
+      toggleContentFullscreen,
     }
   },
   {

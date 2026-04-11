@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import {
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  Refresh,
-  Close,
-  Paperclip,
-} from '@element-plus/icons-vue'
 import Icon from '@/components/icon/icon.vue'
 import { useTabsStore } from '@/stores/modules/tabs'
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { ArrowDown, Close, Paperclip, Refresh } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const tabsStore = useTabsStore()
+const { contentFullscreen } = storeToRefs(tabsStore)
 
 const scrollRef = ref<HTMLElement>()
 const contextMenuVisible = ref(false)
@@ -41,8 +36,7 @@ const handleClickOutside = (e: MouseEvent) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
-  // 页面刷新后滚动到激活的 tab
-  scrollToActiveTab()
+  nextTick(scrollToActiveTab)
 })
 
 onUnmounted(() => {
@@ -84,9 +78,6 @@ const closeContextMenu = () => {
 const handleContextCommand = (command: string) => {
   const path = selectedTab.value
   switch (command) {
-    case 'refresh':
-      tabsStore.refresh()
-      break
     case 'pin':
       tabsStore.toggleAffixTab(path)
       // 固定/取消固定后不关闭菜单，允许继续操作
@@ -138,49 +129,49 @@ const handleCommand = (command: string) => {
   }
 }
 
-// 滚动
-const scroll = (direction: 'left' | 'right') => {
-  const el = scrollRef.value
-  if (!el) return
-  const step = 200
-  el.scrollBy({
-    left: direction === 'left' ? -step : step,
-    behavior: 'smooth',
-  })
-}
-
 // 滚动到当前 tab
 const scrollToActiveTab = () => {
-  nextTick(() => {
-    const el = scrollRef.value
-    if (!el) return
-    const activeTab = el.querySelector('.tab-item.active') as HTMLElement
-    if (!activeTab) return
-    const containerWidth = el.offsetWidth
-    const tabLeft = activeTab.offsetLeft
-    const tabWidth = activeTab.offsetWidth
-    const scrollLeft = el.scrollLeft
+  const el = scrollRef.value
+  if (!el) return
+  const activeTab = el.querySelector('.tab-item.active') as HTMLElement
+  if (!activeTab) return
 
-    if (tabLeft < scrollLeft) {
-      el.scrollTo({ left: tabLeft - 10, behavior: 'smooth' })
-    } else if (tabLeft + tabWidth > scrollLeft + containerWidth) {
-      el.scrollTo({ left: tabLeft + tabWidth - containerWidth + 10, behavior: 'smooth' })
-    }
-  })
+  const containerRect = el.getBoundingClientRect()
+  const tabRect = activeTab.getBoundingClientRect()
+
+  if (tabRect.left < containerRect.left) {
+    el.scrollBy({ left: tabRect.left - containerRect.left - 10, behavior: 'smooth' })
+  } else if (tabRect.right > containerRect.right) {
+    el.scrollBy({ left: tabRect.right - containerRect.right + 10, behavior: 'smooth' })
+  }
 }
 
-// 监听路由变化滚动到当前 tab
-router.afterEach(() => {
-  scrollToActiveTab()
-})
+const back = () => {
+  router.back()
+}
+
+// flush: 'post' 保证 DOM 更新完成后再执行
+watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
 </script>
 
 <template>
   <div class="tabs-container">
-    <!-- 左滚动按钮 -->
-    <div class="scroll-btn" @click="scroll('left')">
-      <el-icon><arrow-left /></el-icon>
+    <!-- 功能按钮 -->
+    <div class="action-btn" title="后退" @click="back">
+      <Icon icon="ep:arrow-left" :size="15" />
     </div>
+    <div class="action-btn" title="刷新" @click="tabsStore.refresh()">
+      <Icon icon="ep:refresh" :size="15" />
+    </div>
+    <div
+      class="action-btn"
+      :title="contentFullscreen ? '退出全屏' : '全屏'"
+      @click="tabsStore.toggleContentFullscreen()"
+    >
+      <Icon :icon="contentFullscreen ? 'mdi:fullscreen-exit' : 'mdi:fullscreen'" :size="15" />
+    </div>
+
+    <div class="action-divider" />
 
     <!-- tabs 滚动区域 -->
     <div ref="scrollRef" class="tabs-scroll">
@@ -193,25 +184,13 @@ router.afterEach(() => {
       >
         <Icon v-if="tab.icon" :icon="tab.icon" :size="14" />
         <span class="tab-title">{{ tab.title }}</span>
-        <el-icon
-          v-if="tab.affix"
-          class="tab-affix"
-        >
+        <el-icon v-if="tab.affix" class="tab-affix">
           <paperclip />
         </el-icon>
-        <el-icon
-          v-else
-          class="tab-close"
-          @click="(e: MouseEvent) => handleClose(e, tab.path)"
-        >
+        <el-icon v-else class="tab-close" @click="(e: MouseEvent) => handleClose(e, tab.path)">
           <close />
         </el-icon>
       </div>
-    </div>
-
-    <!-- 右滚动按钮 -->
-    <div class="scroll-btn" @click="scroll('right')">
-      <el-icon><arrow-right /></el-icon>
     </div>
 
     <!-- 更多操作 -->
@@ -232,15 +211,7 @@ router.afterEach(() => {
 
     <!-- 右键菜单 -->
     <teleport to="body">
-      <div
-        v-show="contextMenuVisible"
-        class="context-menu"
-        :style="contextMenuStyle"
-      >
-        <div class="context-menu-item" @click="handleContextCommand('refresh')">
-          <el-icon><refresh /></el-icon>
-          <span>刷新</span>
-        </div>
+      <div v-show="contextMenuVisible" class="context-menu" :style="contextMenuStyle">
         <div class="context-menu-item" @click="handleContextCommand('pin')">
           <el-icon><paperclip /></el-icon>
           <span>{{ selectedTabItem?.affix ? '取消固定' : '固定' }}</span>
@@ -252,15 +223,9 @@ router.afterEach(() => {
           <el-icon><close /></el-icon>
           <span>关闭</span>
         </div>
-        <div class="context-menu-item" @click="handleContextCommand('closeOther')">
-          关闭其他
-        </div>
-        <div class="context-menu-item" @click="handleContextCommand('closeLeft')">
-          关闭左侧
-        </div>
-        <div class="context-menu-item" @click="handleContextCommand('closeRight')">
-          关闭右侧
-        </div>
+        <div class="context-menu-item" @click="handleContextCommand('closeOther')">关闭其他</div>
+        <div class="context-menu-item" @click="handleContextCommand('closeLeft')">关闭左侧</div>
+        <div class="context-menu-item" @click="handleContextCommand('closeRight')">关闭右侧</div>
       </div>
     </teleport>
   </div>
@@ -275,7 +240,7 @@ router.afterEach(() => {
   border-bottom: 1px solid var(--el-border-color-lighter);
   gap: 4px;
 
-  .scroll-btn {
+  .action-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -290,6 +255,14 @@ router.afterEach(() => {
       background: var(--el-fill-color-light);
       color: var(--el-color-primary);
     }
+  }
+
+  .action-divider {
+    width: 1px;
+    height: 16px;
+    background: var(--el-border-color-lighter);
+    flex-shrink: 0;
+    margin: 0 2px;
   }
 
   .tabs-scroll {

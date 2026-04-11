@@ -78,4 +78,10 @@ export const getConfig = (): ConfigType => ({
       baseUrl: env('ALIYUN_BASE_URL'),
     },
   },
+
+  // 8. 限流配置
+  throttler: {
+    ttl: envNumber('THROTTLE_TTL'),
+    limit: envNumber('THROTTLE_LIMIT'),
+  },
 });

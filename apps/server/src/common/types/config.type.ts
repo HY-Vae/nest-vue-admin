@@ -23,6 +23,11 @@ export type GenCodeType = {
   mainModuleName: string;
 };
 
+export type ThrottlerConfigType = {
+  ttl: number;
+  limit: number;
+};
+
 export type ConfigType = {
   port: number;
   isDemo: boolean;
@@ -32,6 +37,7 @@ export type ConfigType = {
   captcha: ConfigObject;
   genCode: GenCodeType;
   upload: FileUploadType;
+  throttler: ThrottlerConfigType;
 };
 
 export interface LocalFileConfig {

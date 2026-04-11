@@ -121,4 +121,8 @@ export const envValidationSchema = Joi.object({
   }),
 
   ALIYUN_FOLDER: Joi.string().optional().allow(''),
+
+  // --- 限流配置 ---
+  THROTTLE_TTL: Joi.number().default(60),
+  THROTTLE_LIMIT: Joi.number().default(60),
 });

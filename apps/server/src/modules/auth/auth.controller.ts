@@ -4,6 +4,7 @@ import { LocalAuthGuard } from '@/common/guards/localAuth.guard';
 import type { CurrentUserType } from '@/common/types/auth.type';
 import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginReqDto } from './dto/req-auth.dto';
 
@@ -14,6 +15,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Throttle({ default: { ttl: 60000, limit: 10 } })
   @Get('captcha')
   generateCaptcha(@Query('id') id: string) {
     return this.authService.generateCaptcha(id);
@@ -29,6 +31,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @ApiOperation({
     summary: '登录',
   })

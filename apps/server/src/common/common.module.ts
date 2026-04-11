@@ -6,12 +6,25 @@ import { HttpExceptionFilter } from '@/common/filters/exception.filter';
 import { DemoEnvironmentGuard } from '@/common/guards/demo.guard';
 import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
 import { ActionInterceptor } from '@/common/interceptors/action.interceptor';
-import { CacheConfigType, RedisConfigType } from '@/common/types/config.type';
+import {
+  CacheConfigType,
+  RedisConfigType,
+  ThrottlerConfigType,
+} from '@/common/types/config.type';
 import { getConfig } from '@/config/config';
 import { envValidationSchema } from '@/config/config.validation';
 import KeyvRedis from '@keyv/redis';
 import { CacheModule } from '@nestjs/cache-manager';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import {
+  APP_FILTER,
+  APP_GUARD,
+  APP_INTERCEPTOR,
+  APP_PIPE,
+} from '@nestjs/core';
+import {
+  ThrottlerGuard,
+  ThrottlerModule,
+} from '@nestjs/throttler';
 import { CacheableMemory } from 'cacheable';
 import Keyv, { KeyvStoreAdapter } from 'keyv';
 import { PrismaModule } from 'nestjs-prisma';
@@ -41,6 +54,20 @@ const logger = new Logger('CacheModule');
     PrismaModule.forRootAsync({
       isGlobal: true,
       useClass: PrismaConfigService,
+    }),
+    // 限流模块
+    ThrottlerModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        const throttlerConfig =
+          configService.get<ThrottlerConfigType>('throttler')!;
+        return [
+          {
+            ttl: throttlerConfig.ttl * 1000,
+            limit: throttlerConfig.limit,
+          },
+        ];
+      },
+      inject: [ConfigService],
     }),
     CacheModule.registerAsync({
       useFactory: async (configService: ConfigService) => {
@@ -110,6 +137,10 @@ const logger = new Logger('CacheModule');
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
     {
       provide: APP_GUARD,
