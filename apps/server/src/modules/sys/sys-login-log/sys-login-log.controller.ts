@@ -1,0 +1,51 @@
+import { Permission } from '@/common/decorators/permission.decorator';
+import { DelCommonNumbersDto } from '@/common/dtos/common.dto';
+import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
+import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
+import { SysLoginLogService } from './sys-login-log.service';
+
+@ApiTags('登录日志')
+@ApiBearerAuth()
+@Controller('sys/login-log')
+export class SysLoginLogController {
+  constructor(private readonly sysLoginLogService: SysLoginLogService) {}
+
+  /* 列表查询 */
+  @Get()
+  @ApiOperation({ summary: '查询登录日志列表' })
+  @Permission('sys:login-log:list')
+  findAll(@Query() query: GetSysLoginLogListDto) {
+    return this.sysLoginLogService.findAll(query);
+  }
+
+  /* 通过id查询 */
+  @Get(':id')
+  @ApiOperation({ summary: '查询登录日志详情' })
+  @ApiParam({ name: 'id', description: '登录日志ID' })
+  @Permission('sys:login-log:detail')
+  findOne(@Param('id') id: number) {
+    return this.sysLoginLogService.findOne(+id);
+  }
+
+  /* 批量删除 */
+  @Delete()
+  @ApiOperation({ summary: '批量删除登录日志' })
+  @Permission('sys:login-log:remove')
+  removes(@Query() query: DelCommonNumbersDto) {
+    return this.sysLoginLogService.removes(query.ids);
+  }
+
+  /* 清空日志 */
+  @Delete('clear')
+  @ApiOperation({ summary: '清空登录日志' })
+  @Permission('sys:login-log:clear')
+  clear() {
+    return this.sysLoginLogService.clear();
+  }
+}
