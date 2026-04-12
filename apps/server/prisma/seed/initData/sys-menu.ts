@@ -236,10 +236,10 @@ export async function initMenus(prisma: PrismaClient) {
 
   await prisma.sysMenuMeta.upsert({
     where: { sysMenuId: toolRoot.id },
-    update: { title: '代码生成', icon: '', closeTab: true },
+    update: { title: '代码生成', icon: 'ri:code-s-slash-line', closeTab: true },
     create: {
       title: '代码生成',
-      icon: '',
+      icon: 'ri:code-s-slash-line',
       closeTab: true,
       sysMenuId: toolRoot.id,
     },
@@ -254,7 +254,7 @@ export async function initMenus(prisma: PrismaClient) {
     component: 'views/tool/temp/temp.vue',
     sort: 0,
     status: '0',
-    meta: { title: '模板管理', icon: '', closeTab: true },
+    meta: { title: '模板管理', icon: 'ri:file-code-line', closeTab: true },
     btns: [
       { name: '新增模板管理', auth: 'tool:temp:create' },
       { name: '删除单个模板管理', auth: 'tool:temp:remove' },
@@ -274,7 +274,7 @@ export async function initMenus(prisma: PrismaClient) {
     component: 'views/tool/gen/gen.vue',
     sort: 1,
     status: '0',
-    meta: { title: '生成代码', icon: '', closeTab: true },
+    meta: { title: '生成代码', icon: 'ri:terminal-box-line', closeTab: true },
     btns: [
       { name: '新增生成代码', auth: 'tool:gen:create' },
       { name: '删除单个生成代码', auth: 'tool:gen:remove' },
@@ -293,7 +293,7 @@ export async function initMenus(prisma: PrismaClient) {
     component: 'views/tool/auto-code/autoCode.vue',
     sort: 5,
     status: '0',
-    meta: { title: '生成列表', icon: '', closeTab: true },
+    meta: { title: '生成列表', icon: 'ri:list-check-2', closeTab: true },
     btns: [
       { name: '单个删除生成列表', auth: 'tool:auto-code:remove' },
       { name: '查询生成列表列表', auth: 'tool:auto-code:list' },

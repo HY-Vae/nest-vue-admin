@@ -19,7 +19,7 @@ router.beforeEach(async (to, from, next) => {
     document.title = to.meta.title as string
   }
   if (to.path === '/auth/login') {
-    next('/')
+    next()
     return
   }
   const userStore = useUserStore()
