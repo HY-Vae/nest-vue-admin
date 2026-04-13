@@ -1,9 +1,12 @@
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
+import type { ExportColumn } from '@/common/class/export.class';
+import { ExcelExportService } from '@/common/class/export.class';
 import { ApiException } from '@/common/exceptions/api.exception';
 import { generateRedisKey, generateUUid } from '@/utils/util';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import type { Response } from 'express';
 import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysPostDto,
@@ -16,6 +19,7 @@ export class SysPostService {
   constructor(
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly excelExportService: ExcelExportService,
   ) {}
 
   /* 新增 */
@@ -263,6 +267,32 @@ export class SysPostService {
     return this.prisma.sysPost.deleteMany({
       where: { id: { in: ids } },
     });
+  }
+
+  /* 导出岗位列表 */
+  async exportExcel(
+    fields: ExportColumn[],
+    query: GetSysPostListDto,
+    res: Response,
+  ) {
+    const { skip, take, ...whereQuery } = query;
+    const { list } = await this.findAll({ ...whereQuery } as GetSysPostListDto);
+
+    const buffer = await this.excelExportService.export({
+      columns: fields,
+      data: list as unknown as Record<string, unknown>[],
+      filename: '岗位列表',
+    });
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent('岗位列表')}.xlsx"`,
+    );
+    res.send(buffer);
   }
 
   /* 获取岗位选项列表（用于下拉选择） */

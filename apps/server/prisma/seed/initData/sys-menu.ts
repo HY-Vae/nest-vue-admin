@@ -157,6 +157,7 @@ export async function initMenus(prisma: PrismaClient) {
       { name: '编辑岗位', auth: 'sys:post:update' },
       { name: '查询岗位列表', auth: 'sys:post:list' },
       { name: '查询岗位详情', auth: 'sys:post:detail' },
+      { name: '导出岗位', auth: 'sys:post:export' },
     ],
   });
 
@@ -176,6 +177,7 @@ export async function initMenus(prisma: PrismaClient) {
       { name: '编辑用户管理', auth: 'sys:user:update' },
       { name: '查询用户管理列表', auth: 'sys:user:list' },
       { name: '查询用户管理详情', auth: 'sys:user:detail' },
+      { name: '导出用户管理', auth: 'sys:user:export' },
     ],
   });
 
@@ -192,6 +194,25 @@ export async function initMenus(prisma: PrismaClient) {
     btns: [
       { name: '查询操作日志列表', auth: 'sys:sys-action-log:list' },
       { name: '查询操作日志详情', auth: 'sys:sys-action-log:detail' },
+    ],
+  });
+
+  // 登录日志
+  await upsertMenu(prisma, {
+    name: 'sys-login-log',
+    parentId: sysRoot.id,
+    path: '/sys/loginLog',
+    auth: 'sys:login-log',
+    component: 'views/sys/loginLog/index.vue',
+    sort: 6,
+    status: '0',
+    meta: { title: '登录日志', icon: 'ri:login-box-line', closeTab: true },
+    btns: [
+      { name: '查询登录日志列表', auth: 'sys:login-log:list' },
+      { name: '查询登录日志详情', auth: 'sys:login-log:detail' },
+      { name: '删除登录日志', auth: 'sys:login-log:remove' },
+      { name: '清空登录日志', auth: 'sys:login-log:clear' },
+      { name: '导出登录日志', auth: 'sys:login-log:export' },
     ],
   });
 

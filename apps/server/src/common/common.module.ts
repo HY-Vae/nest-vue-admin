@@ -2,6 +2,7 @@ import { Global, Logger, Module, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { CacheModeEnum } from '@/common/enums/config.enum';
+import { ExcelExportService } from '@/common/class/export.class';
 import { HttpExceptionFilter } from '@/common/filters/exception.filter';
 import { DemoEnvironmentGuard } from '@/common/guards/demo.guard';
 import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
@@ -127,6 +128,7 @@ const logger = new Logger('CacheModule');
     }),
   ],
   providers: [
+    ExcelExportService,
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
@@ -163,5 +165,6 @@ const logger = new Logger('CacheModule');
       useClass: ResponseInterceptor,
     },
   ],
+  exports: [ExcelExportService],
 })
 export class CommonModule {}

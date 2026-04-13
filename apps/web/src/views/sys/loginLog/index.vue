@@ -92,6 +92,7 @@
         <el-button type="danger" plain v-auth="'sys:login-log:clear'" @click="handleClear">
           清空日志
         </el-button>
+        <el-button v-auth="'sys:login-log:export'" @click="exportVisible = true">导出</el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
         <el-table
@@ -162,6 +163,14 @@
         />
       </el-row>
     </el-card>
+
+    <ExportDialog
+      v-model:visible="exportVisible"
+      :columns="columns"
+      export-url="/sys/login-log/export"
+      :search-params="searchForm"
+      filename="登录日志"
+    />
   </div>
 </template>
 
@@ -169,6 +178,8 @@
 import { transTime } from '@/utils/util.ts'
 import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
+import ExportDialog from '@/components/export/ExportDialog.vue'
+import type { ColumnConfig } from '@/types/global.ts'
 import { getLoginLogApi, batchDeleteLoginLogApi, clearLoginLogApi } from './service'
 import type { SysLoginLogListType } from './loginLog.type'
 import { useDict } from '@/hooks/dict.hook.ts'
@@ -181,6 +192,19 @@ const loginStatusOptions = ref<SelectOptionItem[]>([])
 getDictOptions('loginStatus').then((res) => {
   loginStatusOptions.value = res
 })
+
+// 导出
+const exportVisible = ref(false)
+const columns: ColumnConfig[] = [
+  { key: 'userName', label: '用户名' },
+  { key: 'ip', label: 'IP' },
+  { key: 'location', label: '登录地点' },
+  { key: 'browser', label: '浏览器' },
+  { key: 'os', label: '操作系统' },
+  { key: 'status', label: '状态', format: { type: 'enum', dictCode: 'loginStatus' } },
+  { key: 'message', label: '失败原因' },
+  { key: 'createdAt', label: '登录时间', format: 'datetime' },
+]
 
 const searchLabelWidth = ref(80)
 

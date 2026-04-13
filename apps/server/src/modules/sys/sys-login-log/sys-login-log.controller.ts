@@ -1,12 +1,14 @@
 import { Permission } from '@/common/decorators/permission.decorator';
+import type { ExportColumn } from '@/common/class/export.class';
 import { DelCommonNumbersDto } from '@/common/dtos/common.dto';
-import { Controller, Delete, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
 import { SysLoginLogService } from './sys-login-log.service';
 
@@ -22,6 +24,18 @@ export class SysLoginLogController {
   @Permission('sys:login-log:list')
   findAll(@Query() query: GetSysLoginLogListDto) {
     return this.sysLoginLogService.findAll(query);
+  }
+
+  /* 导出登录日志 */
+  @Post('export')
+  @ApiOperation({ summary: '导出登录日志' })
+  @Permission('sys:login-log:export')
+  exportExcel(
+    @Body() body: { fields: ExportColumn[] },
+    @Query() query: GetSysLoginLogListDto,
+    @Res() res: Response,
+  ) {
+    return this.sysLoginLogService.exportExcel(body.fields, query, res);
   }
 
   /* 通过id查询 */

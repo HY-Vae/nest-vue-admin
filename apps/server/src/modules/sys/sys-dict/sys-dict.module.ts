@@ -5,5 +5,6 @@ import { SysDictService } from './sys-dict.service';
 @Module({
   controllers: [SysDictController],
   providers: [SysDictService],
+  exports: [SysDictService],
 })
 export class SysDictModule {}

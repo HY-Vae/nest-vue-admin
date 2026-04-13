@@ -75,6 +75,7 @@
         <el-button type="primary" :icon="Plus" v-auth="'sys:post:create'" @click="addSysPost"
           >新增</el-button
         >
+        <el-button v-auth="'sys:post:export'" @click="exportVisible = true">导出</el-button>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
         <el-table :data="tableData" border row-key="id">
@@ -155,6 +156,14 @@
       @cancel="cancelDialog"
       @confirm="runActionSysPost"
     />
+
+    <ExportDialog
+      v-model:visible="exportVisible"
+      :columns="columns"
+      export-url="/sys/post/export"
+      :search-params="searchSysPostForm"
+      filename="岗位列表"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -163,6 +172,8 @@ import { transTime } from '@/utils/util.ts'
 import { Plus } from '@element-plus/icons-vue'
 import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
+import ExportDialog from '@/components/export/ExportDialog.vue'
+import type { ColumnConfig } from '@/types/global.ts'
 import {
   addSysPostApi,
   deleteSysPostApi,
@@ -189,6 +200,18 @@ const deptOptions = ref<SelectTreeItem[]>([])
 getDeptOptionsApi().then((res) => {
   deptOptions.value = res.data
 })
+
+// 导出
+const exportVisible = ref(false)
+const columns: ColumnConfig[] = [
+  { key: 'name', label: '岗位名称' },
+  { key: 'dept.deptName', label: '所属部门' },
+  { key: 'code', label: '岗位编码' },
+  { key: 'isLeader', label: '负责人岗位' },
+  { key: 'sort', label: '排序' },
+  { key: 'status', label: '启用状态', format: { type: 'enum', dictCode: 'enableStatus' } },
+  { key: 'createdAt', label: '创建时间', format: 'datetime', tableVisible: false },
+]
 
 const searchSpan = ref({
   xs: 24,

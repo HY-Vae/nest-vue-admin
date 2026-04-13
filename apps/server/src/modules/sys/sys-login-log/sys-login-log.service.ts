@@ -1,7 +1,9 @@
 import { getIpLocation, getRequestIp } from '@/utils/util';
+import type { ExportColumn } from '@/common/class/export.class';
+import { ExcelExportService } from '@/common/class/export.class';
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { Request } from 'express';
+import type { Request, Response } from 'express';
 import { PrismaService } from 'nestjs-prisma';
 import { UAParser } from 'ua-parser-js';
 import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
@@ -10,7 +12,10 @@ import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
 export class SysLoginLogService {
   private readonly logger = new Logger(SysLoginLogService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly excelExportService: ExcelExportService,
+  ) {}
 
   /* 记录登录成功日志 */
   async recordSuccess(request: Request, userId: string) {
@@ -115,6 +120,32 @@ export class SysLoginLogService {
     ]);
 
     return { list, total };
+  }
+
+  /* 导出登录日志 */
+  async exportExcel(
+    fields: ExportColumn[],
+    query: GetSysLoginLogListDto,
+    res: Response,
+  ) {
+    const { skip, take, ...whereQuery } = query;
+    const { list } = await this.findAll({ ...whereQuery } as GetSysLoginLogListDto);
+
+    const buffer = await this.excelExportService.export({
+      columns: fields,
+      data: list as unknown as Record<string, unknown>[],
+      filename: '登录日志',
+    });
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${encodeURIComponent('登录日志')}.xlsx"`,
+    );
+    res.send(buffer);
   }
 
   /* 通过id查询 */

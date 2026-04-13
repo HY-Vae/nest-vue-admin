@@ -1,4 +1,5 @@
 import { Permission } from '@/common/decorators/permission.decorator';
+import type { ExportColumn } from '@/common/class/export.class';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
 import {
@@ -10,8 +11,10 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import {
   CreateSysPostDto,
   GetSysPostListDto,
@@ -41,6 +44,19 @@ export class SysPostController {
   @Get()
   findAll(@Query() query: GetSysPostListDto) {
     return this.sysPostService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '导出岗位列表',
+  })
+  @Permission('sys:post:export')
+  @Post('export')
+  exportExcel(
+    @Body() body: { fields: ExportColumn[] },
+    @Query() query: GetSysPostListDto,
+    @Res() res: Response,
+  ) {
+    return this.sysPostService.exportExcel(body.fields, query, res);
   }
 
   @ApiOperation({

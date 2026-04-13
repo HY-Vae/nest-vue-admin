@@ -1,6 +1,8 @@
 import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
 import { User } from '@/common/decorators/user.decorator';
+import { ExcelExportService } from '@/common/class/export.class';
+import type { ExportColumn } from '@/common/class/export.class';
 import { ActionEnum } from '@/common/enums/action.enum';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
@@ -14,8 +16,10 @@ import {
   Patch,
   Post,
   Query,
+  Res,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import {
   CreateSysUserDto,
   GetSysUserListDto,
@@ -29,7 +33,10 @@ import { SysUserService } from './sys-user.service';
 @ApiBearerAuth()
 @Controller('sys/user')
 export class SysUserController {
-  constructor(private readonly sysUserService: SysUserService) {}
+  constructor(
+    private readonly sysUserService: SysUserService,
+    private readonly excelExportService: ExcelExportService,
+  ) {}
 
   @ApiOperation({
     summary: '新增用户',
@@ -48,6 +55,20 @@ export class SysUserController {
   @Get()
   findAll(@Query() query: GetSysUserListDto) {
     return this.sysUserService.findAll(query);
+  }
+
+  @ApiOperation({
+    summary: '导出用户列表',
+  })
+  @Permission('sys:user:export')
+  @Post('export')
+  exportExcel(
+    @Body() body: { fields: ExportColumn[] },
+    @Query() query: GetSysUserListDto,
+    @Res() res: Response,
+  ) {
+    const { fields } = body;
+    return this.sysUserService.exportExcel(fields, query, res);
   }
 
   @ApiOperation({

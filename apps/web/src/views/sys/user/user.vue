@@ -44,6 +44,7 @@
             <span class="user-total">({{ userTotal }}人)</span>
           </span>
           <el-button type="primary" v-auth="'sys:user:create'" @click="addUser">新增用户</el-button>
+          <el-button v-auth="'sys:user:export'" @click="exportVisible = true">导出</el-button>
         </div>
       </template>
 
@@ -99,12 +100,12 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="部门" width="120">
+        <el-table-column :label="colLabel('dept.deptName')" width="120">
           <template #default="{ row }">
             <span>{{ row.dept?.deptName || '-' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="岗位" width="150">
+        <el-table-column :label="colLabel('post.name')" width="150">
           <template #default="{ row }">
             <div class="post-cell">
               <span>{{ row.post?.name || '-' }}</span>
@@ -112,8 +113,8 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="手机号" prop="phone" width="120" />
-        <el-table-column label="状态" width="80" align="center">
+        <el-table-column :label="colLabel('phone')" prop="phone" width="120" />
+        <el-table-column :label="colLabel('status')" width="80" align="center">
           <template #default="{ row }">
             <el-tag :type="row.status === '0' ? 'success' : 'danger'" size="small">
               {{ getDictLabel(enableStatusOptions, row.status) }}
@@ -168,6 +169,14 @@
       @cancel="dialogVisible = false"
       @confirm="handleSubmit"
     />
+
+    <ExportDialog
+      v-model:visible="exportVisible"
+      :columns="columns"
+      export-url="/sys/user/export"
+      :search-params="searchForm"
+      filename="用户列表"
+    />
   </div>
 </template>
 
@@ -175,7 +184,7 @@
 import { useSearchParams } from '@/composables/useSearchParams'
 import { ActionEnum } from '@/enums/common'
 import { useDict } from '@/hooks/dict.hook.ts'
-import type { SelectOptionItem } from '@/types/global.ts'
+import type { ColumnConfig, SelectOptionItem } from '@/types/global.ts'
 import { getSysDeptApi } from '@/views/sys/dept/service'
 import type { SysDeptListType } from '@/views/sys/dept/sysDept.type'
 import type { SysPostListType } from '@/views/sys/post/post.type'
@@ -183,6 +192,7 @@ import { getSysPostApi } from '@/views/sys/post/service'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRequest } from 'vue-request'
 import { useRouter } from 'vue-router'
+import ExportDialog from '@/components/export/ExportDialog.vue'
 import UserDialog from './UserDialog.vue'
 import { addUserApi, deleteUserApi, getUserApi, getUserOneApi, updateUserApi } from './service'
 import type {
@@ -235,6 +245,24 @@ const dialogAction = ref<ActionEnum>(ActionEnum.Add)
 const dialogLoading = ref(false)
 const detailLoading = ref(false)
 const currentUser = ref<UserDetailType | undefined>()
+
+// 导出
+const exportVisible = ref(false)
+
+// 统一列配置（表格标签 + 导出字段）
+const columns: ColumnConfig[] = [
+  { key: 'userName', label: '用户名' },
+  { key: 'nickName', label: '昵称' },
+  { key: 'dept.deptName', label: '部门' },
+  { key: 'post.name', label: '岗位' },
+  { key: 'phone', label: '手机号' },
+  { key: 'email', label: '邮箱' },
+  { key: 'status', label: '状态', format: { type: 'enum', dictCode: 'enableStatus' } },
+  { key: 'createdAt', label: '创建时间', format: 'datetime', tableVisible: false },
+]
+
+// 根据 key 获取列标签
+const colLabel = (key: string) => columns.find((c) => c.key === key)?.label || ''
 
 // 树配置
 const treeProps = {
