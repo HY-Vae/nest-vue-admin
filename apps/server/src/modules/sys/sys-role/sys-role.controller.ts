@@ -1,5 +1,7 @@
 import { Action } from '@/common/decorators/action.decorator';
 import { Permission } from '@/common/decorators/permission.decorator';
+import { User } from '@/common/decorators/user.decorator';
+import type { CurrentUserType } from '@/common/types/auth.type';
 import { ActionEnum } from '@/common/enums/action.enum';
 import { CreateDtoPipe } from '@/common/pipes/createDto.pipe';
 import { UpdateDtoPipe } from '@/common/pipes/updateDto.pipe';
@@ -33,8 +35,11 @@ export class SysRoleController {
   })
   @Action({ action: ActionEnum.CREATE, title: '新增角色' })
   @Post()
-  create(@Body(CreateDtoPipe) createSysRoleDto: CreateSysRoleDto) {
-    return this.sysRoleService.create(createSysRoleDto);
+  create(
+    @Body(CreateDtoPipe) createSysRoleDto: CreateSysRoleDto,
+    @User() user: CurrentUserType,
+  ) {
+    return this.sysRoleService.create(createSysRoleDto, user);
   }
 
   @Permission('sys:role:list')
@@ -73,8 +78,9 @@ export class SysRoleController {
   update(
     @Param('id') id: string,
     @Body(UpdateDtoPipe) updateSysRoleDto: UpdateSysRoleDto,
+    @User() user: CurrentUserType,
   ) {
-    return this.sysRoleService.update(id, updateSysRoleDto);
+    return this.sysRoleService.update(id, updateSysRoleDto, user);
   }
 
   @Permission('sys:role:remove')

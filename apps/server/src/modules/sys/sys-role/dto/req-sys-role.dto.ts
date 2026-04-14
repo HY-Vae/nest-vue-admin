@@ -1,9 +1,10 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
 import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsNumber,
   IsOptional,
   IsString,
@@ -43,6 +44,16 @@ export class CreateSysRoleDto {
   @MaxLength(1)
   status: string;
 
+  @ApiProperty({ description: '数据权限范围 (ALL/CUSTOM/DEPT/DEPT_AND_CHILD/SELF)', required: true })
+  @IsString()
+  @MaxLength(20)
+  dataScope: string;
+
+  @ApiPropertyOptional({ description: '是否超管角色', default: false })
+  @IsBoolean()
+  @IsOptional()
+  isSuper?: boolean;
+
   @ApiProperty({ description: '角色描述', required: false })
   @IsString()
   @IsOptional()
@@ -56,6 +67,11 @@ export class CreateSysRoleDto {
   @ApiProperty({ description: '接口权限', required: true })
   @IsArray()
   menuBtns: number[];
+
+  @ApiProperty({ description: '自定义数据权限的部门ID列表', required: false })
+  @IsArray()
+  @IsOptional()
+  deptIds?: string[];
 }
 
 export class UpdateSysRoleDto extends PartialType(CreateSysRoleDto) {}

@@ -14,6 +14,8 @@ export interface RoleListType {
   key: string
   sort: number
   status: string
+  isSuper: boolean
+  dataScope: string
   remark: string | null
   createBy: string
   createdAt: Date
@@ -26,9 +28,12 @@ export interface CreateRoleType {
   key: string
   sort: number
   status: string
+  isSuper: boolean
+  dataScope: string
   remark: string | null
   menus: number[]
   menuBtns: number[]
+  deptIds: string[]
 }
 
 export interface UpdateRoleType extends Partial<CreateRoleType> {

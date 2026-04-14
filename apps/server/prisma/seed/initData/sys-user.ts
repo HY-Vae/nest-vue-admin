@@ -538,5 +538,21 @@ export async function initUser(prisma: PrismaClient) {
       create: user,
     });
   }
+
+  // 将 admin 用户绑定到超级管理员角色
+  const superRole = await prisma.sysRole.findUnique({
+    where: { key: 'super_admin' },
+  });
+  if (superRole) {
+    await prisma.sysUser.update({
+      where: { userName: 'admin' },
+      data: {
+        roles: {
+          set: [{ id: superRole.id }],
+        },
+      },
+    });
+  }
+
   console.log('用户数据初始化完成');
 }

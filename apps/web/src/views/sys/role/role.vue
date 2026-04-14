@@ -51,6 +51,19 @@
               </el-tag>
             </template>
           </el-table-column>
+          <el-table-column prop="isSuper" align="center" label="超管" width="70">
+            <template #default="scope">
+              <el-tag v-if="scope.row.isSuper" type="danger">是</el-tag>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="dataScope" align="center" label="数据权限">
+            <template #default="scope">
+              <el-tag type="info">
+                {{ getDictLabel(dataScopeOptions, scope.row.dataScope) }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="sort" align="center" label="排序" />
           <el-table-column prop="createBy" align="center" label="创建人" />
           <el-table-column prop="createdAt" align="center" label="创建时间" width="170">
@@ -69,6 +82,7 @@
                 >修改</el-button
               >
               <el-button type="danger" v-auth="'sys:role:remove'" link @click="delRoles(scope.row)"
+                :disabled="scope.row.isSuper"
                 >删除</el-button
               >
             </template>
@@ -118,8 +132,12 @@ import { useSearchParams } from '@/composables/useSearchParams'
 const { getDictOptions, getDictLabel } = useDict()
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
+const dataScopeOptions = ref<SelectOptionItem[]>([])
 getDictOptions('enableStatus').then((res) => {
   enableStatusOptions.value = res
+})
+getDictOptions('dataScope').then((res) => {
+  dataScopeOptions.value = res
 })
 
 const searchSpan = ref({
@@ -132,8 +150,8 @@ const searchSpan = ref({
 
 // 初始搜索条件
 const initialSearchForm = {
-  name: '',
-  status: '',
+  name: undefined,
+  status: undefined,
   current: 1,
   pageSize: 20,
 }

@@ -160,8 +160,8 @@ const searchSpan = ref({
 
 // 初始搜索条件
 const initialSearchForm = {
-  label: '',
-  status: '',
+  label: undefined,
+  status: undefined,
   current: 1,
   pageSize: 20,
 }

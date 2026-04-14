@@ -5,6 +5,7 @@ import { CacheModeEnum } from '@/common/enums/config.enum';
 import { ExcelExportService } from '@/common/class/export.class';
 import { HttpExceptionFilter } from '@/common/filters/exception.filter';
 import { DemoEnvironmentGuard } from '@/common/guards/demo.guard';
+import { DevOnlyGuard } from '@/common/guards/devOnly.guard';
 import { JwtAuthGuard } from '@/common/guards/jwtAuth.guard';
 import { ActionInterceptor } from '@/common/interceptors/action.interceptor';
 import {
@@ -155,6 +156,10 @@ const logger = new Logger('CacheModule');
     {
       provide: APP_GUARD,
       useClass: DemoEnvironmentGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: DevOnlyGuard,
     },
     {
       provide: APP_INTERCEPTOR,

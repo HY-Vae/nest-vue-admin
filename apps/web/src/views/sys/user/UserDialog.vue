@@ -4,6 +4,7 @@ import { getDeptOptionsApi } from '@/views/sys/dept/service.ts'
 import { getSysPostOptionsApi } from '@/views/sys/post/service.ts'
 import { ActionEnum } from '@/enums/common.ts'
 import { useDict } from '@/hooks/dict.hook.ts'
+import { useUserStore } from '@/stores/modules/user.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import type { CreateUserType, UserDetailType } from '@/views/sys/user/user.type'
 import type { FormInstance, UploadInstance, UploadProps } from 'element-plus'
@@ -12,6 +13,10 @@ import { Plus, CircleClose } from '@element-plus/icons-vue'
 import { computed, ref, watch, type PropType } from 'vue'
 import { deleteFileUploadByUrlApi } from '@/views/upload/file/service'
 import { useRequest } from 'vue-request'
+import { storeToRefs } from 'pinia'
+
+const userStore = useUserStore()
+const { currentUser } = storeToRefs(userStore)
 
 const props = defineProps({
   action: {
@@ -137,6 +142,15 @@ const roleOptions = ref<SelectOptionItem[]>([])
 const deptOptions = ref<SelectTreeItem[]>([])
 const postOptions = ref<SelectOptionItem[]>([])
 const sexStatusOptions = ref<SelectOptionItem[]>([])
+
+// 非超管用户需要过滤超管角色
+const roleOptionsVisible = computed(() => {
+  if (currentUser.value?.isSuper) return roleOptions.value
+  return roleOptions.value.map((item: any) => ({
+    ...item,
+    disabled: item.isSuper === true,
+  }))
+})
 
 // 加载岗位选项（根据部门ID过滤）
 const loadPostOptions = (deptId?: string | null) => {
@@ -368,20 +382,37 @@ const handleRemoveAvatar = () => {
         </el-col>
         <el-col v-bind="formSpan">
           <el-form-item label="用户角色" :label-width="formLabelWidth" prop="menus">
-            <el-tree-select
+            <el-select
+              v-model="userForm.roleIds"
               multiple
               collapse-tags
-              check-strictly
               collapse-tags-tooltip
-              show-checkbox
-              v-model="userForm.roleIds"
-              treeRef="menuRef"
-              :data="roleOptions"
-              highlight-current
-              auto-expand-parent
               placeholder="请选择角色"
-              :render-after-expand="false"
-            />
+              clearable
+              filterable
+              style="width: 100%"
+            >
+              <el-option
+                v-for="item in roleOptionsVisible"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                :disabled="(item as any).disabled"
+              >
+                <span>{{ item.label }}</span>
+                <el-tag
+                  v-if="(item as any).isSuper"
+                  type="danger"
+                  size="small"
+                  style="margin-left: 8px"
+                >
+                  超管
+                </el-tag>
+              </el-option>
+            </el-select>
+            <div v-if="!currentUser?.isSuper" class="el-upload__tip">
+              超管角色仅超级管理员可分配
+            </div>
           </el-form-item>
         </el-col>
         <el-col v-bind="formSpan">

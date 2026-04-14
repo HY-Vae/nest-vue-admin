@@ -47,6 +47,10 @@ model SysRole {
   key       String       @unique @db.VarChar(30)
   sort      Int          @default(0)
   status    String       @db.Char(1)
+  /// 是否超管角色（超管拥有所有权限，不受数据权限限制）
+  isSuper   Boolean      @default(false) @map("is_super")
+  /// 数据权限范围 (ALL/CUSTOM/DEPT/DEPT_AND_CHILD/SELF)
+  dataScope String       @default("SELF") @map("data_scope") @db.VarChar(20)
   remark    String?      @db.VarChar(255)
   createBy  String?      @map("create_by") @db.VarChar(64)
   createdAt DateTime     @default(now()) @map("created_at")
@@ -55,6 +59,7 @@ model SysRole {
   users     SysUser[]
   menus     SysMenu[]
   menuBtns  SysMenuBtn[]
+  depts     SysDept[]
 
   @@map("sys_role")
 }
@@ -183,6 +188,8 @@ model SysDept {
   deptCode  String    @unique @map("dept_code") @db.VarChar(20)
   /// 父级部门ID
   parentId  String?   @map("parent_id") @db.VarChar(36)
+  /// 祖级部门列表（逗号分隔，如 "1,2,7"）
+  ancestors String?   @map("ancestors") @db.VarChar(255)
   /// 联系电话
   phone     String?   @map("phone") @db.VarChar(11)
   /// 邮箱
@@ -210,6 +217,8 @@ model SysDept {
   users     SysUser[]
   /// 部门岗位
   posts     SysPost[]
+  /// 数据权限关联的角色
+  roles     SysRole[]
 
   @@map("sys_dept")
 }

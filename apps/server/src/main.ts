@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { WinstonModule } from 'nest-winston';
 import path, { join } from 'path';
 import { AppModule } from './app.module';
@@ -14,21 +15,28 @@ async function bootstrap() {
     logger: WinstonModule.createLogger(winstonConfig),
   });
   const configService = app.get(ConfigService);
+  app.use(helmet());
   app.enableCors();
 
-  const config = new DocumentBuilder()
-    .setTitle('NVA')
-    .setDescription('nest-vue-admin接口文档')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
-  const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('document', app, documentFactory, {
-    swaggerOptions: {
-      docExpansion: 'none',
-    },
-  });
   const port = configService.get('port');
+  const env = configService.get<string>('NODE_ENV');
+
+  // Swagger 仅开发环境启用
+  if (env === 'development') {
+    const config = new DocumentBuilder()
+      .setTitle('NVA')
+      .setDescription('nest-vue-admin接口文档')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .build();
+    const documentFactory = () => SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('document', app, documentFactory, {
+      swaggerOptions: {
+        docExpansion: 'none',
+      },
+    });
+    console.log(`文档地址：http://127.0.0.1:${port}/document`);
+  }
   // 注册本地静态资源目录
   const uploadConfig = configService.get<FileUploadType>('upload');
   if (uploadConfig?.mode === UploadModeEnum.LOCAL) {
@@ -44,8 +52,6 @@ async function bootstrap() {
   }
 
   await app.listen(port);
-  // 启动日志使用 console 是标准做法，此时 Logger 可能未完全初始化
-  console.log(`服务启动成功，端口：http://127.0.0.1:${port}`);
-  console.log(`文档地址：http://127.0.0.1:${port}/document`);
+  console.log(`服务启动成功，端口：http://127.0.0.1:${port}，环境：${env}`);
 }
 bootstrap();

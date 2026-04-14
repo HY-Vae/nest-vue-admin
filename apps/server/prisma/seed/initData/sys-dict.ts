@@ -65,6 +65,20 @@ const dicts: Dict[] = [
       { label: '登录失败', value: '1', sort: 1, status: '0', createBy: 'nva' },
     ],
   },
+  {
+    name: '数据权限',
+    code: 'dataScope',
+    sort: 5,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '全部数据', value: 'ALL', sort: 0, status: '0', createBy: 'nva' },
+      { label: '自定义', value: 'CUSTOM', sort: 1, status: '0', createBy: 'nva' },
+      { label: '本部门', value: 'DEPT', sort: 2, status: '0', createBy: 'nva' },
+      { label: '本部门及子部门', value: 'DEPT_AND_CHILD', sort: 3, status: '0', createBy: 'nva' },
+      { label: '仅本人', value: 'SELF', sort: 4, status: '0', createBy: 'nva' },
+    ],
+  },
 ];
 
 export async function initDicts(prisma: PrismaClient) {

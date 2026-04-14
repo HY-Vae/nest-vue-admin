@@ -1,6 +1,7 @@
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { EnableStatusEnum } from '@/common/enums/common.enum';
 import { ApiException } from '@/common/exceptions/api.exception';
+import type { CurrentUserType } from '@/common/types/auth.type';
 import { generateRedisKey, generateUUid } from '@/utils/util';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
@@ -18,7 +19,13 @@ export class SysRoleService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
-  async create(createSysRoleDto: CreateSysRoleDto) {
+
+  async create(createSysRoleDto: CreateSysRoleDto, currentUser: CurrentUserType) {
+    // 非超管不能创建超管角色
+    if (createSysRoleDto.isSuper && !currentUser.isSuper) {
+      throw new ApiException('只有超级管理员才能创建超管角色');
+    }
+
     const exist = await this.prisma.sysRole.findFirst({
       where: {
         key: createSysRoleDto.key,
@@ -27,10 +34,13 @@ export class SysRoleService {
     if (exist) {
       throw new ApiException('角色值已存在');
     }
-    const { menus, menuBtns, ...others } = createSysRoleDto;
+    const { menus, menuBtns, deptIds, ...others } = createSysRoleDto;
+    // 超管角色自动设置数据权限为 ALL
+    const dataScope = others.isSuper ? 'ALL' : others.dataScope;
     return this.prisma.sysRole.create({
       data: {
         ...others,
+        dataScope,
         id: generateUUid(),
         menus: {
           connect: createSysRoleDto.menus.map((id) => ({ id })),
@@ -38,6 +48,11 @@ export class SysRoleService {
         menuBtns: {
           connect: createSysRoleDto.menuBtns.map((id) => ({ id })),
         },
+        ...(deptIds?.length && {
+          depts: {
+            connect: deptIds.map((id) => ({ id })),
+          },
+        }),
       },
     });
   }
@@ -76,12 +91,14 @@ export class SysRoleService {
       select: {
         id: true,
         name: true,
+        isSuper: true,
       },
     });
     return roles.map((item) => {
       return {
         label: item.name,
         value: item.id,
+        isSuper: item.isSuper,
       };
     });
   }
@@ -102,6 +119,11 @@ export class SysRoleService {
             id: true,
           },
         },
+        depts: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (!role) {
@@ -109,10 +131,13 @@ export class SysRoleService {
     }
     const menus = role.menus.map((menu) => menu.id);
     const menuBtns = role.menuBtns.map((menuBtn) => menuBtn.id);
+    const deptIds = role.depts.map((dept) => dept.id);
+    const { depts, ...roleData } = role;
     return {
-      ...role,
+      ...roleData,
       menus,
       menuBtns,
+      deptIds,
     };
   }
 
@@ -136,7 +161,7 @@ export class SysRoleService {
     }
   }
 
-  async update(id: string, updateSysRoleDto: UpdateSysRoleDto) {
+  async update(id: string, updateSysRoleDto: UpdateSysRoleDto, currentUser: CurrentUserType) {
     const exist = await this.prisma.sysRole.findFirst({
       where: {
         key: updateSysRoleDto.key,
@@ -148,7 +173,20 @@ export class SysRoleService {
     if (exist) {
       throw new ApiException('角色值已存在');
     }
-    const { menus, menuBtns, ...others } = updateSysRoleDto;
+
+    // 检查超管角色保护
+    const targetRole = await this.prisma.sysRole.findUnique({ where: { id } });
+    if (targetRole?.isSuper && !currentUser.isSuper) {
+      throw new ApiException('只有超级管理员才能修改超管角色');
+    }
+    // 非超管不能把普通角色提升为超管
+    if (updateSysRoleDto.isSuper && !currentUser.isSuper) {
+      throw new ApiException('只有超级管理员才能设置超管角色');
+    }
+
+    const { menus, menuBtns, deptIds, ...others } = updateSysRoleDto;
+    // 超管角色自动设置数据权限为 ALL
+    const dataScope = others.isSuper ? 'ALL' : others.dataScope;
     await this.removeCache(id);
     return this.prisma.sysRole.update({
       where: {
@@ -156,12 +194,18 @@ export class SysRoleService {
       },
       data: {
         ...others,
+        ...(dataScope !== undefined && { dataScope }),
         menus: {
           set: menus?.map((id) => ({ id })),
         },
         menuBtns: {
           set: menuBtns?.map((id) => ({ id })),
         },
+        ...(deptIds !== undefined && {
+          depts: {
+            set: deptIds.map((id) => ({ id })),
+          },
+        }),
       },
     });
   }
@@ -170,6 +214,14 @@ export class SysRoleService {
     // 先查询这个角色下是否有用户;
     if (!id) {
       throw new ApiException('参数异常');
+    }
+    const role = await this.prisma.sysRole.findUnique({ where: { id } });
+    if (!role) {
+      throw new ApiException('角色不存在');
+    }
+    // 不能删除超管角色
+    if (role.isSuper) {
+      throw new ApiException('不能删除超管角色');
     }
     const user = await this.prisma.sysUser.findFirst({
       where: {
@@ -181,7 +233,7 @@ export class SysRoleService {
       },
     });
     if (user) {
-      throw new Error('该角色下有用户，请先解除用户角色分配');
+      throw new ApiException('该角色下有用户，请先解除用户角色分配');
     }
     await this.removeCache(id);
     await this.prisma.sysRole.delete({

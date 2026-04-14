@@ -123,8 +123,8 @@ const searchSpan = ref({
 })
 
 const searchTempForm = ref({
-  name: '',
-  code: '',
+  name: undefined,
+  code: undefined,
   current: 1,
   pageSize: 20,
 })
@@ -136,8 +136,8 @@ const onTempSearch = () => {
 
 const onTempReset = () => {
   searchTempForm.value = {
-    name: '',
-    code: '',
+    name: undefined,
+    code: undefined,
     current: 1,
     pageSize: 20,
   }

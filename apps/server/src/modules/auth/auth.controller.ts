@@ -1,3 +1,4 @@
+import { DevOnly } from '@/common/decorators/devOnly.decorator';
 import { Public } from '@/common/decorators/public.decorator';
 import { User } from '@/common/decorators/user.decorator';
 import { LocalAuthGuard } from '@/common/guards/localAuth.guard';
@@ -22,9 +23,10 @@ export class AuthController {
   }
 
   @Public()
+  @DevOnly()
   @Get('testToken')
   @ApiOperation({
-    summary: '获取token',
+    summary: '获取token（仅开发环境）',
   })
   generateToken() {
     return this.authService.login({ id: '1' } as CurrentUserType);

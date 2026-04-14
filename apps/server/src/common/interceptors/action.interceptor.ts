@@ -1,7 +1,7 @@
 import { ACTION_KEY } from '@/common/constants/decorator.constant';
 import { ActionMetaType } from '@/common/types/action.type';
 import { CurrentUserType } from '@/common/types/auth.type';
-import { getRequestIp } from '@/utils/util';
+import { getRequestIp, sanitize } from '@/utils/util';
 import {
   CallHandler,
   ExecutionContext,
@@ -39,9 +39,8 @@ export class ActionInterceptor implements NestInterceptor {
     // 获取用户信息 (假设经由 AuthGuard 注入)
     const user = request.user as CurrentUserType;
 
-    // 3. 组装基础日志数据 (请求参数序列化)
-    // 建议：合并 body, query, params 以便完整记录，同时注意脱敏密码等敏感字段
-    const reqData = { body, query, params: routeParams };
+    // 3. 组装基础日志数据 (请求参数序列化，敏感字段脱敏)
+    const reqData = sanitize({ body, query, params: routeParams });
     const paramsJson = JSON.stringify(reqData);
 
     // 获取真实 IP (处理 Nginx 代理情况)

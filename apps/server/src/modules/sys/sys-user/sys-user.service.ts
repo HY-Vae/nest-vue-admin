@@ -16,6 +16,7 @@ import {
   UpdateProfileDto,
   UpdateSysUserDto,
 } from './dto/req-sys-user.dto';
+import type { CurrentUserType } from '@/common/types/auth.type';
 
 @Injectable()
 export class SysUserService {
@@ -24,7 +25,7 @@ export class SysUserService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly excelExportService: ExcelExportService,
   ) {}
-  async create(createSysUserDto: CreateSysUserDto) {
+  async create(createSysUserDto: CreateSysUserDto, currentUser: CurrentUserType) {
     const user = await this.prisma.sysUser.findFirst({
       where: {
         userName: createSysUserDto.userName,
@@ -32,6 +33,15 @@ export class SysUserService {
     });
     if (user) {
       throw new ApiException('用户名已存在');
+    }
+    // 非超管不能给用户分配超管角色
+    if (createSysUserDto.roleIds?.length && !currentUser.isSuper) {
+      const superRoleCount = await this.prisma.sysRole.count({
+        where: { id: { in: createSysUserDto.roleIds }, isSuper: true },
+      });
+      if (superRoleCount > 0) {
+        throw new ApiException('只有超级管理员才能分配超管角色');
+      }
     }
     const salt = await bcrypt.genSalt();
     const password = await bcrypt.hash('123456', salt);
@@ -51,7 +61,7 @@ export class SysUserService {
     });
   }
 
-  async findAll(query: GetSysUserListDto) {
+  async findAll(query: GetSysUserListDto, currentUser: CurrentUserType) {
     const { skip, take } = query;
     const where: Prisma.SysUserWhereInput = {};
     if (query.userName) {
@@ -80,6 +90,9 @@ export class SysUserService {
     if (query.postId) {
       where.postId = query.postId;
     }
+
+    // 数据权限：直接合并已解析的 where 条件
+    Object.assign(where, currentUser.dataScope);
 
     const listPromise = this.prisma.sysUser.findMany({
       where,
@@ -118,10 +131,11 @@ export class SysUserService {
   async exportExcel(
     fields: ExportColumn[],
     query: GetSysUserListDto,
+    currentUser: CurrentUserType,
     res: Response,
   ) {
     const { skip, take, ...whereQuery } = query;
-    const { list } = await this.findAll({ ...whereQuery } as GetSysUserListDto);
+    const { list } = await this.findAll({ ...whereQuery } as GetSysUserListDto, currentUser);
 
     const buffer = await this.excelExportService.export({
       columns: fields,
@@ -182,7 +196,7 @@ export class SysUserService {
     };
   }
 
-  async update(id: string, updateSysUserDto: UpdateSysUserDto) {
+  async update(id: string, updateSysUserDto: UpdateSysUserDto, currentUser: CurrentUserType) {
     const { roleIds, ...other } = updateSysUserDto;
     const exist = await this.prisma.sysUser.findFirst({
       where: {
@@ -194,6 +208,15 @@ export class SysUserService {
     });
     if (exist) {
       throw new ApiException('用户名已存在');
+    }
+    // 非超管不能给用户分配超管角色
+    if (roleIds?.length && !currentUser.isSuper) {
+      const superRoleCount = await this.prisma.sysRole.count({
+        where: { id: { in: roleIds }, isSuper: true },
+      });
+      if (superRoleCount > 0) {
+        throw new ApiException('只有超级管理员才能分配超管角色');
+      }
     }
     const user = await this.prisma.sysUser.update({
       where: {
@@ -248,8 +271,14 @@ export class SysUserService {
       throw new ApiException('用户不存在');
     }
 
-    // 不能删除超级管理员
-    if (user.userName === 'admin') {
+    // 不能删除拥有超管角色的用户
+    const superRole = await this.prisma.sysRole.findFirst({
+      where: {
+        isSuper: true,
+        users: { some: { id } },
+      },
+    });
+    if (superRole) {
       throw new ApiException('不能删除超级管理员');
     }
 

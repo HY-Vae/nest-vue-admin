@@ -2,7 +2,15 @@ import { PaginationDto } from '@/common/dtos/pagination.dto';
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class GetSysUserListDto extends PaginationDto {
   @ApiProperty({ description: '用户名', required: false })
@@ -161,7 +169,12 @@ export class UpdatePasswordDto {
   @IsString()
   oldPassword: string;
 
-  @ApiProperty({ description: '新密码' })
+  @ApiProperty({ description: '新密码（6-20位，需包含字母和数字）' })
   @IsString()
+  @MinLength(6, { message: '密码长度不能少于6位' })
+  @MaxLength(20, { message: '密码长度不能超过20位' })
+  @Matches(/^(?=.*[A-Za-z])(?=.*\d).+$/, {
+    message: '密码必须包含字母和数字',
+  })
   newPassword: string;
 }

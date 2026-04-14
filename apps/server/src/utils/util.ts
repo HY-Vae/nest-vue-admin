@@ -126,3 +126,43 @@ export function getIpLocation(ip: string): string {
     return '未知';
   }
 }
+
+/** 需要脱敏的字段名（不区分大小写匹配） */
+const SENSITIVE_KEYS = new Set([
+  'password',
+  'oldpassword',
+  'newpassword',
+  'confirmpassword',
+  'salt',
+  'token',
+  'secret',
+  'accesstoken',
+  'refreshtoken',
+  'apikey',
+  'privatekey',
+]);
+
+/**
+ * 递归脱敏对象中的敏感字段
+ * 匹配到的字段值替换为 '***'，非敏感字段原样保留
+ */
+export function sanitize<T>(obj: T): T {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj !== 'object') return obj;
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) => sanitize(item)) as T;
+  }
+
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+    if (SENSITIVE_KEYS.has(key.toLowerCase())) {
+      result[key] = '***';
+    } else if (typeof value === 'object' && value !== null) {
+      result[key] = sanitize(value);
+    } else {
+      result[key] = value;
+    }
+  }
+  return result as T;
+}

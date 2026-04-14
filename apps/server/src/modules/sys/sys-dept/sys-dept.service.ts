@@ -29,7 +29,8 @@ export class SysDeptService {
   async create(createSysDeptDto: CreateSysDeptDto) {
     const { parentId, ...other } = createSysDeptDto;
 
-    // 校验父级部门是否存在
+    let ancestors = '';
+    // 校验父级部门是否存在，并计算 ancestors
     if (parentId) {
       const parent = await this.prisma.sysDept.findUnique({
         where: { id: parentId },
@@ -37,6 +38,9 @@ export class SysDeptService {
       if (!parent) {
         throw new ApiException('父级部门不存在');
       }
+      ancestors = parent.ancestors
+        ? `${parent.ancestors},${parent.id}`
+        : parent.id;
     }
 
     return this.prisma.sysDept.create({
@@ -44,6 +48,7 @@ export class SysDeptService {
         ...other,
         id: generateUUid(),
         parentId: parentId || null,
+        ancestors,
       },
     });
   }
@@ -188,13 +193,37 @@ export class SysDeptService {
       throw new ApiException('父级部门不能是自己');
     }
 
+    // 如果 parentId 有值，需要重新计算 ancestors
+    let ancestors: string | undefined;
+    if (parentId !== undefined) {
+      if (parentId) {
+        const parent = await this.prisma.sysDept.findUnique({
+          where: { id: parentId },
+        });
+        if (!parent) {
+          throw new ApiException('父级部门不存在');
+        }
+        ancestors = parent.ancestors
+          ? `${parent.ancestors},${parent.id}`
+          : parent.id;
+      } else {
+        ancestors = '';
+      }
+    }
+
     const dept = await this.prisma.sysDept.update({
       where: { id },
       data: {
         ...other,
-        parentId: parentId || null,
+        ...(parentId !== undefined && { parentId: parentId || null }),
+        ...(ancestors !== undefined && { ancestors }),
       },
     });
+
+    // 如果 ancestors 变了，级联更新所有子部门的 ancestors
+    if (ancestors !== undefined) {
+      await this.updateChildAncestors(id, ancestors);
+    }
 
     // 清除该部门下所有用户的缓存
     const users = await this.prisma.sysUser.findMany({
@@ -208,6 +237,29 @@ export class SysDeptService {
     }
 
     return dept;
+  }
+
+  /**
+   * 递归更新子部门的 ancestors
+   */
+  private async updateChildAncestors(
+    parentId: string,
+    parentAncestors: string,
+  ) {
+    const children = await this.prisma.sysDept.findMany({
+      where: { parentId },
+      select: { id: true },
+    });
+    for (const child of children) {
+      const childAncestors = parentAncestors
+        ? `${parentAncestors},${parentId}`
+        : parentId;
+      await this.prisma.sysDept.update({
+        where: { id: child.id },
+        data: { ancestors: childAncestors },
+      });
+      await this.updateChildAncestors(child.id, childAncestors);
+    }
   }
 
   /* 删除 */

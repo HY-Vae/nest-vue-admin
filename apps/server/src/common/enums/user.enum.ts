@@ -3,4 +3,7 @@ export enum UserKeyEnum {
   'userName' = 'userName',
   'nickName' = 'nickName',
   'phone' = 'phone',
+  'isSuper' = 'isSuper',
+  'permissions' = 'permissions',
+  'dataScope' = 'dataScope',
 }

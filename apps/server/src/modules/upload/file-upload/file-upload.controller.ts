@@ -25,21 +25,36 @@ import {
 import { FileUploadService } from './file-upload.service';
 
 import { User } from '@/common/decorators/user.decorator';
+import { isFileAllowed } from '@/common/constants/upload.constant';
 import type { CurrentUserType } from '@/common/types/auth.type';
 import { FileInterceptor } from '@nestjs/platform-express';
+
+const uploadMulterOptions = {
+  limits: {
+    fileSize: Number(process.env.UPLOAD_MAX_FILE_SIZE) || 20 * 1024 * 1024,
+  },
+  fileFilter: (_req: any, file: Express.Multer.File, callback: any) => {
+    const { allowed, reason } = isFileAllowed(file.originalname, file.mimetype);
+    if (!allowed) {
+      return callback(new Error(reason), false);
+    }
+    callback(null, true);
+  },
+};
 
 @ApiTags('附件上传')
 @ApiBearerAuth()
 @Controller('upload/file')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
+
   /* 新增 */
   @Post()
   @ApiOperation({
     summary: '附件上传',
   })
   @Permission('upload:file:create')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', uploadMulterOptions))
   async create(
     @UploadedFile() file: Express.Multer.File,
     @User() user: CurrentUserType,

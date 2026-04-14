@@ -44,8 +44,8 @@ export class SysUserController {
   @Permission('sys:user:create')
   @Action({ title: '新增用户', action: ActionEnum.CREATE })
   @Post()
-  create(@Body(CreateDtoPipe) createSysUserDto: CreateSysUserDto) {
-    return this.sysUserService.create(createSysUserDto);
+  create(@Body(CreateDtoPipe) createSysUserDto: CreateSysUserDto, @User() user: CurrentUserType) {
+    return this.sysUserService.create(createSysUserDto, user);
   }
 
   @ApiOperation({
@@ -53,8 +53,8 @@ export class SysUserController {
   })
   @Permission('sys:user:list')
   @Get()
-  findAll(@Query() query: GetSysUserListDto) {
-    return this.sysUserService.findAll(query);
+  findAll(@Query() query: GetSysUserListDto, @User() user: CurrentUserType) {
+    return this.sysUserService.findAll(query, user);
   }
 
   @ApiOperation({
@@ -65,10 +65,11 @@ export class SysUserController {
   exportExcel(
     @Body() body: { fields: ExportColumn[] },
     @Query() query: GetSysUserListDto,
+    @User() user: CurrentUserType,
     @Res() res: Response,
   ) {
     const { fields } = body;
-    return this.sysUserService.exportExcel(fields, query, res);
+    return this.sysUserService.exportExcel(fields, query, user, res);
   }
 
   @ApiOperation({
@@ -127,8 +128,9 @@ export class SysUserController {
   update(
     @Param('id') id: string,
     @Body(UpdateDtoPipe) updateSysUserDto: UpdateSysUserDto,
+    @User() user: CurrentUserType,
   ) {
-    return this.sysUserService.update(id, updateSysUserDto);
+    return this.sysUserService.update(id, updateSysUserDto, user);
   }
 
   @ApiOperation({

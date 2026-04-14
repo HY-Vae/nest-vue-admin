@@ -50,7 +50,7 @@ const noticeList = ref<NoticeListType[]>([])
 const noticeTotal = ref(0)
 const noticePagination = reactive({
   current: 1,
-  pageSize: 10,
+  pageSize: 20,
 })
 
 // 待办列表
@@ -58,7 +58,7 @@ const todoList = ref<TodoListType[]>([])
 const todoTotal = ref(0)
 const todoPagination = reactive({
   current: 1,
-  pageSize: 10,
+  pageSize: 20,
 })
 
 // 加载状态

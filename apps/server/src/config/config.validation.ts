@@ -12,7 +12,7 @@ export const envValidationSchema = Joi.object({
 
   GLOBAL_PREFIX: Joi.string().optional().allow(''),
 
-  JWT_SECRET: Joi.string().required(),
+  JWT_SECRET: Joi.string().min(16).required(),
 
   JWT_EXPIRES_IN: Joi.number().required(), // 建议单位：毫秒
 

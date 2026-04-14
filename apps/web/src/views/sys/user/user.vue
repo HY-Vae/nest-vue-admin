@@ -227,7 +227,7 @@ const initialSearchForm: QueryUserType = {
   status: undefined,
   includeChildren: true,
   current: 1,
-  pageSize: 10,
+  pageSize: 20,
 }
 
 // 用户列表

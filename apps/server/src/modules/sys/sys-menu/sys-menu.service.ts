@@ -178,19 +178,17 @@ export class SysMenuService {
   }
 
   async remove(id: number) {
-    // TODO: 需要级联删除掉数据
-    this.prisma.$transaction(async (tx) => {
-      //   1.需要删除角色菜单权限表关系
-      //   2.需要删除角色按钮权限表关系
-      //   3.删除菜单meta
-      //   4.删除按钮信息
-      //   5.删除菜单信息
-    });
+    const menu = await this.prisma.sysMenu.findUnique({ where: { id } });
+    if (!menu) throw new ApiException('菜单不存在');
 
-    return this.prisma.sysMenu.delete({
-      where: {
-        id,
-      },
+    // 检查是否有子菜单
+    const childCount = await this.prisma.sysMenu.count({
+      where: { parentId: id },
     });
+    if (childCount > 0) throw new ApiException('请先删除子菜单');
+
+    // 删除菜单，数据库 ON DELETE CASCADE 自动清理：
+    // meta、btns、parameters、角色-菜单关联、角色-按钮关联
+    return this.prisma.sysMenu.delete({ where: { id } });
   }
 }

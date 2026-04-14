@@ -7,7 +7,6 @@
     "start": "pnpm run --parallel start"
   },
   "devDependencies": {
-    "axios": "^1.13.1",
     "eslint": "^9.18.0",
     "prettier": "^3.4.2",
     "prettier-plugin-organize-imports": "^4.3.0",
@@ -16,12 +15,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@prisma/client": "^6.17.1",
-    "change-case": "^4.1.2",
-    "dayjs": "^1.11.19",
-    "uuid": "^8.3.2"
-  },
   "pnpm": {
     "overrides": {
     "typescript": "5.7.3"

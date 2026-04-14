@@ -4,7 +4,7 @@ import * as svgCaptcha from 'svg-captcha';
 
 import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
 import { ApiException } from '@/common/exceptions/api.exception';
-import { CurrentUserType, JwtPayloadType } from '@/common/types/auth.type';
+import { CurrentUserType, DataScopeWhere, JwtPayloadType } from '@/common/types/auth.type';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -12,6 +12,7 @@ import { PrismaService } from 'nestjs-prisma';
 
 import { SUPER_ADMIN } from '@/common/constants/base.constant';
 import { EnableStatusEnum } from '@/common/enums/common.enum';
+import { DataScopeEnum } from '@/common/enums/dataScope.enum';
 import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { JwtConfigType } from '@/common/types/config.type';
 import { simplifyMenuTree } from '@/utils/menu.util';
@@ -89,11 +90,11 @@ export class AuthService {
       },
     });
     if (!user) {
-      throw new ApiException('用户不存在');
+      throw new ApiException('用户名或密码错误');
     }
     const isok = await bcrypt.compare(password, user.password);
     if (!isok) {
-      throw new ApiException('密码错误');
+      throw new ApiException('用户名或密码错误');
     }
     return await this.getCurrentUser(user.id);
   }
@@ -119,9 +120,13 @@ export class AuthService {
       },
       select: {
         id: true,
+        isSuper: true,
       },
     });
-    return roles.map((item) => item.id);
+    return {
+      roleIds: roles.map((item) => item.id),
+      isSuper: roles.some((item) => item.isSuper),
+    };
   }
 
   async getPermissions(roleIds: string[]) {
@@ -253,16 +258,21 @@ export class AuthService {
       },
     });
     if (!user) throw new ApiException('用户不存在');
-    // 获取菜单、获取按钮权限
-    const roleIds = await this.getRoleIds(id);
-    let isSuper = false;
+    // 获取角色信息（含 isSuper 标记）
+    const { roleIds, isSuper } = await this.getRoleIds(id);
     let permissions: string[] = [];
-    if (user.userName === 'admin') {
+    if (isSuper) {
       permissions = [SUPER_ADMIN];
-      isSuper = true;
     } else {
       permissions = await this.getPermissions(roleIds);
     }
+    // 解析数据权限
+    const dataScope = await this.resolveDataScope(
+      id,
+      user.deptId,
+      roleIds,
+      isSuper,
+    );
     const { dept, post, ...userData } = user;
     const currentUser: CurrentUserType = {
       ...userData,
@@ -270,12 +280,95 @@ export class AuthService {
       post,
       isSuper,
       permissions,
+      dataScope,
     };
     await this.cacheManager.set(
       generateRedisKey(REDIS_KEYS.USER_INFO, id),
       currentUser,
     );
     return currentUser;
+  }
+
+  /**
+   * 解析数据权限为 Prisma where 条件
+   * 权限优先级: ALL > CUSTOM > DEPT_AND_CHILD > DEPT > SELF
+   */
+  private async resolveDataScope(
+    userId: string,
+    userDeptId: string | null,
+    roleIds: string[],
+    isSuper: boolean,
+  ): Promise<DataScopeWhere> {
+    if (isSuper) return {};
+
+    if (!roleIds.length) return { createBy: userId };
+
+    const roles = await this.prisma.sysRole.findMany({
+      where: { id: { in: roleIds } },
+      select: { dataScope: true, depts: { select: { id: true } } },
+    });
+
+    // 取最大权限
+    const scopePriority: Record<string, number> = {
+      [DataScopeEnum.ALL]: 5,
+      [DataScopeEnum.CUSTOM]: 4,
+      [DataScopeEnum.DEPT_AND_CHILD]: 3,
+      [DataScopeEnum.DEPT]: 2,
+      [DataScopeEnum.SELF]: 1,
+    };
+
+    let maxScope = DataScopeEnum.SELF;
+    let maxPriority = 0;
+    for (const role of roles) {
+      const priority = scopePriority[role.dataScope] || 0;
+      if (priority > maxPriority) {
+        maxPriority = priority;
+        maxScope = role.dataScope as DataScopeEnum;
+      }
+    }
+
+    switch (maxScope) {
+      case DataScopeEnum.ALL:
+        return {};
+
+      case DataScopeEnum.CUSTOM: {
+        const allCustomRoleDeptIds = roles
+          .filter((r) => r.dataScope === DataScopeEnum.CUSTOM)
+          .flatMap((r) => r.depts.map((d) => d.id));
+        const uniqueDeptIds = [...new Set(allCustomRoleDeptIds)];
+        if (!uniqueDeptIds.length) return { createBy: userId };
+        return { deptId: { in: uniqueDeptIds } };
+      }
+
+      case DataScopeEnum.DEPT_AND_CHILD: {
+        if (!userDeptId) return { createBy: userId };
+        // 利用 ancestors 字段一次性查出所有子部门
+        const childDepts = await this.prisma.sysDept.findMany({
+          where: {
+            OR: [
+              { id: userDeptId },
+              { ancestors: { contains: `,${userDeptId},` } },
+              { ancestors: { startsWith: `${userDeptId},` } },
+              { ancestors: { endsWith: `,${userDeptId}` } },
+              { ancestors: userDeptId },
+            ],
+          },
+          select: { id: true },
+        });
+        const deptIds = childDepts.map((d) => d.id);
+        if (!deptIds.length) return { createBy: userId };
+        return { deptId: { in: deptIds } };
+      }
+
+      case DataScopeEnum.DEPT: {
+        if (!userDeptId) return { createBy: userId };
+        return { deptId: { in: [userDeptId] } };
+      }
+
+      case DataScopeEnum.SELF:
+      default:
+        return { createBy: userId };
+    }
   }
 
   async getCurrentUser(userId: string, fromDb: boolean = false) {
