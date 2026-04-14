@@ -201,7 +201,7 @@ export async function initMenus(prisma: PrismaClient) {
   await upsertMenu(prisma, {
     name: 'sys-login-log',
     parentId: sysRoot.id,
-    path: '/sys/loginLog',
+    path: '/sys/login-log',
     auth: 'sys:login-log',
     component: 'views/sys/loginLog/index.vue',
     sort: 6,
