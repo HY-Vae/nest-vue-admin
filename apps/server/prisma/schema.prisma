@@ -37,7 +37,14 @@ model SysUser {
   post        SysPost?  @relation(fields: [postId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   noticeReads SysNoticeRead[]
   todos       SysTodo[]
+  /// 密码最后修改时间
+  passwordUpdatedAt DateTime  @default(now()) @map("password_updated_at")
+  /// 密码历史记录
+  passwordHistories SysPasswordHistory[]
 
+  @@index([deptId])
+  @@index([phone])
+  @@index([status])
   @@map("sys_user")
 }
 
@@ -89,6 +96,7 @@ model SysMenu {
   menuBtns   SysMenuBtn[]
   roles      SysRole[]
 
+  @@index([parentId])
   @@map("sys_menu")
 }
 
@@ -220,6 +228,7 @@ model SysDept {
   /// 数据权限关联的角色
   roles     SysRole[]
 
+  @@index([parentId])
   @@map("sys_dept")
 }
 
@@ -285,6 +294,7 @@ model SysActionLog {
   /// 创建时间
   createdAt DateTime? @default(now()) @map("created_at")
 
+  @@index([userId, createdAt])
   @@map("sys_action_log")
 }
 
@@ -310,6 +320,7 @@ model SysLoginLog {
   /// 登录时间
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([userName, createdAt])
   @@map("sys_login_log")
 }
 
@@ -442,5 +453,23 @@ model SysTodo {
 
   user        SysUser   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId, status])
   @@map("sys_todo")
+}
+
+/// 密码历史记录
+model SysPasswordHistory {
+  /// 记录ID
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  /// 用户ID
+  userId       String   @map("user_id") @db.VarChar(36)
+  /// 密码哈希
+  passwordHash String   @map("password_hash") @db.VarChar(100)
+  /// 创建时间
+  createdAt    DateTime @default(now()) @map("created_at")
+  /// 关联用户
+  user         SysUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("sys_password_history")
 }

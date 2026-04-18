@@ -3,6 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
 export class ReqAuthDto {}
+export class RefreshTokenDto {
+  @ApiProperty({ description: '刷新令牌' })
+  @Trim()
+  @IsString()
+  refreshToken: string;
+}
 export class LoginReqDto {
   @ApiProperty({ description: '验证码', required: true })
   @Trim()

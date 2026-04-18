@@ -75,3 +75,10 @@ export class CreateSysRoleDto {
 }
 
 export class UpdateSysRoleDto extends PartialType(CreateSysRoleDto) {}
+
+export class UpdateRoleUsersDto {
+  @ApiProperty({ description: '用户ID列表', required: true })
+  @IsArray()
+  @IsString({ each: true })
+  userIds: string[];
+}

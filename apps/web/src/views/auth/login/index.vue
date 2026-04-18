@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { getCaptchaApi, loginApi } from '@/api/auth.ts'
+import { setToken, setRefreshToken } from '@/utils/auth.ts'
 import router from '@/router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { debounce } from 'lodash-es'
@@ -33,7 +34,8 @@ const submitForm = (formEl: FormInstance | undefined) => {
         ...loginForm,
         captchaId: captchaInfo.value.id,
       })
-      localStorage.setItem('token', res.data.token)
+      setToken(res.data.accessToken)
+      setRefreshToken(res.data.refreshToken)
       ElMessage.success('登录成功')
       if (!res.data.home) {
         ElMessage.error('当前用户没有配置菜单权限，请联系管理员')

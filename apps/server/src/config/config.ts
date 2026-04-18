@@ -26,7 +26,8 @@ export const getConfig = (): ConfigType => ({
   // 2. JWT
   jwt: {
     secret: env('JWT_SECRET'),
-    expiresIn: envNumber('JWT_EXPIRES_IN'),
+    accessTokenExpiresIn: envNumber('JWT_ACCESS_EXPIRES_IN'),
+    refreshTokenExpiresIn: envNumber('JWT_REFRESH_EXPIRES_IN'),
   },
 
   // 3. 缓存

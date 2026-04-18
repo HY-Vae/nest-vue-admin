@@ -11,7 +11,6 @@ import {
   addNoticeApi,
   updateNoticeApi,
 } from './service'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSearchParams } from '@/composables/useSearchParams'
 
 const searchlabelWith = ref(80)
@@ -80,7 +79,6 @@ const handleCurrentChange = () => {
 const dialogVisible = ref(false)
 const dialogAction = ref<ActionEnum>(ActionEnum.Add)
 const currentNotice = ref<NoticeListType | undefined>()
-const dialogLoading = ref(false)
 
 const handleAdd = () => {
   dialogAction.value = ActionEnum.Add
@@ -94,31 +92,56 @@ const handleEdit = (row: NoticeListType) => {
   dialogVisible.value = true
 }
 
-const handleDelete = async (row: NoticeListType) => {
-  await ElMessageBox.confirm(`确定要删除通知「${row.title}」吗？`, '提示', {
+// 删除
+const { runAsync: runDeleteNotice } = useRequest(deleteNoticeApi, {
+  manual: true,
+  loadingKeep: 500,
+})
+
+const handleDelete = (row: NoticeListType) => {
+  ElMessageBox.confirm(`确定要删除通知「${row.title}」吗？`, '提示', {
     type: 'warning',
+    beforeClose: (action, instance, done) => {
+      if (action === 'confirm') {
+        instance.confirmButtonLoading = true
+        instance.confirmButtonText = '正在删除...'
+        runDeleteNotice(row.id)
+          .then(() => {
+            instance.confirmButtonLoading = false
+            instance.confirmButtonText = '确定'
+            done()
+          })
+          .catch(() => {
+            instance.confirmButtonLoading = false
+            instance.confirmButtonText = '确定'
+          })
+      } else {
+        done()
+      }
+    },
+  }).then(() => {
+    ElMessage.success('删除成功')
+    runQuery()
   })
-  await deleteNoticeApi(row.id)
-  ElMessage.success('删除成功')
-  runQuery()
 }
 
-const handleConfirm = async (data: CreateNoticeType) => {
-  dialogLoading.value = true
-  try {
+// 提交表单
+const { loading: dialogLoading, run: handleConfirm } = useRequest(
+  (data: CreateNoticeType) => {
     if (dialogAction.value === ActionEnum.Add) {
-      await addNoticeApi(data)
-      ElMessage.success('新增成功')
-    } else {
-      await updateNoticeApi({ ...data, id: currentNotice.value!.id })
-      ElMessage.success('更新成功')
+      return addNoticeApi(data)
     }
-    dialogVisible.value = false
-    runQuery()
-  } finally {
-    dialogLoading.value = false
-  }
-}
+    return updateNoticeApi({ ...data, id: currentNotice.value!.id })
+  },
+  {
+    loadingKeep: 500,
+    onSuccess: () => {
+      ElMessage.success(dialogAction.value === ActionEnum.Add ? '新增成功' : '更新成功')
+      dialogVisible.value = false
+      runQuery()
+    },
+  },
+)
 </script>
 
 <template>

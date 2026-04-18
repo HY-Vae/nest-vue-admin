@@ -4,7 +4,9 @@ import type {
   CreateRoleType,
   QueryRoleType,
   RoleListType,
+  RoleUsersResult,
   UpdateRoleType,
+  UpdateRoleUsersData,
 } from './role.type'
 
 export function getRoleApi(params: QueryRoleType): Promise<ListResult<RoleListType>> {
@@ -43,5 +45,18 @@ export function updateRoleApi(data: UpdateRoleType): Promise<Result> {
 export function deleteRoleApi(id: string): Promise<Result> {
   return request(`/sys/role/${id}`, {
     method: 'DELETE',
+  })
+}
+
+export function getRoleUsersApi(roleId: string): Promise<Result<RoleUsersResult>> {
+  return request(`/sys/role/${roleId}/users`, {
+    method: 'GET',
+  })
+}
+
+export function updateRoleUsersApi(roleId: string, data: UpdateRoleUsersData): Promise<Result> {
+  return request(`/sys/role/${roleId}/users`, {
+    method: 'PUT',
+    data,
   })
 }

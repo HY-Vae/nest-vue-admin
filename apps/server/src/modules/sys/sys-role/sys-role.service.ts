@@ -10,6 +10,7 @@ import { PrismaService } from 'nestjs-prisma';
 import {
   CreateSysRoleDto,
   GetSysRoleListDto,
+  UpdateRoleUsersDto,
   UpdateSysRoleDto,
 } from './dto/req-sys-role.dto';
 
@@ -241,5 +242,54 @@ export class SysRoleService {
         id,
       },
     });
+  }
+
+  async getRoleUsers(roleId: string) {
+    const role = await this.prisma.sysRole.findUnique({
+      where: { id: roleId },
+      select: { users: { select: { id: true } } },
+    });
+    if (!role) {
+      return { userIds: [] };
+    }
+    return { userIds: role.users.map((u) => u.id) };
+  }
+
+  async updateRoleUsers(roleId: string, dto: UpdateRoleUsersDto, currentUser: CurrentUserType) {
+    const targetRole = await this.prisma.sysRole.findUnique({ where: { id: roleId } });
+    if (!targetRole) {
+      throw new ApiException('角色不存在');
+    }
+    // 超管角色保护
+    if (targetRole.isSuper && !currentUser.isSuper) {
+      throw new ApiException('只有超级管理员才能修改超管角色');
+    }
+
+    // 先获取旧用户列表（更新后这些用户可能已不属于该角色）
+    const oldUsers = await this.prisma.sysUser.findMany({
+      where: { roles: { some: { id: roleId } } },
+      select: { id: true },
+    });
+
+    await this.prisma.sysRole.update({
+      where: { id: roleId },
+      data: {
+        users: {
+          set: dto.userIds.map((id) => ({ id })),
+        },
+      },
+    });
+
+    // 清除旧用户和新用户的缓存
+    const newUsers = await this.prisma.sysUser.findMany({
+      where: { roles: { some: { id: roleId } } },
+      select: { id: true },
+    });
+    const allUserIds = new Set([...oldUsers.map((u) => u.id), ...newUsers.map((u) => u.id)]);
+    for (const uid of allUserIds) {
+      await this.cacheManager.del(
+        generateRedisKey(REDIS_KEYS.USER_INFO, uid),
+      );
+    }
   }
 }

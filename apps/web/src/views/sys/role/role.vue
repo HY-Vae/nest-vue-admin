@@ -72,7 +72,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" align="center" label="备注" />
-          <el-table-column label="操作" align="center" width="110">
+          <el-table-column label="操作" align="center" width="160">
             <template #default="scope">
               <el-button
                 type="primary"
@@ -80,6 +80,13 @@
                 link
                 @click="updateRole(scope.row)"
                 >修改</el-button
+              >
+              <el-button
+                type="success"
+                v-auth="'sys:role:update'"
+                link
+                @click="openAssignUser(scope.row)"
+                >分配用户</el-button
               >
               <el-button type="danger" v-auth="'sys:role:remove'" link @click="delRoles(scope.row)"
                 :disabled="scope.row.isSuper"
@@ -114,6 +121,12 @@
       @cancel="cancelDialog"
       @confirm="runActionRole"
     />
+    <assign-user-dialog
+      v-model="assignUserVisible"
+      :role-id="assignRoleId"
+      :role-name="assignRoleName"
+      @success="runGetRole"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -124,6 +137,7 @@ import type { SelectOptionItem } from '@/types/global.ts'
 import { transTime } from '@/utils/util.ts'
 import type { CreateRoleType, RoleListType, UpdateRoleType } from '@/views/sys/role/role.type'
 import RoleDialog from '@/views/sys/role/RoleDialog.vue'
+import AssignUserDialog from '@/views/sys/role/AssignUserDialog.vue'
 import { Plus } from '@element-plus/icons-vue'
 import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
@@ -238,6 +252,16 @@ const updateRole = (row: RoleListType) => {
   action.value = ActionEnum.Edit
   visible.value = true
   runGetRoleOne(row.id)
+}
+
+// 分配用户
+const assignUserVisible = ref(false)
+const assignRoleId = ref('')
+const assignRoleName = ref('')
+const openAssignUser = (row: RoleListType) => {
+  assignRoleId.value = row.id
+  assignRoleName.value = row.name
+  assignUserVisible.value = true
 }
 
 const { runAsync: runDeleteRole } = useRequest(deleteRoleApi, {

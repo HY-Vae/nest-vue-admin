@@ -9,4 +9,6 @@ export const REDIS_KEYS = {
   USER_ROLE_API: 'user:role:api',
   USER_ROLE_API_PERMISSION: 'user:role',
   DICT_KEY: 'dict:key',
+  LOGIN_FAIL: 'login:fail',
+  USER_REFRESH: 'user:refresh',
 };

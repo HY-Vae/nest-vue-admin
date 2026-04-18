@@ -234,7 +234,6 @@ const initialSearchForm: QueryUserType = {
 const searchForm = ref<QueryUserType>({ ...initialSearchForm })
 const userList = ref<UserListType[]>([])
 const userTotal = ref(0)
-const userLoading = ref(false)
 
 // 搜索条件保存恢复
 const { reset: resetSearchParams } = useSearchParams(searchForm.value)
@@ -242,8 +241,6 @@ const { reset: resetSearchParams } = useSearchParams(searchForm.value)
 // 弹窗
 const dialogVisible = ref(false)
 const dialogAction = ref<ActionEnum>(ActionEnum.Add)
-const dialogLoading = ref(false)
-const detailLoading = ref(false)
 const currentUser = ref<UserDetailType | undefined>()
 
 // 导出
@@ -349,16 +346,17 @@ const handleNodeClick = async (data: SysDeptListType) => {
 }
 
 // 加载用户列表
-const loadUsers = async () => {
-  userLoading.value = true
-  try {
-    const res = await getUserApi(searchForm.value)
-    userList.value = res.data.list
-    userTotal.value = res.data.total
-  } finally {
-    userLoading.value = false
-  }
-}
+const { loading: userLoading, run: loadUsers } = useRequest(
+  () => getUserApi(searchForm.value),
+  {
+    manual: true,
+    loadingKeep: 500,
+    onSuccess: (res) => {
+      userList.value = res.data.list
+      userTotal.value = res.data.total
+    },
+  },
+)
 
 // 搜索用户
 const searchUsers = () => {
@@ -382,8 +380,9 @@ const addUser = () => {
 }
 
 // 编辑用户
-const { run: runGetUserOne } = useRequest(getUserOneApi, {
+const { loading: detailLoading, run: runGetUserOne } = useRequest(getUserOneApi, {
   manual: true,
+  loadingKeep: 500,
   onSuccess: (res) => {
     currentUser.value = res.data
   },
@@ -396,13 +395,33 @@ const editUser = (row: UserListType) => {
 }
 
 // 删除用户
-const { runAsync: runDeleteUser } = useRequest(deleteUserApi, { manual: true })
+const { runAsync: runDeleteUser } = useRequest(deleteUserApi, {
+  manual: true,
+  loadingKeep: 500,
+})
 
 const deleteUser = (row: UserListType) => {
   ElMessageBox.confirm(`确定删除用户「${row.nickName}」吗？`, '提示', {
     type: 'warning',
-  }).then(async () => {
-    await runDeleteUser(row.id)
+    beforeClose: (action, instance, done) => {
+      if (action === 'confirm') {
+        instance.confirmButtonLoading = true
+        instance.confirmButtonText = '正在删除...'
+        runDeleteUser(row.id)
+          .then(() => {
+            instance.confirmButtonLoading = false
+            instance.confirmButtonText = '确定'
+            done()
+          })
+          .catch(() => {
+            instance.confirmButtonLoading = false
+            instance.confirmButtonText = '确定'
+          })
+      } else {
+        done()
+      }
+    },
+  }).then(() => {
     ElMessage.success('删除成功')
     refreshData()
   })
@@ -415,25 +434,22 @@ const refreshData = () => {
 }
 
 // 提交用户表单
-const { runAsync: runAddUser } = useRequest(addUserApi, { manual: true })
-const { runAsync: runUpdateUser } = useRequest(updateUserApi, { manual: true })
-
-const handleSubmit = async (values: CreateUserType | UpdateUserType) => {
-  dialogLoading.value = true
-  try {
+const { loading: dialogLoading, run: handleSubmit } = useRequest(
+  (values: CreateUserType | UpdateUserType) => {
     if (dialogAction.value === ActionEnum.Add) {
-      await runAddUser(values as CreateUserType)
-      ElMessage.success('新增成功')
-    } else {
-      await runUpdateUser(values as UpdateUserType)
-      ElMessage.success('修改成功')
+      return addUserApi(values as CreateUserType)
     }
-    dialogVisible.value = false
-    refreshData()
-  } finally {
-    dialogLoading.value = false
-  }
-}
+    return updateUserApi(values as UpdateUserType)
+  },
+  {
+    loadingKeep: 500,
+    onSuccess: () => {
+      ElMessage.success(dialogAction.value === ActionEnum.Add ? '新增成功' : '修改成功')
+      dialogVisible.value = false
+      refreshData()
+    },
+  },
+)
 
 // 跳转到部门管理
 const goToDept = () => {

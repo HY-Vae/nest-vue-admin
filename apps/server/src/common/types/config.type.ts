@@ -15,8 +15,9 @@ export type CacheConfigType = {
 };
 
 export type JwtConfigType = {
-  expiresIn: number;
   secret: string;
+  accessTokenExpiresIn: number;
+  refreshTokenExpiresIn: number;
 };
 export type GenCodeType = {
   serverFolder: string;

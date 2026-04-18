@@ -12,9 +12,10 @@ export const envValidationSchema = Joi.object({
 
   GLOBAL_PREFIX: Joi.string().optional().allow(''),
 
+  // --- JWT 认证 ---
   JWT_SECRET: Joi.string().min(16).required(),
-
-  JWT_EXPIRES_IN: Joi.number().required(), // 建议单位：毫秒
+  JWT_ACCESS_EXPIRES_IN: Joi.number().min(60).default(7200),
+  JWT_REFRESH_EXPIRES_IN: Joi.number().min(60).default(604800),
 
   DATABASE_URL: Joi.string().required(),
 
@@ -125,4 +126,12 @@ export const envValidationSchema = Joi.object({
   // --- 限流配置 ---
   THROTTLE_TTL: Joi.number().default(60),
   THROTTLE_LIMIT: Joi.number().default(60),
+
+  // --- 账号安全配置 ---
+  LOGIN_MAX_FAIL_COUNT: Joi.number().min(1).default(5),
+  LOGIN_LOCK_MINUTES: Joi.number().min(1).default(30),
+
+  // --- 密码策略配置 ---
+  PASSWORD_HISTORY_COUNT: Joi.number().min(0).default(5),
+  PASSWORD_EXPIRE_DAYS: Joi.number().min(0).default(90),
 });

@@ -1,6 +1,12 @@
+import type { AxiosResponse } from 'axios'
 import { BASE_API } from '@/constants/constant.ts'
+import { clearTokens, getRefreshToken, getToken, setToken } from '@/utils/auth.ts'
 import router from '@/router'
 import axios from 'axios'
+
+// --- 401 刷新队列 ---
+let isRefreshing = false
+let pendingRequests: Array<(token: string) => void> = []
 
 const request = axios.create({
   baseURL: BASE_API,
@@ -9,7 +15,7 @@ const request = axios.create({
 
 request.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = getToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -29,11 +35,7 @@ request.interceptors.response.use(
     if (res && res.data) {
       const { code, message } = res.data
       if (code === 401) {
-        localStorage.removeItem('token')
-        ElMessage.error(message)
-        const currentPath = encodeURIComponent(router.currentRoute.value.fullPath)
-        router.push(`/auth/login?redirect=${currentPath}`)
-        return Promise.reject(res.data)
+        return handleTokenExpired(res, message)
       }
       if (code !== 200) {
         ElMessage.error(message)
@@ -57,5 +59,50 @@ request.interceptors.response.use(
     return Promise.reject(error)
   },
 )
+
+/** 处理 401：用 refreshToken 静默刷新，队列重试 */
+function handleTokenExpired(res: AxiosResponse, message: string) {
+  const refreshToken = getRefreshToken()
+  if (!refreshToken) {
+    clearTokensAndRedirect(message)
+    return Promise.reject(res.data)
+  }
+
+  if (isRefreshing) {
+    return new Promise((resolve) => {
+      pendingRequests.push((newToken: string) => {
+        res.config.headers.Authorization = `Bearer ${newToken}`
+        resolve(request(res.config))
+      })
+    })
+  }
+
+  isRefreshing = true
+  return axios
+    .post(`${BASE_API}/auth/refresh`, { refreshToken })
+    .then((refreshRes) => {
+      const newToken = refreshRes.data.data.accessToken
+      setToken(newToken)
+      pendingRequests.forEach((cb) => cb(newToken))
+      pendingRequests = []
+      res.config.headers.Authorization = `Bearer ${newToken}`
+      return request(res.config)
+    })
+    .catch(() => {
+      pendingRequests = []
+      clearTokensAndRedirect('登录状态已过期')
+      return Promise.reject(res.data)
+    })
+    .finally(() => {
+      isRefreshing = false
+    })
+}
+
+function clearTokensAndRedirect(message?: string) {
+  clearTokens()
+  ElMessage.error(message || '登录状态已过期')
+  const currentPath = encodeURIComponent(router.currentRoute.value.fullPath)
+  router.push(`/auth/login?redirect=${currentPath}`)
+}
 
 export default request

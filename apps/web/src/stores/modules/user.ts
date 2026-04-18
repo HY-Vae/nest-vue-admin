@@ -1,4 +1,5 @@
 import { getRoutesApi, getUserInfoApi, logoutApi } from '@/api/auth.ts'
+import { clearTokens } from '@/utils/auth.ts'
 import router from '@/router'
 import { useSearchParamsStore } from '@/stores/modules/searchParams'
 import { useTabsStore } from '@/stores/modules/tabs'
@@ -73,7 +74,7 @@ export const useUserStore = defineStore('user', () => {
     const searchParamsStore = useSearchParamsStore()
     searchParamsStore.clearAllParams()
     // 清除 token
-    localStorage.removeItem('token')
+    clearTokens()
   }
 
   return { currentUser, getCurrentUser, menus, renderRoutes, logout }

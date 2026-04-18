@@ -10,14 +10,9 @@ import { AuthService } from './auth.service';
 @Module({
   imports: [
     JwtModule.registerAsync({
-      useFactory: (configService: ConfigService) => {
-        return {
-          secret: configService.get('jwt.secret'),
-          signOptions: {
-            expiresIn: configService.get('jwt.expiresIn'),
-          },
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('jwt.secret'),
+      }),
       inject: [ConfigService],
     }),
     SysLoginLogModule,

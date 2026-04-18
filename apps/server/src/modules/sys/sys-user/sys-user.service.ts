@@ -5,6 +5,7 @@ import { ApiException } from '@/common/exceptions/api.exception';
 import { generateRedisKey, generateUUid } from '@/utils/util';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import type { Response } from 'express';
@@ -24,40 +25,53 @@ export class SysUserService {
     private readonly prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private readonly excelExportService: ExcelExportService,
+    private readonly configService: ConfigService,
   ) {}
   async create(createSysUserDto: CreateSysUserDto, currentUser: CurrentUserType) {
-    const user = await this.prisma.sysUser.findFirst({
-      where: {
-        userName: createSysUserDto.userName,
-      },
-    });
-    if (user) {
-      throw new ApiException('用户名已存在');
-    }
-    // 非超管不能给用户分配超管角色
-    if (createSysUserDto.roleIds?.length && !currentUser.isSuper) {
-      const superRoleCount = await this.prisma.sysRole.count({
-        where: { id: { in: createSysUserDto.roleIds }, isSuper: true },
-      });
-      if (superRoleCount > 0) {
-        throw new ApiException('只有超级管理员才能分配超管角色');
-      }
-    }
-    const salt = await bcrypt.genSalt();
-    const password = await bcrypt.hash('123456', salt);
-    const { roleIds, ...other } = createSysUserDto;
-    return this.prisma.sysUser.create({
-      data: {
-        ...other,
-        id: generateUUid(),
-        password,
-        roles: {
-          connect: roleIds.map((id) => ({ id })),
+    return this.prisma.$transaction(async (tx) => {
+      const user = await tx.sysUser.findFirst({
+        where: {
+          userName: createSysUserDto.userName,
         },
-      },
-      omit: {
-        password: true,
-      },
+      });
+      if (user) {
+        throw new ApiException('用户名已存在');
+      }
+      // 非超管不能给用户分配超管角色
+      if (createSysUserDto.roleIds?.length && !currentUser.isSuper) {
+        const superRoleCount = await tx.sysRole.count({
+          where: { id: { in: createSysUserDto.roleIds }, isSuper: true },
+        });
+        if (superRoleCount > 0) {
+          throw new ApiException('只有超级管理员才能分配超管角色');
+        }
+      }
+      const salt = await bcrypt.genSalt();
+      const password = await bcrypt.hash('123456', salt);
+      const { roleIds, ...other } = createSysUserDto;
+      const userId = generateUUid();
+      const created = await tx.sysUser.create({
+        data: {
+          ...other,
+          id: userId,
+          password,
+          roles: {
+            connect: roleIds.map((id) => ({ id })),
+          },
+        },
+        omit: {
+          password: true,
+        },
+      });
+      // 写入初始密码历史
+      await tx.sysPasswordHistory.create({
+        data: {
+          id: generateUUid(),
+          userId,
+          passwordHash: password,
+        },
+      });
+      return created;
     });
   }
 
@@ -198,42 +212,44 @@ export class SysUserService {
 
   async update(id: string, updateSysUserDto: UpdateSysUserDto, currentUser: CurrentUserType) {
     const { roleIds, ...other } = updateSysUserDto;
-    const exist = await this.prisma.sysUser.findFirst({
-      where: {
-        userName: updateSysUserDto.userName,
-        id: {
-          not: id,
+    const result = await this.prisma.$transaction(async (tx) => {
+      const exist = await tx.sysUser.findFirst({
+        where: {
+          userName: updateSysUserDto.userName,
+          id: {
+            not: id,
+          },
         },
-      },
-    });
-    if (exist) {
-      throw new ApiException('用户名已存在');
-    }
-    // 非超管不能给用户分配超管角色
-    if (roleIds?.length && !currentUser.isSuper) {
-      const superRoleCount = await this.prisma.sysRole.count({
-        where: { id: { in: roleIds }, isSuper: true },
       });
-      if (superRoleCount > 0) {
-        throw new ApiException('只有超级管理员才能分配超管角色');
+      if (exist) {
+        throw new ApiException('用户名已存在');
       }
-    }
-    const user = await this.prisma.sysUser.update({
-      where: {
-        id,
-      },
-      data: {
-        ...other,
-        roles: {
-          set: roleIds?.map((id) => ({ id })),
+      // 非超管不能给用户分配超管角色
+      if (roleIds?.length && !currentUser.isSuper) {
+        const superRoleCount = await tx.sysRole.count({
+          where: { id: { in: roleIds }, isSuper: true },
+        });
+        if (superRoleCount > 0) {
+          throw new ApiException('只有超级管理员才能分配超管角色');
+        }
+      }
+      return tx.sysUser.update({
+        where: {
+          id,
         },
-      },
-      omit: {
-        password: true,
-      },
+        data: {
+          ...other,
+          roles: {
+            set: roleIds?.map((id) => ({ id })),
+          },
+        },
+        omit: {
+          password: true,
+        },
+      });
     });
     await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, id));
-    return user;
+    return result;
   }
 
   /* 获取用户选项列表（用于下拉选择） */
@@ -258,49 +274,53 @@ export class SysUserService {
   }
 
   async remove(id: string, currentUserId: string) {
-    // 不能删除自己
-    if (id === currentUserId) {
-      throw new ApiException('不能删除自己');
-    }
+    const result = await this.prisma.$transaction(async (tx) => {
+      // 不能删除自己
+      if (id === currentUserId) {
+        throw new ApiException('不能删除自己');
+      }
 
-    const user = await this.prisma.sysUser.findUnique({
-      where: { id },
-    });
+      const user = await tx.sysUser.findUnique({
+        where: { id },
+      });
 
-    if (!user) {
-      throw new ApiException('用户不存在');
-    }
+      if (!user) {
+        throw new ApiException('用户不存在');
+      }
 
-    // 不能删除拥有超管角色的用户
-    const superRole = await this.prisma.sysRole.findFirst({
-      where: {
-        isSuper: true,
-        users: { some: { id } },
-      },
-    });
-    if (superRole) {
-      throw new ApiException('不能删除超级管理员');
-    }
+      // 不能删除拥有超管角色的用户
+      const superRole = await tx.sysRole.findFirst({
+        where: {
+          isSuper: true,
+          users: { some: { id } },
+        },
+      });
+      if (superRole) {
+        throw new ApiException('不能删除超级管理员');
+      }
 
-    // 检查角色关联
-    const role = await this.prisma.sysRole.findFirst({
-      where: {
-        users: {
-          some: {
-            id,
+      // 检查角色关联
+      const role = await tx.sysRole.findFirst({
+        where: {
+          users: {
+            some: {
+              id,
+            },
           },
         },
-      },
-    });
-    if (role) {
-      throw new ApiException('该用户已分配角色，请先解除角色分配');
-    }
+      });
+      if (role) {
+        throw new ApiException('该用户已分配角色，请先解除角色分配');
+      }
 
-    return this.prisma.sysUser.delete({
-      where: {
-        id,
-      },
+      return tx.sysUser.delete({
+        where: {
+          id,
+        },
+      });
     });
+    await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, id));
+    return result;
   }
 
   /* 获取当前用户个人信息 */
@@ -355,11 +375,57 @@ export class SysUserService {
     }
 
     const salt = await bcrypt.genSalt();
-    const password = await bcrypt.hash(updatePasswordDto.newPassword, salt);
+    const newPasswordHash = await bcrypt.hash(updatePasswordDto.newPassword, salt);
 
-    await this.prisma.sysUser.update({
-      where: { id: userId },
-      data: { password },
+    // 检查密码历史
+    const historyCount = this.configService.get<number>('PASSWORD_HISTORY_COUNT')!;
+    if (historyCount > 0) {
+      const histories = await this.prisma.sysPasswordHistory.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: historyCount,
+        select: { passwordHash: true },
+      });
+      for (const h of histories) {
+        const reused = await bcrypt.compare(updatePasswordDto.newPassword, h.passwordHash);
+        if (reused) {
+          throw new ApiException(`新密码不能与最近 ${historyCount} 次使用过的密码相同`);
+        }
+      }
+    }
+
+    await this.prisma.$transaction(async (tx) => {
+      // 更新密码
+      await tx.sysUser.update({
+        where: { id: userId },
+        data: {
+          password: newPasswordHash,
+          passwordUpdatedAt: new Date(),
+        },
+      });
+      // 写入历史记录
+      await tx.sysPasswordHistory.create({
+        data: {
+          id: generateUUid(),
+          userId,
+          passwordHash: newPasswordHash,
+        },
+      });
+      // 清理旧记录，只保留 historyCount 条
+      if (historyCount > 0) {
+        const keepCount = historyCount;
+        const allRecords = await tx.sysPasswordHistory.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+        if (allRecords.length > keepCount) {
+          const idsToDelete = allRecords.slice(keepCount).map((r) => r.id);
+          await tx.sysPasswordHistory.deleteMany({
+            where: { id: { in: idsToDelete } },
+          });
+        }
+      }
     });
 
     await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId));

@@ -13,12 +13,14 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
   CreateSysRoleDto,
   GetSysRoleListDto,
+  UpdateRoleUsersDto,
   UpdateSysRoleDto,
 } from './dto/req-sys-role.dto';
 import { SysRoleService } from './sys-role.service';
@@ -67,6 +69,29 @@ export class SysRoleController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.sysRoleService.findOne(id);
+  }
+
+  @Permission('sys:role:list')
+  @ApiOperation({
+    summary: '获取角色关联的用户ID列表',
+  })
+  @Get(':id/users')
+  getRoleUsers(@Param('id') id: string) {
+    return this.sysRoleService.getRoleUsers(id);
+  }
+
+  @Permission('sys:role:update')
+  @ApiOperation({
+    summary: '批量设置角色用户',
+  })
+  @Action({ action: ActionEnum.UPDATE, title: '分配角色用户' })
+  @Put(':id/users')
+  updateRoleUsers(
+    @Param('id') id: string,
+    @Body() dto: UpdateRoleUsersDto,
+    @User() user: CurrentUserType,
+  ) {
+    return this.sysRoleService.updateRoleUsers(id, dto, user);
   }
 
   @Permission('sys:role:update')

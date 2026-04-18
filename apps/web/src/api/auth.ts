@@ -50,3 +50,10 @@ export function logoutApi(): Promise<Result<null>> {
     method: 'POST',
   })
 }
+
+export function refreshTokenApi(refreshToken: string) {
+  return request('/auth/refresh', {
+    method: 'POST',
+    data: { refreshToken },
+  })
+}

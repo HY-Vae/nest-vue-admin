@@ -32,22 +32,39 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  async login(user: CurrentUserType) {
+  async login(user: CurrentUserType & { mustChangePassword?: boolean }) {
+    // 密码过期，不发放 token
+    if (user.mustChangePassword) {
+      return {
+        mustChangePassword: true,
+        message: '密码已过期，请修改密码',
+        userId: user.id,
+      };
+    }
     //   走到这里说明登录成功
-    const payload: JwtPayloadType = {
-      id: user.id,
-    };
-    const token = this.jwtService.sign(payload);
-    const jwtConfig = this.configService.get<JwtConfigType>('jwt');
-    const expiresIn = jwtConfig?.expiresIn || 60 * 60 * 24 * 7 * 1000;
+    const payload: JwtPayloadType = { id: user.id };
+    const jwtConfig = this.configService.get<JwtConfigType>('jwt')!;
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: jwtConfig.accessTokenExpiresIn });
+    const refreshToken = this.jwtService.sign(
+      { ...payload, type: 'refresh' },
+      { expiresIn: jwtConfig.refreshTokenExpiresIn },
+    );
+
     await this.cacheManager.set(
       generateRedisKey(REDIS_KEYS.USER_TOKEN, user.id),
-      token,
-      expiresIn,
+      accessToken,
+      jwtConfig.accessTokenExpiresIn * 1000,
+    );
+    await this.cacheManager.set(
+      generateRedisKey(REDIS_KEYS.USER_REFRESH, user.id),
+      refreshToken,
+      jwtConfig.refreshTokenExpiresIn * 1000,
     );
     const home = await this.getUserHomePage(user);
     return {
-      token,
+      accessToken,
+      refreshToken,
       home,
     };
   }
@@ -83,6 +100,18 @@ export class AuthService {
   }
 
   async validateUser(userName: string, password: string) {
+    const maxFailCount = this.configService.get<number>('LOGIN_MAX_FAIL_COUNT')!;
+    const lockMinutes = this.configService.get<number>('LOGIN_LOCK_MINUTES')!;
+    const lockTtl = lockMinutes * 60 * 1000;
+
+    // 1. 检查账号是否被锁定
+    const failKey = generateRedisKey(REDIS_KEYS.LOGIN_FAIL, userName);
+    const failCount = await this.cacheManager.get<number>(failKey);
+    if (failCount && failCount >= maxFailCount) {
+      throw new ApiException(`密码错误次数过多，账号已锁定 ${lockMinutes} 分钟`);
+    }
+
+    // 2. 校验用户是否存在
     const user = await this.prisma.sysUser.findFirst({
       where: {
         userName,
@@ -90,13 +119,44 @@ export class AuthService {
       },
     });
     if (!user) {
+      // 用户不存在也计一次失败，防止通过错误信息枚举用户名
+      await this.recordLoginFail(userName, maxFailCount, lockTtl);
       throw new ApiException('用户名或密码错误');
     }
+
+    // 3. 校验密码
     const isok = await bcrypt.compare(password, user.password);
     if (!isok) {
-      throw new ApiException('用户名或密码错误');
+      const remaining = await this.recordLoginFail(userName, maxFailCount, lockTtl);
+      if (remaining <= 0) {
+        throw new ApiException(`密码错误次数过多，账号已锁定 ${lockMinutes} 分钟`);
+      }
+      throw new ApiException(`用户名或密码错误，还剩 ${remaining} 次尝试机会`);
     }
+
+    // 4. 登录成功，清除失败计数
+    await this.cacheManager.del(failKey);
+
+    // 5. 检查密码是否过期
+    const expireDays = this.configService.get<number>('PASSWORD_EXPIRE_DAYS')!;
+    if (expireDays > 0 && user.passwordUpdatedAt) {
+      const expiresAt = new Date(user.passwordUpdatedAt.getTime() + expireDays * 24 * 60 * 60 * 1000);
+      if (new Date() > expiresAt) {
+        const currentUser = await this.getCurrentUser(user.id);
+        return { ...currentUser, mustChangePassword: true };
+      }
+    }
+
     return await this.getCurrentUser(user.id);
+  }
+
+  /** 记录一次登录失败，返回剩余尝试次数 */
+  private async recordLoginFail(userName: string, maxFailCount: number, lockTtl: number): Promise<number> {
+    const failKey = generateRedisKey(REDIS_KEYS.LOGIN_FAIL, userName);
+    const current = (await this.cacheManager.get<number>(failKey)) || 0;
+    const newCount = current + 1;
+    await this.cacheManager.set(failKey, newCount, lockTtl);
+    return Math.max(0, maxFailCount - newCount);
   }
 
   async validateToken(id: string, token: string) {
@@ -384,12 +444,50 @@ export class AuthService {
     return user;
   }
 
+  /** 使用 refreshToken 换取新的 accessToken */
+  async refreshToken(token: string) {
+    let payload: { id: string; type: string };
+    try {
+      payload = this.jwtService.verify<{ id: string; type: string }>(token);
+    } catch {
+      throw new ApiException('刷新令牌已过期，请重新登录');
+    }
+
+    if (payload.type !== 'refresh') {
+      throw new ApiException('无效的刷新令牌');
+    }
+
+    const cachedToken = await this.cacheManager.get<string>(
+      generateRedisKey(REDIS_KEYS.USER_REFRESH, payload.id),
+    );
+    if (cachedToken !== token) {
+      throw new ApiException('刷新令牌已失效，请重新登录');
+    }
+
+    const jwtConfig = this.configService.get<JwtConfigType>('jwt')!;
+    const newAccessToken = this.jwtService.sign(
+      { id: payload.id },
+      { expiresIn: jwtConfig.accessTokenExpiresIn },
+    );
+    await this.cacheManager.set(
+      generateRedisKey(REDIS_KEYS.USER_TOKEN, payload.id),
+      newAccessToken,
+      jwtConfig.accessTokenExpiresIn * 1000,
+    );
+
+    return { accessToken: newAccessToken };
+  }
+
   async logout(userId: string) {
     // 清除用户信息缓存
     await this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId));
     // 清除用户 token 缓存
     await this.cacheManager.del(
       generateRedisKey(REDIS_KEYS.USER_TOKEN, userId),
+    );
+    // 清除用户 refreshToken 缓存
+    await this.cacheManager.del(
+      generateRedisKey(REDIS_KEYS.USER_REFRESH, userId),
     );
   }
 }

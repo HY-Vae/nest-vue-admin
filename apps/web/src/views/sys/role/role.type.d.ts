@@ -44,3 +44,11 @@ export interface PermissionType {
   apiTree: SelectTreeItem[]
   menuTree: SelectTreeItem[]
 }
+
+export interface RoleUsersResult {
+  userIds: string[]
+}
+
+export interface UpdateRoleUsersData {
+  userIds: string[]
+}

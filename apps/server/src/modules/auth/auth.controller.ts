@@ -7,7 +7,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { LoginReqDto } from './dto/req-auth.dto';
+import { LoginReqDto, RefreshTokenDto } from './dto/req-auth.dto';
 
 @ApiTags('权限接口')
 @ApiBearerAuth()
@@ -41,6 +41,14 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   login(@Body() body: LoginReqDto, @User() user: CurrentUserType) {
     return this.authService.login(user);
+  }
+
+  @Public()
+  @Throttle({ default: { ttl: 60000, limit: 20 } })
+  @ApiOperation({ summary: '刷新访问令牌' })
+  @Post('refresh')
+  refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshToken(dto.refreshToken);
   }
 
   @ApiOperation({
