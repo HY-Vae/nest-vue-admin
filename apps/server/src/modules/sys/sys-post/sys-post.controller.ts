@@ -77,6 +77,15 @@ export class SysPostController {
   }
 
   @ApiOperation({
+    summary: '获取岗位关联的角色ID列表',
+  })
+  @Permission('sys:post:list')
+  @Get(':id/roles')
+  getPostRoleIds(@Param('id') id: string) {
+    return this.sysPostService.getPostRoleIds(id);
+  }
+
+  @ApiOperation({
     summary: '更新岗位',
   })
   @Permission('sys:post:update')

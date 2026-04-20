@@ -30,6 +30,7 @@ const treeData = ref<TreeNode[]>([])
 const assignedUserIds = ref<string[]>([])
 const searchText = ref('')
 const checkedCount = ref(0)
+const isAllExpanded = ref(true)
 
 const filterNode = (value: string, data: TreeNode) => {
   if (!value) return true
@@ -49,7 +50,6 @@ const buildDeptNodes = (
     const node: TreeNode = {
       id: dept.value,
       label: dept.label,
-      disabled: true,
       children: [],
     }
     deptMap.set(dept.value, node)
@@ -68,7 +68,6 @@ const buildTree = (depts: any[], users: UserListType[]): TreeNode[] => {
   const noDeptNode: TreeNode = {
     id: '__no_dept',
     label: '未分配部门',
-    disabled: true,
     children: [],
   }
 
@@ -77,6 +76,7 @@ const buildTree = (depts: any[], users: UserListType[]): TreeNode[] => {
       id: user.id,
       label: `${user.nickName} (${user.userName})`,
       isUser: true,
+      disabled: user.status === '1',
     }
     if (user.deptId && deptMap.has(user.deptId)) {
       deptMap.get(user.deptId)!.children!.push(node)
@@ -92,8 +92,35 @@ const buildTree = (depts: any[], users: UserListType[]): TreeNode[] => {
 }
 
 const updateCheckedCount = () => {
-  const checked = treeRef.value?.getCheckedNodes(false, true) as TreeNode[]
+  const checked = treeRef.value?.getCheckedNodes(true, false) as TreeNode[]
   checkedCount.value = checked?.filter((n) => n.isUser).length || 0
+}
+
+/** 全部展开 */
+const expandAll = () => {
+  const tree = treeRef.value
+  if (!tree) return
+  const nodes = tree.store._getAllNodes()
+  nodes.forEach((node: any) => { node.expanded = true })
+  isAllExpanded.value = true
+}
+
+/** 全部折叠 */
+const collapseAll = () => {
+  const tree = treeRef.value
+  if (!tree) return
+  const nodes = tree.store._getAllNodes()
+  nodes.forEach((node: any) => { node.expanded = false })
+  isAllExpanded.value = false
+}
+
+/** 切换展开/折叠 */
+const toggleExpand = () => {
+  if (isAllExpanded.value) {
+    collapseAll()
+  } else {
+    expandAll()
+  }
 }
 
 const { loading: submitLoading, run: runSubmit } = useRequest(
@@ -110,7 +137,7 @@ const { loading: submitLoading, run: runSubmit } = useRequest(
 )
 
 const handleConfirm = () => {
-  const checkedNodes = treeRef.value?.getCheckedNodes(false, true) as TreeNode[]
+  const checkedNodes = treeRef.value?.getCheckedNodes(true, false) as TreeNode[]
   const userIds = checkedNodes?.filter((n) => n.isUser).map((n) => n.id) || []
   runSubmit(props.roleId, userIds)
 }
@@ -132,6 +159,7 @@ const initDialog = async () => {
     treeRef.value?.setChecked(userId, true, false)
   }
   updateCheckedCount()
+  isAllExpanded.value = true
 }
 
 const handleOpen = () => {
@@ -144,6 +172,7 @@ const handleClose = () => {
   assignedUserIds.value = []
   searchText.value = ''
   checkedCount.value = 0
+  isAllExpanded.value = true
 }
 </script>
 
@@ -157,30 +186,41 @@ const handleClose = () => {
     :close-on-press-escape="false"
     @closed="handleClose"
   >
-    <el-input
-      v-model="searchText"
-      placeholder="搜索用户名/昵称"
-      clearable
-      class="search-input"
-    />
-    <el-tree
-      ref="treeRef"
-      :data="treeData"
-      show-checkbox
-      check-strictly
-      node-key="id"
-      default-expand-all
-      :filter-node-method="filterNode"
-      highlight-current
-      @check="updateCheckedCount"
-      :props="{ label: 'label', children: 'children', disabled: 'disabled' }"
-    >
-      <template #default="{ data }">
-        <span class="tree-node-label" :class="{ 'is-user': (data as TreeNode).isUser }">
-          {{ data.label }}
-        </span>
-      </template>
-    </el-tree>
+    <div class="toolbar">
+      <el-input
+        v-model="searchText"
+        placeholder="搜索用户名/昵称"
+        clearable
+        class="search-input"
+      />
+      <el-button
+        class="toggle-btn"
+        link
+        type="primary"
+        @click="toggleExpand"
+      >
+        {{ isAllExpanded ? '折叠全部' : '展开全部' }}
+      </el-button>
+    </div>
+    <div class="tree-container">
+      <el-tree
+        ref="treeRef"
+        :data="treeData"
+        show-checkbox
+        node-key="id"
+        default-expand-all
+        :filter-node-method="filterNode"
+        highlight-current
+        @check="updateCheckedCount"
+        :props="{ label: 'label', children: 'children' }"
+      >
+        <template #default="{ data }">
+          <span class="tree-node-label" :class="{ 'is-user': (data as TreeNode).isUser }">
+            {{ data.label }}
+          </span>
+        </template>
+      </el-tree>
+    </div>
     <div class="checked-info">已勾选 {{ checkedCount }} 个用户</div>
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
@@ -190,8 +230,28 @@ const handleClose = () => {
 </template>
 
 <style scoped lang="scss">
-.search-input {
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-bottom: 12px;
+}
+
+.search-input {
+  flex: 1;
+}
+
+.toggle-btn {
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.tree-container {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+  padding: 4px 0;
 }
 
 .checked-info {

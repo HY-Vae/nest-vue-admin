@@ -96,6 +96,17 @@
             </template>
           </el-table-column>
 
+          <el-table-column label="默认角色" align="center" min-width="150">
+            <template #default="scope">
+              <template v-if="scope.row.roles?.length">
+                <el-tag v-for="role in scope.row.roles" :key="role.id" size="small" style="margin: 2px">
+                  {{ role.name }}
+                </el-tag>
+              </template>
+              <span v-else style="color: #909399">-</span>
+            </template>
+          </el-table-column>
+
           <el-table-column label="排序" align="center" prop="sort" width="80" />
 
           <el-table-column label="启用状态" align="center" prop="status" width="100">

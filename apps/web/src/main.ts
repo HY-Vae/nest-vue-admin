@@ -1,5 +1,6 @@
 import './assets/base.css'
 import './assets/main.scss'
+import './assets/element-reset.scss'
 import './assets/tailwind.css'
 import './assets/theme.scss'
 // import 'element-plus/dist/index.css'

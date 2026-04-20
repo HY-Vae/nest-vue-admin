@@ -7,7 +7,7 @@ import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
-import { LoginReqDto, RefreshTokenDto } from './dto/req-auth.dto';
+import { ChangeExpiredPasswordDto, LoginReqDto, RefreshTokenDto } from './dto/req-auth.dto';
 
 @ApiTags('权限接口')
 @ApiBearerAuth()
@@ -49,6 +49,14 @@ export class AuthController {
   @Post('refresh')
   refresh(@Body() dto: RefreshTokenDto) {
     return this.authService.refreshToken(dto.refreshToken);
+  }
+
+  @Public()
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
+  @ApiOperation({ summary: '过期/强制改密（无需JWT）' })
+  @Post('changeExpiredPassword')
+  changeExpiredPassword(@Body() dto: ChangeExpiredPasswordDto) {
+    return this.authService.changeExpiredPassword(dto);
   }
 
   @ApiOperation({

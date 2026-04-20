@@ -41,6 +41,8 @@ model SysUser {
   passwordUpdatedAt DateTime  @default(now()) @map("password_updated_at")
   /// 密码历史记录
   passwordHistories SysPasswordHistory[]
+  /// 是否需要强制修改密码
+  mustChangePassword Boolean @default(false) @map("must_change_password")
 
   @@index([deptId])
   @@index([phone])
@@ -67,6 +69,8 @@ model SysRole {
   menus     SysMenu[]
   menuBtns  SysMenuBtn[]
   depts     SysDept[]
+  /// 岗位关联的默认角色
+  posts     SysPost[]
 
   @@map("sys_role")
 }
@@ -262,6 +266,8 @@ model SysPost {
   dept      SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
   /// 岗位用户
   users     SysUser[]
+  /// 岗位关联的默认角色
+  roles     SysRole[]
 
   @@map("sys_post")
 }

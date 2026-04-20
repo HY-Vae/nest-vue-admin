@@ -183,6 +183,20 @@ const handleDeptChange = (deptId: string | null) => {
   loadPostOptions(deptId)
 }
 
+// 岗位切换时自动合并该岗位的默认角色
+const handlePostChange = (postId: string | null) => {
+  if (!postId) return
+  const selectedPost = (postOptions.value as any[]).find((item) => item.value === postId)
+  if (selectedPost?.roleIds?.length) {
+    // 合并岗位默认角色到已有角色（去重）
+    const existingRoleIds = new Set(userForm.value.roleIds || [])
+    for (const rid of selectedPost.roleIds) {
+      existingRoleIds.add(rid)
+    }
+    userForm.value.roleIds = [...existingRoleIds]
+  }
+}
+
 watch(
   () => props.current,
   (val) => {
@@ -341,6 +355,7 @@ const handleRemoveAvatar = () => {
               clearable
               filterable
               style="width: 100%"
+              @change="handlePostChange"
             >
               <el-option
                 v-for="item in postOptions"
@@ -412,6 +427,9 @@ const handleRemoveAvatar = () => {
             </el-select>
             <div v-if="!currentUser?.isSuper" class="el-upload__tip">
               超管角色仅超级管理员可分配
+            </div>
+            <div v-else class="el-upload__tip">
+              已根据岗位自动关联角色，您仍可手动调整
             </div>
           </el-form-item>
         </el-col>

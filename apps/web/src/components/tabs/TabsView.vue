@@ -53,8 +53,10 @@ const handleClick = (path: string) => {
 const handleClose = (e: MouseEvent, path: string) => {
   e.stopPropagation()
   const nextPath = tabsStore.closeTab(path)
-  if (nextPath !== null) {
+  if (nextPath) {
     router.push(nextPath)
+  } else if (tabsStore.tabs.length === 0) {
+    router.push('/')
   }
 }
 
@@ -86,6 +88,8 @@ const handleContextCommand = (command: string) => {
       const nextPath = tabsStore.closeTab(path)
       if (nextPath) {
         router.push(nextPath)
+      } else if (tabsStore.tabs.length === 0) {
+        router.push('/')
       }
       break
     }
@@ -123,6 +127,8 @@ const handleCommand = (command: string) => {
       const nextPath = tabsStore.closeAllTabs()
       if (nextPath) {
         router.push(nextPath)
+      } else if (tabsStore.tabs.length === 0) {
+        router.push('/')
       }
       break
     }

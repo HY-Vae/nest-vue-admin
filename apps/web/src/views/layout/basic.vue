@@ -26,10 +26,10 @@ watch(
 <template>
   <div class="nva-container">
     <div v-show="!contentFullscreen" class="aside" :class="{ 'is-collapse': isCollapse }">
-      <div class="logo">
+      <router-link to="/" class="logo">
         <img src="@/assets/logo.svg" alt="logo" class="logo-img" />
         <span class="logo-text" v-show="!isCollapse">Nest-Vue-Admin</span>
-      </div>
+      </router-link>
       <side-menu />
     </div>
     <div class="main">
@@ -105,6 +105,7 @@ watch(
     .content {
       flex: 1;
       min-height: 0;
+      overflow: auto;
       .router-view {
         padding: 20px;
         height: 100%;

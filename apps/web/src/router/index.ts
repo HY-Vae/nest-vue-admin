@@ -4,26 +4,6 @@ const router = createRouter({
   history: createWebHistory('/'),
   routes: [
     {
-      path: '/redirect/:path(.*)',
-      name: 'Redirect',
-      component: {
-        beforeRouteEnter(to, from, next) {
-          next((vm) => {
-            vm.$router.replace('/' + to.params.path)
-          })
-        },
-        render: () => null,
-      },
-      meta: {
-        hidden: true,
-      },
-    },
-    // {
-    //   path: '/',
-    //   redirect: '/about',
-    //   name: 'home',
-    // },
-    {
       path: '/auth',
       name: 'auth',
       component: () => import('../views/layout/auth.vue'),

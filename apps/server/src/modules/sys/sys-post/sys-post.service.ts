@@ -24,7 +24,7 @@ export class SysPostService {
 
   /* 新增 */
   async create(createSysPostDto: CreateSysPostDto) {
-    const { deptId, ...other } = createSysPostDto;
+    const { deptId, roleIds, ...other } = createSysPostDto;
 
     // 校验岗位编码是否已存在
     const existCode = await this.prisma.sysPost.findUnique({
@@ -49,6 +49,9 @@ export class SysPostService {
         ...other,
         id: generateUUid(),
         deptId: deptId || null,
+        ...(roleIds?.length && {
+          roles: { connect: roleIds.map((id) => ({ id })) },
+        }),
       },
     });
   }
@@ -94,6 +97,9 @@ export class SysPostService {
       include: {
         dept: {
           select: { id: true, deptName: true, sort: true },
+        },
+        roles: {
+          select: { id: true, name: true },
         },
       },
     });
@@ -183,13 +189,16 @@ export class SysPostService {
         dept: {
           select: { id: true, deptName: true },
         },
+        roles: {
+          select: { id: true, name: true },
+        },
       },
     });
   }
 
   /* 更新 */
   async update(id: string, updateSysPostDto: UpdateSysPostDto) {
-    const { deptId, code, ...other } = updateSysPostDto;
+    const { deptId, code, roleIds, ...other } = updateSysPostDto;
 
     // 校验岗位编码是否已存在（排除自己）
     if (code) {
@@ -220,6 +229,9 @@ export class SysPostService {
         ...other,
         code,
         deptId: deptId || null,
+        ...(roleIds !== undefined && {
+          roles: { set: roleIds.map((rid) => ({ id: rid })) },
+        }),
       },
     });
 
@@ -317,6 +329,9 @@ export class SysPostService {
         code: true,
         isLeader: true,
         deptId: true,
+        roles: {
+          select: { id: true },
+        },
       },
       orderBy: { sort: 'asc' },
     });
@@ -325,7 +340,22 @@ export class SysPostService {
       value: post.id,
       label: post.name,
       isLeader: post.isLeader,
+      roleIds: post.roles.map((r) => r.id),
     }));
+  }
+
+  /* 获取岗位关联的角色ID列表 */
+  async getPostRoleIds(postId: string) {
+    const post = await this.prisma.sysPost.findUnique({
+      where: { id: postId },
+      select: {
+        roles: { select: { id: true } },
+      },
+    });
+    if (!post) {
+      throw new ApiException('岗位不存在');
+    }
+    return post.roles.map((r) => r.id);
   }
 
   /* 递归获取所有子部门 ID */

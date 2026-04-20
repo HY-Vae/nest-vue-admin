@@ -57,3 +57,14 @@ export function refreshTokenApi(refreshToken: string) {
     data: { refreshToken },
   })
 }
+
+export function changeExpiredPasswordApi(data: {
+  userId: string
+  oldPassword: string
+  newPassword: string
+}) {
+  return request('/auth/changeExpiredPassword', {
+    method: 'POST',
+    data,
+  })
+}

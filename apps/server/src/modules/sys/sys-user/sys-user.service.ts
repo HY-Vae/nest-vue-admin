@@ -55,6 +55,7 @@ export class SysUserService {
           ...other,
           id: userId,
           password,
+          mustChangePassword: true,
           roles: {
             connect: roleIds.map((id) => ({ id })),
           },
@@ -401,6 +402,7 @@ export class SysUserService {
         data: {
           password: newPasswordHash,
           passwordUpdatedAt: new Date(),
+          mustChangePassword: false,
         },
       });
       // 写入历史记录

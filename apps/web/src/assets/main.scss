@@ -4,6 +4,25 @@ body {
   width: 100%;
 }
 
+/* 全局滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(144, 147, 153, 0.3);
+  border-radius: 3px;
+
+  &:hover {
+    background: rgba(144, 147, 153, 0.5);
+  }
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 #app {
   width: 100%;
   height: 100%;

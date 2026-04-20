@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import ChangePasswordForm from '@/components/ChangePasswordForm.vue'
 import { useDict } from '@/hooks/dict.hook'
 import { useUserStore } from '@/stores/modules/user'
 import type { SelectOptionItem } from '@/types/global'
 import { updatePasswordApi, updateProfileApi } from '@/views/sys/user/service'
-import { CircleCheckFilled, CircleClose, Plus } from '@element-plus/icons-vue'
+import { Plus } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules, UploadProps } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { storeToRefs } from 'pinia'
@@ -21,7 +22,7 @@ const uploadHeaders = computed(() => ({
 
 const profileLoading = ref(false)
 const profileFormRef = ref<FormInstance>()
-const passwordFormRef = ref<FormInstance>()
+const changePasswordRef = ref<InstanceType<typeof ChangePasswordForm>>()
 const activeTab = ref('basic')
 const showPasswordDialog = ref(false)
 const uploadLoading = ref(false)
@@ -39,13 +40,6 @@ const profileForm = reactive({
   sex: '',
 })
 
-// 密码表单
-const passwordForm = reactive({
-  oldPassword: '',
-  newPassword: '',
-  confirmPassword: '',
-})
-
 // 表单验证规则
 const profileRules: FormRules = {
   nickName: [
@@ -56,55 +50,10 @@ const profileRules: FormRules = {
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'change' }],
 }
 
-const passwordRules: FormRules = {
-  oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
-  newPassword: [
-    { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度为6-20位', trigger: 'change' },
-    {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d).+$/,
-      message: '密码必须包含字母和数字',
-      trigger: 'change',
-    },
-  ],
-  confirmPassword: [
-    { required: true, message: '请确认新密码', trigger: 'blur' },
-    {
-      validator: (_rule, value, callback) => {
-        if (value !== passwordForm.newPassword) {
-          callback(new Error('两次输入的密码不一致'))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur',
-    },
-  ],
-}
-
-// 密码强度检测
-const passwordChecks = computed(() => {
-  const pwd = passwordForm.newPassword
-  return [
-    { label: '至少6个字符', passed: pwd.length >= 6 },
-    { label: '包含字母', passed: /[A-Za-z]/.test(pwd) },
-    { label: '包含数字', passed: /\d/.test(pwd) },
-    { label: '包含特殊字符', passed: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(pwd) },
-  ]
-})
-
-const passwordStrength = computed(() => {
-  const passedCount = passwordChecks.value.filter((c) => c.passed).length
-  if (passedCount <= 1) return { level: 0, text: '弱', color: '#F56C6C' }
-  if (passedCount === 2) return { level: 1, text: '较弱', color: '#E6A23C' }
-  if (passedCount === 3) return { level: 2, text: '中等', color: '#409EFF' }
-  return { level: 3, text: '强', color: '#67C23A' }
-})
-
 // 弹窗关闭时重置密码表单
 watch(showPasswordDialog, (val) => {
   if (!val) {
-    passwordFormRef.value?.resetFields()
+    changePasswordRef.value?.resetFields()
   }
 })
 
@@ -153,15 +102,16 @@ const handleSaveProfile = async () => {
 // 修改密码
 const passwordSaving = ref(false)
 const handleChangePassword = async () => {
-  const valid = await passwordFormRef.value?.validate().catch(() => false)
-  if (!valid) return
+  let data: { oldPassword: string; newPassword: string }
+  try {
+    data = await changePasswordRef.value!.validate()
+  } catch {
+    return
+  }
 
   passwordSaving.value = true
   try {
-    await updatePasswordApi({
-      oldPassword: passwordForm.oldPassword,
-      newPassword: passwordForm.newPassword,
-    })
+    await updatePasswordApi(data)
 
     ElMessage.success('密码修改成功')
     showPasswordDialog.value = false
@@ -382,73 +332,7 @@ fetchProfile()
       width="480px"
       :close-on-click-modal="false"
     >
-      <el-form
-        ref="passwordFormRef"
-        :model="passwordForm"
-        :rules="passwordRules"
-        label-width="80px"
-      >
-        <el-form-item label="旧密码" prop="oldPassword">
-          <el-input
-            v-model="passwordForm.oldPassword"
-            type="password"
-            placeholder="请输入旧密码"
-            show-password
-          />
-        </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
-          <el-popover
-            :visible="!!passwordForm.newPassword"
-            placement="right"
-            :width="240"
-            :show-arrow="true"
-            :offset="8"
-          >
-            <template #reference>
-              <el-input
-                v-model="passwordForm.newPassword"
-                type="password"
-                placeholder="6-20位，需包含字母和数字"
-                show-password
-              />
-            </template>
-            <div class="password-strength">
-              <div class="strength-bar">
-                <div
-                  v-for="i in 4"
-                  :key="i"
-                  class="strength-segment"
-                  :style="{ backgroundColor: i <= passwordStrength.level + 1 ? passwordStrength.color : '' }"
-                />
-              </div>
-              <span class="strength-text" :style="{ color: passwordStrength.color }">
-                {{ passwordStrength.text }}
-              </span>
-            </div>
-            <div class="password-checks">
-              <div
-                v-for="item in passwordChecks"
-                :key="item.label"
-                class="check-item"
-                :class="{ passed: item.passed }"
-              >
-                <el-icon :size="14">
-                  <component :is="item.passed ? 'CircleCheckFilled' : 'CircleClose'" />
-                </el-icon>
-                <span>{{ item.label }}</span>
-              </div>
-            </div>
-          </el-popover>
-        </el-form-item>
-        <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="passwordForm.confirmPassword"
-            type="password"
-            placeholder="请再次输入新密码"
-            show-password
-          />
-        </el-form-item>
-      </el-form>
+      <ChangePasswordForm ref="changePasswordRef" layout="label" />
       <template #footer>
         <el-button @click="showPasswordDialog = false">取消</el-button>
         <el-button type="primary" :loading="passwordSaving" @click="handleChangePassword">
@@ -645,50 +529,5 @@ fetchProfile()
     }
   }
 }
-
-.password-strength {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .strength-bar {
-    display: flex;
-    gap: 4px;
-    flex: 1;
-
-    .strength-segment {
-      height: 4px;
-      flex: 1;
-      border-radius: 2px;
-      background-color: var(--el-border-color-light);
-      transition: background-color 0.3s;
-    }
-  }
-
-  .strength-text {
-    font-size: 12px;
-    min-width: 28px;
-    text-align: right;
-  }
-}
-
-.password-checks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 16px;
-  margin-top: 10px;
-
-  .check-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    color: var(--el-text-color-placeholder);
-    transition: color 0.3s;
-
-    &.passed {
-      color: var(--el-color-success);
-    }
-  }
-}
 </style>
+

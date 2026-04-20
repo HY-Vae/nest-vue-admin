@@ -3,6 +3,7 @@ import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsArray,
   IsBoolean,
   IsInt,
   IsNotEmpty,
@@ -82,6 +83,12 @@ export class CreateSysPostDto {
   @IsString()
   @IsOptional()
   remark?: string;
+
+  @ApiPropertyOptional({ description: '默认角色ID列表', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  roleIds?: string[];
 }
 
 /* 编辑 */

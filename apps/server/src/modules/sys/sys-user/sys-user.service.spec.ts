@@ -99,6 +99,7 @@ describe('SysUserService - 创建用户写入初始密码历史 (Task 7)', () =>
           data: expect.objectContaining({
             userName: 'newuser',
             password: 'hashed-123456',
+            mustChangePassword: true,
           }),
         }),
       );

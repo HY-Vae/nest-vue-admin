@@ -75,6 +75,62 @@ export async function initPosts(prisma: PrismaClient) {
   }
   console.log('岗位数据初始化完成');
 }
+
+// 岗位-角色映射
+const postRoleMapping: Record<string, string> = {
+  // 公司高管 → super_admin
+  ceo: 'super_admin',
+  cto: 'super_admin',
+  coo: 'super_admin',
+  // 各部门总监/经理 → tech_admin
+  tech_director: 'tech_admin',
+  tech_manager: 'tech_admin',
+  fe_lead: 'tech_admin',
+  be_lead: 'tech_admin',
+  qa_lead: 'tech_admin',
+  devops_lead: 'tech_admin',
+  product_director: 'tech_admin',
+  operation_director: 'tech_admin',
+  hr_director: 'tech_admin',
+  finance_director: 'tech_admin',
+  plan_lead: 'tech_admin',
+  ux_lead: 'tech_admin',
+  marketing_lead: 'tech_admin',
+  cs_lead: 'tech_admin',
+  // 普通员工/工程师 → normal_user
+  fe_senior: 'normal_user',
+  fe_engineer: 'normal_user',
+  be_senior: 'normal_user',
+  be_engineer: 'normal_user',
+  qa_engineer: 'normal_user',
+  devops_engineer: 'normal_user',
+  product_manager: 'normal_user',
+  ui_designer: 'normal_user',
+  marketing_staff: 'normal_user',
+  cs_staff: 'normal_user',
+  hr_manager: 'normal_user',
+  recruiter: 'normal_user',
+  accountant: 'normal_user',
+  cashier: 'normal_user',
+  intern: 'normal_user',
+};
+
+export async function initPostRoles(prisma: PrismaClient) {
+  console.log('开始初始化岗位-角色映射...');
+  for (const [postCode, roleKey] of Object.entries(postRoleMapping)) {
+    const post = await prisma.sysPost.findUnique({ where: { code: postCode } });
+    const role = await prisma.sysRole.findUnique({ where: { key: roleKey } });
+    if (post && role) {
+      await prisma.sysPost.update({
+        where: { id: post.id },
+        data: {
+          roles: { set: [{ id: role.id }] },
+        },
+      });
+    }
+  }
+  console.log('岗位-角色映射初始化完成');
+}
 // 导出岗位ID供其他模块使用
 export const postIds = {
   ceo: '1',

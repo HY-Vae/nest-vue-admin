@@ -13,8 +13,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Avatar: typeof import('./src/components/header/Avatar.vue')['default']
+    Breadcrumb: typeof import('./src/components/breadcrumb/index.vue')['default']
+    ChangePasswordForm: typeof import('./src/components/ChangePasswordForm.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBadge: typeof import('element-plus/es')['ElBadge']
+    ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+    ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
@@ -84,8 +88,12 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const Avatar: typeof import('./src/components/header/Avatar.vue')['default']
+  const Breadcrumb: typeof import('./src/components/breadcrumb/index.vue')['default']
+  const ChangePasswordForm: typeof import('./src/components/ChangePasswordForm.vue')['default']
   const ElAvatar: typeof import('element-plus/es')['ElAvatar']
   const ElBadge: typeof import('element-plus/es')['ElBadge']
+  const ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+  const ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
   const ElButton: typeof import('element-plus/es')['ElButton']
   const ElCard: typeof import('element-plus/es')['ElCard']
   const ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getCaptchaApi, loginApi } from '@/api/auth.ts'
+import ChangePasswordForm from '@/components/ChangePasswordForm.vue'
+import { changeExpiredPasswordApi, getCaptchaApi, loginApi } from '@/api/auth.ts'
 import { setToken, setRefreshToken } from '@/utils/auth.ts'
 import router from '@/router'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -8,7 +9,12 @@ import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const ruleFormRef = ref<FormInstance>()
+const changePasswordRef = ref<InstanceType<typeof ChangePasswordForm>>()
 const route = useRoute()
+
+const mustChangePassword = ref(false)
+const mustChangePasswordUserId = ref('')
+const prefilledOldPassword = ref('')
 
 const loginForm = reactive({
   userName: '',
@@ -34,6 +40,12 @@ const submitForm = (formEl: FormInstance | undefined) => {
         ...loginForm,
         captchaId: captchaInfo.value.id,
       })
+      if (res.data.mustChangePassword) {
+        mustChangePassword.value = true
+        mustChangePasswordUserId.value = res.data.userId
+        prefilledOldPassword.value = loginForm.password
+        return
+      }
       setToken(res.data.accessToken)
       setRefreshToken(res.data.refreshToken)
       ElMessage.success('登录成功')
@@ -52,6 +64,35 @@ const submitForm = (formEl: FormInstance | undefined) => {
       loading.value = false
     }
   })
+}
+
+const submitChangePassword = async () => {
+  let data: { oldPassword: string; newPassword: string }
+  try {
+    data = await changePasswordRef.value!.validate()
+  } catch {
+    return
+  }
+  loading.value = true
+  try {
+    const res = await changeExpiredPasswordApi({
+      userId: mustChangePasswordUserId.value,
+      ...data,
+    })
+    setToken(res.data.accessToken)
+    setRefreshToken(res.data.refreshToken)
+    ElMessage.success('密码修改成功')
+    const redirect = route.query.redirect
+    if (redirect) {
+      router.push(redirect as string)
+      return
+    }
+    router.push(res.data.home)
+  } catch {
+    // error handled by global interceptor
+  } finally {
+    loading.value = false
+  }
 }
 
 const captchaInfo = ref({ id: '', img: '' })
@@ -101,71 +142,94 @@ getCaptcha()
     <!-- 右侧表单区 -->
     <div class="login-main">
       <div class="login-card">
-        <h2 class="form-title">欢迎回来</h2>
-        <p class="form-subtitle">请登录您的账号</p>
+        <template v-if="!mustChangePassword">
+          <h2 class="form-title">欢迎回来</h2>
+          <p class="form-subtitle">请登录您的账号</p>
 
-        <el-form
-          ref="ruleFormRef"
-          :model="loginForm"
-          :rules="rules"
-          size="large"
-          class="login-form"
-          @keyup.enter="submitForm(ruleFormRef)"
-        >
-          <el-form-item prop="userName">
-            <el-input
-              v-model="loginForm.userName"
-              placeholder="请输入用户名"
-              clearable
-            >
-              <template #prefix>
-                <el-icon><i-ep-user /></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-
-          <el-form-item prop="password">
-            <el-input
-              v-model="loginForm.password"
-              type="password"
-              placeholder="请输入密码"
-              show-password
-              clearable
-            >
-              <template #prefix>
-                <el-icon><i-ep-lock /></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-
-          <el-form-item prop="captcha">
-            <div class="captcha-row">
+          <el-form
+            ref="ruleFormRef"
+            :model="loginForm"
+            :rules="rules"
+            size="large"
+            class="login-form"
+            @keyup.enter="submitForm(ruleFormRef)"
+          >
+            <el-form-item prop="userName">
               <el-input
-                v-model="loginForm.captcha"
-                placeholder="请输入验证码"
+                v-model="loginForm.userName"
+                placeholder="请输入用户名"
                 clearable
               >
                 <template #prefix>
-                  <el-icon><i-ep-key /></el-icon>
+                  <el-icon><i-ep-user /></el-icon>
                 </template>
               </el-input>
-              <div class="captcha-img" title="点击刷新" @click="refreshCaptcha">
-                <div v-html="captchaInfo.img" />
-              </div>
-            </div>
-          </el-form-item>
+            </el-form-item>
 
-          <el-form-item>
+            <el-form-item prop="password">
+              <el-input
+                v-model="loginForm.password"
+                type="password"
+                placeholder="请输入密码"
+                show-password
+                clearable
+              >
+                <template #prefix>
+                  <el-icon><i-ep-lock /></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+
+            <el-form-item prop="captcha">
+              <div class="captcha-row">
+                <el-input
+                  v-model="loginForm.captcha"
+                  placeholder="请输入验证码"
+                  clearable
+                >
+                  <template #prefix>
+                    <el-icon><i-ep-key /></el-icon>
+                  </template>
+                </el-input>
+                <div class="captcha-img" title="点击刷新" @click="refreshCaptcha">
+                  <div v-html="captchaInfo.img" />
+                </div>
+              </div>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button
+                type="primary"
+                class="login-btn"
+                :loading="loading"
+                @click="submitForm(ruleFormRef)"
+              >
+                {{ loading ? '登录中...' : '登 录' }}
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </template>
+
+        <template v-else>
+          <h2 class="form-title">修改密码</h2>
+          <p class="form-subtitle">您的密码需要修改后才能继续使用</p>
+
+          <div class="login-form" @keyup.enter="submitChangePassword">
+            <ChangePasswordForm
+              ref="changePasswordRef"
+              layout="icon"
+              :default-old-password="prefilledOldPassword"
+            />
             <el-button
               type="primary"
               class="login-btn"
               :loading="loading"
-              @click="submitForm(ruleFormRef)"
+              @click="submitChangePassword"
             >
-              {{ loading ? '登录中...' : '登 录' }}
+              {{ loading ? '提交中...' : '确认修改' }}
             </el-button>
-          </el-form-item>
-        </el-form>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -307,6 +371,10 @@ getCaptcha()
   }
 
   .el-form-item {
+    margin-bottom: 22px;
+  }
+
+  :deep(.change-password-form) .el-form-item {
     margin-bottom: 22px;
   }
 }

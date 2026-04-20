@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Avatar from '@/components/header/Avatar.vue'
+import Breadcrumb from '@/components/breadcrumb/index.vue'
 import NoticeIcon from '@/components/header/NoticeIcon.vue'
 import { presetColors, useThemeStore } from '@/stores/modules/theme'
 import { useUserStore } from '@/stores/modules/user.ts'
@@ -33,6 +34,7 @@ const handleCommadn = async (command: string) => {
         <Fold v-if="!isCollapse" />
         <Expand v-else />
       </el-icon>
+      <Breadcrumb style="margin-left: 12px" />
     </div>
 
     <div class="header-actions">

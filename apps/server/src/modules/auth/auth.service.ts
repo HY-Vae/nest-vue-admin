@@ -137,7 +137,13 @@ export class AuthService {
     // 4. 登录成功，清除失败计数
     await this.cacheManager.del(failKey);
 
-    // 5. 检查密码是否过期
+    // 5. 检查布尔字段 mustChangePassword（优先于天数检查）
+    if (user.mustChangePassword) {
+      const currentUser = await this.getCurrentUser(user.id);
+      return { ...currentUser, mustChangePassword: true };
+    }
+
+    // 6. 检查密码是否过期
     const expireDays = this.configService.get<number>('PASSWORD_EXPIRE_DAYS')!;
     if (expireDays > 0 && user.passwordUpdatedAt) {
       const expiresAt = new Date(user.passwordUpdatedAt.getTime() + expireDays * 24 * 60 * 60 * 1000);
@@ -489,5 +495,115 @@ export class AuthService {
     await this.cacheManager.del(
       generateRedisKey(REDIS_KEYS.USER_REFRESH, userId),
     );
+  }
+
+  /** 过期/强制改密用户修改密码（无需 JWT） */
+  async changeExpiredPassword(dto: { userId: string; oldPassword: string; newPassword: string }) {
+    const maxFailCount = this.configService.get<number>('LOGIN_MAX_FAIL_COUNT')!;
+    const lockMinutes = this.configService.get<number>('LOGIN_LOCK_MINUTES')!;
+    const lockTtl = lockMinutes * 60 * 1000;
+
+    // 1. 检查是否已被锁定
+    const failKey = generateRedisKey(REDIS_KEYS.LOGIN_FAIL, `cpw:${dto.userId}`);
+    const failCount = await this.cacheManager.get<number>(failKey);
+    if (failCount && failCount >= maxFailCount) {
+      throw new ApiException(`密码错误次数过多，请 ${lockMinutes} 分钟后再试`);
+    }
+
+    const user = await this.prisma.sysUser.findUnique({ where: { id: dto.userId } });
+    if (!user) throw new ApiException('用户不存在');
+
+    // 2. 校验旧密码
+    const isMatch = await bcrypt.compare(dto.oldPassword, user.password);
+    if (!isMatch) {
+      const current = (await this.cacheManager.get<number>(failKey)) || 0;
+      const newCount = current + 1;
+      await this.cacheManager.set(failKey, newCount, lockTtl);
+      const remaining = Math.max(0, maxFailCount - newCount);
+      if (remaining <= 0) {
+        throw new ApiException(`密码错误次数过多，请 ${lockMinutes} 分钟后再试`);
+      }
+      throw new ApiException(`旧密码错误，还剩 ${remaining} 次尝试机会`);
+    }
+
+    // 3. 密码正确，清除失败计数
+    await this.cacheManager.del(failKey);
+
+    // 密码历史检查
+    const historyCount = this.configService.get<number>('PASSWORD_HISTORY_COUNT')!;
+    if (historyCount > 0) {
+      const histories = await this.prisma.sysPasswordHistory.findMany({
+        where: { userId: dto.userId },
+        orderBy: { createdAt: 'desc' },
+        take: historyCount,
+        select: { passwordHash: true },
+      });
+      for (const h of histories) {
+        const reused = await bcrypt.compare(dto.newPassword, h.passwordHash);
+        if (reused) {
+          throw new ApiException(`新密码不能与最近 ${historyCount} 次使用过的密码相同`);
+        }
+      }
+    }
+
+    const salt = await bcrypt.genSalt();
+    const newPasswordHash = await bcrypt.hash(dto.newPassword, salt);
+
+    await this.prisma.$transaction(async (tx) => {
+      await tx.sysUser.update({
+        where: { id: dto.userId },
+        data: {
+          password: newPasswordHash,
+          passwordUpdatedAt: new Date(),
+          mustChangePassword: false,
+        },
+      });
+      await tx.sysPasswordHistory.create({
+        data: {
+          id: generateUUid(),
+          userId: dto.userId,
+          passwordHash: newPasswordHash,
+        },
+      });
+      // 清理旧记录，只保留 historyCount 条
+      if (historyCount > 0) {
+        const allRecords = await tx.sysPasswordHistory.findMany({
+          where: { userId: dto.userId },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true },
+        });
+        if (allRecords.length > historyCount) {
+          const idsToDelete = allRecords.slice(historyCount).map((r) => r.id);
+          await tx.sysPasswordHistory.deleteMany({
+            where: { id: { in: idsToDelete } },
+          });
+        }
+      }
+    });
+
+    // 生成 JWT（复用 login 逻辑）
+    const currentUser = await this.getCurrentUser(dto.userId, true);
+    const payload: JwtPayloadType = { id: currentUser.id };
+    const jwtConfig = this.configService.get<JwtConfigType>('jwt')!;
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: jwtConfig.accessTokenExpiresIn });
+    const refreshToken = this.jwtService.sign(
+      { ...payload, type: 'refresh' },
+      { expiresIn: jwtConfig.refreshTokenExpiresIn },
+    );
+
+    await this.cacheManager.set(
+      generateRedisKey(REDIS_KEYS.USER_TOKEN, currentUser.id),
+      accessToken,
+      jwtConfig.accessTokenExpiresIn * 1000,
+    );
+    await this.cacheManager.set(
+      generateRedisKey(REDIS_KEYS.USER_REFRESH, currentUser.id),
+      refreshToken,
+      jwtConfig.refreshTokenExpiresIn * 1000,
+    );
+
+    const home = await this.getUserHomePage(currentUser);
+    return { accessToken, refreshToken, home };
   }
 }

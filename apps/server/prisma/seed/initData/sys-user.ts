@@ -554,5 +554,24 @@ export async function initUser(prisma: PrismaClient) {
     });
   }
 
+  // 根据岗位角色映射为其他用户分配角色
+  for (const user of users) {
+    if (user.userName === 'admin') continue;
+    if (!user.postId) continue;
+
+    const post = await prisma.sysPost.findUnique({
+      where: { id: user.postId },
+      include: { roles: { select: { id: true } } },
+    });
+    if (post?.roles?.length) {
+      await prisma.sysUser.update({
+        where: { userName: user.userName },
+        data: {
+          roles: { set: post.roles.map((r) => ({ id: r.id })) },
+        },
+      });
+    }
+  }
+
   console.log('用户数据初始化完成');
 }

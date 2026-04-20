@@ -21,6 +21,7 @@ export interface SysPostListType {
   createdAt?: Date
   updateBy?: string
   updatedAt?: Date
+  roles?: { id: string; name: string }[]
 }
 
 export interface CreateSysPostType {
@@ -31,6 +32,7 @@ export interface CreateSysPostType {
   sort?: number
   status: string
   remark?: string
+  roleIds?: string[]
 }
 
 export interface UpdateSysPostType extends Partial<CreateSysPostType> {

@@ -64,7 +64,7 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="sort" align="center" label="排序" />
+          <el-table-column prop="sort" align="center" label="排序" width="70" />
           <el-table-column prop="createBy" align="center" label="创建人" />
           <el-table-column prop="createdAt" align="center" label="创建时间" width="170">
             <template #default="scope">
@@ -72,7 +72,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="remark" align="center" label="备注" />
-          <el-table-column label="操作" align="center" width="160">
+          <el-table-column label="操作" align="center" width="240">
             <template #default="scope">
               <el-button
                 type="primary"

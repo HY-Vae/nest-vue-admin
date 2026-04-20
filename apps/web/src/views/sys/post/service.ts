@@ -54,3 +54,10 @@ export function getSysPostOptionsApi(deptId?: string): Promise<Result<SelectOpti
     params: deptId ? { deptId } : {},
   })
 }
+
+// 获取岗位关联的角色ID列表
+export function getSysPostRolesApi(id: string): Promise<Result<string[]>> {
+  return request(`/sys/post/${id}/roles`, {
+    method: 'GET',
+  })
+}

@@ -7,6 +7,7 @@ import type { CreateSysPostType, SysPostListType } from './post.type'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem, SelectTreeItem } from '@/types/global.ts'
 import { getDeptOptionsApi } from '@/views/sys/dept/service'
+import { getRoleOptionsApi } from '@/views/sys/role/service.ts'
 
 const props = defineProps({
   action: {
@@ -43,6 +44,7 @@ const sysPostForm = ref<CreateSysPostType>({
   sort: 0,
   status: '0',
   remark: '',
+  roleIds: [],
 })
 
 const rules = {
@@ -80,11 +82,13 @@ const closeDialog = () => {
     sort: 0,
     status: '0',
     remark: '',
+    roleIds: [],
   }
 }
 
 const enableStatusOptions = ref<SelectOptionItem[]>([])
 const deptOptions = ref<SelectTreeItem[]>([])
+const roleOptions = ref<SelectOptionItem[]>([])
 
 const openDialog = () => {
   getDictOptions('enableStatus').then((res) => {
@@ -92,6 +96,9 @@ const openDialog = () => {
   })
   getDeptOptionsApi().then((res) => {
     deptOptions.value = [{ value: '', label: '公司通用岗位' }, ...res.data]
+  })
+  getRoleOptionsApi().then((res) => {
+    roleOptions.value = res.data
   })
 }
 
@@ -103,7 +110,11 @@ watch(
   () => props.current,
   (val) => {
     if (val != undefined && !props.detailLoading) {
-      sysPostForm.value = { ...val }
+      const { roles, ...rest } = val as any
+      sysPostForm.value = {
+        ...rest,
+        roleIds: roles?.map((r: any) => r.id) ?? [],
+      }
     }
   },
 )
@@ -188,6 +199,29 @@ watch(
               maxlength="255"
               show-word-limit
             />
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="rowSpan">
+          <el-form-item label="默认角色" prop="roleIds">
+            <el-select
+              v-model="sysPostForm.roleIds"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              placeholder="请选择默认角色"
+              clearable
+              filterable
+              style="width: 100%"
+            >
+              <el-option
+                v-for="item in roleOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+            <div class="el-upload__tip">分配此岗位的用户将自动继承这些角色</div>
           </el-form-item>
         </el-col>
       </el-row>

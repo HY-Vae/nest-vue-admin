@@ -23,7 +23,7 @@ export const useTabsStore = defineStore(
 
     const addTab = (route: RouteLocationNormalized) => {
       const { path, name, meta } = route
-      if (!name || meta.hidden) return
+      if (!name || name === 'home' || meta.hidden) return
 
       const title = (meta.title as string) || (name as string)
       const icon = meta.icon as string | undefined

@@ -1,0 +1,6 @@
+// Element Plus 全局样式重置
+
+// 去掉 el-dropdown / el-tooltip 触发元素聚焦时的黑色 outline
+.el-tooltip__trigger {
+  outline: unset;
+}
