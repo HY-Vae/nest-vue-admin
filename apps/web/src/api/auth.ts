@@ -68,3 +68,10 @@ export function changeExpiredPasswordApi(data: {
     data,
   })
 }
+
+export function verifyPasswordApi(password: string): Promise<Result> {
+  return request('/auth/verifyPassword', {
+    method: 'POST',
+    data: { password },
+  })
+}

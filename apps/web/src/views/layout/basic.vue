@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LockScreen from '@/components/LockScreen.vue'
 import TheHeader from '@/components/header/TheHeader.vue'
 import SideMenu from '@/components/sideMenu/index.vue'
 import TabsView from '@/components/tabs/TabsView.vue'
@@ -25,6 +26,7 @@ watch(
 
 <template>
   <div class="nva-container">
+    <LockScreen />
     <div v-show="!contentFullscreen" class="aside" :class="{ 'is-collapse': isCollapse }">
       <router-link to="/" class="logo">
         <img src="@/assets/logo.svg" alt="logo" class="logo-img" />

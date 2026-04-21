@@ -37,9 +37,7 @@ export const useUserStore = defineStore('user', () => {
   const addRouter = () => {
     // 我需要递归去处理菜单信息
     const routes = transMenuRouter(menus.value)
-    console.log(routes)
     routes.forEach((item) => {
-      console.log('item', item)
       if (!item.path.startsWith('http')) {
         router.addRoute(item)
         if (item.name) {
@@ -47,6 +45,16 @@ export const useUserStore = defineStore('user', () => {
         }
       }
     })
+
+    // 兜底 404 路由，必须在所有动态路由之后注册
+    router.addRoute({
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: () => import('@/views/error/NotFound.vue'),
+      meta: { title: '页面不存在' },
+    })
+    addedRouteNames.value.push('NotFound')
+
     return true
   }
 

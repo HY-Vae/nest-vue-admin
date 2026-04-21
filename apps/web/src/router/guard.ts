@@ -22,6 +22,7 @@ router.beforeEach(async (to, from, next) => {
     next()
     return
   }
+
   const userStore = useUserStore()
   if (!userStore.currentUser) {
     await userStore.getCurrentUser()

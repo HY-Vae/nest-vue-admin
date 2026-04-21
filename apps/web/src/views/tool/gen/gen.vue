@@ -233,9 +233,7 @@ const generateCode = () => {
         addIndex: addIndex.value,
         fields: fieldsTableData.value,
       }
-      insertCode(body).then((res) => {
-        console.log(res)
-      })
+      insertCode(body)
     }
   })
 }
@@ -248,9 +246,7 @@ const generateWebCode = () => {
         addIndex: addIndex.value,
         fields: fieldsTableData.value,
       }
-      insertCodeWeb(body).then((res) => {
-        console.log(res)
-      })
+      insertCodeWeb(body)
     }
   })
 }

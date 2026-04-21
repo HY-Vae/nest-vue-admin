@@ -19,19 +19,19 @@ export const transMenuRouter = (menus: MenuListType[]): RouteRecordRaw[] => {
             path: item.path,
             name: item.name,
             component,
-            meta: item.meta as unknown as Record<string, unknown>,
+            meta: { ...item.meta },
             children: item.children ? transMenuRouter(item.children) : [],
           },
         ],
-      } as unknown as RouteRecordRaw)
+      })
     } else {
       routes.push({
         path: item.path,
         name: item.name,
         component,
-        meta: item.meta as unknown as Record<string, unknown>,
+        meta: { ...item.meta },
         children: item.children ? transMenuRouter(item.children) : [],
-      } as unknown as RouteRecordRaw)
+      })
     }
   })
   return routes

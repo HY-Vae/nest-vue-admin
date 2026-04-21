@@ -1,7 +1,7 @@
 import { SortEnum } from '@/common/enums/sort.enum';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({
@@ -16,14 +16,16 @@ export class PaginationDto {
   public current: number = 1;
 
   @ApiProperty({
-    description: '每页数量',
+    description: '每页数量（最大100）',
     default: 20,
     required: false,
+    maximum: 100,
   })
   @IsNumber()
   @IsOptional()
   @Type()
   @Min(1)
+  @Max(100)
   public pageSize: number = 20;
 
   @ApiProperty({

@@ -606,4 +606,16 @@ export class AuthService {
     const home = await this.getUserHomePage(currentUser);
     return { accessToken, refreshToken, home };
   }
+
+  /** 验证当前用户密码（锁屏解锁用） */
+  async verifyPassword(userId: string, password: string) {
+    const user = await this.prisma.sysUser.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    });
+    if (!user) throw new ApiException('用户不存在');
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new ApiException('密码错误');
+    return true;
+  }
 }

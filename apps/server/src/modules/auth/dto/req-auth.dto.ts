@@ -28,6 +28,13 @@ export class LoginReqDto {
   password: string;
 }
 
+export class VerifyPasswordDto {
+  @ApiProperty({ description: '密码' })
+  @IsString()
+  @IsNotEmpty()
+  password: string;
+}
+
 export class ChangeExpiredPasswordDto {
   @ApiProperty({ description: '用户ID' })
   @IsString()

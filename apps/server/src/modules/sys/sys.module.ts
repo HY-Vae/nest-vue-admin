@@ -1,4 +1,4 @@
-import { SysDictDetailModule } from '@/modules/sys/sys-dict-detial/sys-dict-detail.module';
+import { SysDictDetailModule } from '@/modules/sys/sys-dict-detail/sys-dict-detail.module';
 import { SysDictModule } from '@/modules/sys/sys-dict/sys-dict.module';
 import { SysMenuModule } from '@/modules/sys/sys-menu/sys-menu.module';
 import { SysMessageModule } from '@/modules/sys/sys-message/sys-message.module';

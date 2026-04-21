@@ -14,6 +14,7 @@ export interface DictDetailListType {
   sort: number
   status: string
   remark: string | null
+  sysDictCode: string
   createBy: string
   createdAt: Date
   updateBy: string | null

@@ -2,9 +2,10 @@
 import Avatar from '@/components/header/Avatar.vue'
 import Breadcrumb from '@/components/breadcrumb/index.vue'
 import NoticeIcon from '@/components/header/NoticeIcon.vue'
+import { useLockStore } from '@/stores/modules/lock'
 import { presetColors, useThemeStore } from '@/stores/modules/theme'
 import { useUserStore } from '@/stores/modules/user.ts'
-import { Moon, Sunny, Check, Fold, Expand, User } from '@element-plus/icons-vue'
+import { Moon, Sunny, Check, Fold, Expand, User, Lock } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -12,6 +13,7 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const themeStore = useThemeStore()
+const lockStore = useLockStore()
 const { isCollapse, isDark } = storeToRefs(themeStore)
 
 const handleCommadn = async (command: string) => {
@@ -82,6 +84,13 @@ const handleCommadn = async (command: string) => {
 
       <!-- 通知图标 -->
       <NoticeIcon />
+
+      <!-- 锁屏 -->
+      <el-tooltip content="锁屏" placement="bottom">
+        <el-button circle @click="lockStore.lock()">
+          <el-icon :size="16"><Lock /></el-icon>
+        </el-button>
+      </el-tooltip>
 
       <el-dropdown @command="handleCommadn">
         <avatar />

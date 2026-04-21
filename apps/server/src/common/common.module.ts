@@ -1,4 +1,4 @@
-import { Global, Logger, Module, ValidationPipe } from '@nestjs/common';
+import { Global, Logger, Module, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { CacheModeEnum } from '@/common/enums/config.enum';
@@ -29,7 +29,7 @@ import {
 } from '@nestjs/throttler';
 import { CacheableMemory } from 'cacheable';
 import Keyv, { KeyvStoreAdapter } from 'keyv';
-import { PrismaModule } from 'nestjs-prisma';
+import { PrismaModule, PrismaService } from 'nestjs-prisma';
 import { PermissionGuard } from './guards/permission.guard';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 import { PrismaConfigService } from './prismaService/prismaConfigService';
@@ -172,4 +172,46 @@ const logger = new Logger('CacheModule');
   ],
   exports: [ExcelExportService],
 })
-export class CommonModule {}
+export class CommonModule implements OnModuleInit {
+  constructor(private readonly prisma: PrismaService) {}
+
+  onModuleInit() {
+    const logger = new Logger('Prisma');
+    const isDev = process.env.NODE_ENV === 'development';
+
+    // SQL 日志（仅开发环境）
+    if (isDev) {
+      this.prisma.$on('query', (e: any) => {
+        const sql = formatSql(e.query, e.params);
+        logger.verbose(`${sql} [${e.duration}ms]`);
+      });
+    }
+
+    // info/warn/error 统一走 Winston
+    this.prisma.$on('info', (e: any) => {
+      logger.log(e.message);
+    });
+    this.prisma.$on('warn', (e: any) => {
+      logger.warn(e.message);
+    });
+    this.prisma.$on('error', (e: any) => {
+      logger.error(e.message);
+    });
+  }
+}
+
+/** 将 Prisma 参数化 SQL 替换为带实际值的 SQL（兼容 MySQL ? 和 PostgreSQL $1 占位符） */
+function formatSql(query: string, params: string): string {
+  try {
+    const values: any[] = JSON.parse(params);
+    let idx = 0;
+    return query.replace(/\?/g, () => {
+      const val = values[idx++];
+      if (val === null || val === undefined) return 'NULL';
+      if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+      return `'${String(val).replace(/'/g, "\\'")}'`;
+    });
+  } catch {
+    return query;
+  }
+}

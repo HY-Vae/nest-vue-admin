@@ -222,8 +222,8 @@ const cancelDialog = () => {}
 
 const { loading: actionLoading, run: runActionDictDetail } = useRequest(
   (values: CreateDictDetailType | UpdateDictDetailType) => {
+    values.sysDictCode = route.params.code as string
     if (action.value === ActionEnum.Add) {
-      values.sysDictCode = route.params.code as string
       return addDictDetailApi(values as CreateDictDetailType)
     }
     return updateDictDetailApi(values as UpdateDictDetailType)

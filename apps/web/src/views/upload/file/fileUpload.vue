@@ -300,8 +300,8 @@ const download = (row: FileUploadListType) => {
       URL.revokeObjectURL(blobUrl)
       link.remove()
     })
-    .catch((e) => {
-      console.log('e', e)
+    .catch(() => {
+      ElMessage.error('文件下载失败')
     })
 }
 

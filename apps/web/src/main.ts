@@ -22,7 +22,7 @@ const app = createApp(App)
 initDirectives(app)
 
 app.config.errorHandler = (err) => {
-  console.log(err)
+  console.error(err)
 }
 
 const pinia = createPinia()
