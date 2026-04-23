@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import Icon from '@/components/icon/icon.vue'
 import { useUserStore } from '@/stores/modules/user'
 import { storeToRefs } from 'pinia'
 
@@ -16,37 +17,37 @@ const greeting = (() => {
 
 const coreFeatures = [
   {
-    icon: 'i-ep-shield',
+    icon: 'ri:shield-check-line',
     color: '#409eff',
     title: '企业级安全体系',
     desc: '双 Token + Redis 服务端校验，密码过期 / 历史去重 / 强度检测，防爆破锁定，审计日志自动脱敏',
   },
   {
-    icon: 'i-ep-data-analysis',
+    icon: 'ep:data-analysis',
     color: '#67c23a',
     title: '五级数据权限',
     desc: '全部 / 自定义 / 本部门及下级 / 本部门 / 仅本人，多角色取最大权限，ancestors 路径单次查询',
   },
   {
-    icon: 'i-ep-key',
+    icon: 'ep:key',
     color: '#e6a23c',
     title: '三层 RBAC + 按钮级',
     desc: '用户 → 角色 → 菜单 / 按钮，v-auth 指令 + @Permission 装饰器，超管四层越权保护',
   },
   {
-    icon: 'i-ep-cpu',
+    icon: 'ep:cpu',
     color: '#a855f7',
     title: '全栈代码生成',
     desc: '一键生成 10 个文件（Controller / Service / DTO / Prisma / Vue / API / 类型），自动注册路由和权限',
   },
   {
-    icon: 'i-ep-office-building',
+    icon: 'ep:office-building',
     color: '#14b8a6',
     title: '部门-岗位-角色联动',
     desc: '部门树负责人标识，岗位绑定默认角色，组织架构聚合人数，用户按部门层级智能排序',
   },
   {
-    icon: 'i-ep-document-checked',
+    icon: 'ep:document-checked',
     color: '#f56c6c',
     title: '操作审计 + 登录追踪',
     desc: '双日志体系，操作日志自动脱敏，登录日志含 IP 归属地、浏览器与操作系统识别',
@@ -55,25 +56,25 @@ const coreFeatures = [
 
 const uxHighlights = [
   {
-    icon: 'i-ep-search',
+    icon: 'ep:search',
     color: '#3b82f6',
     title: '搜索条件持久化',
     desc: '切换页面再回来，筛选条件和分页位置自动恢复，12 个列表页全部覆盖',
   },
   {
-    icon: 'i-ep-files',
+    icon: 'ep:files',
     color: '#8b5cf6',
     title: '多标签页导航',
     desc: '标签页状态持久化，右键菜单支持关闭 / 关闭其他 / 固定，刷新浏览器标签不丢失',
   },
   {
-    icon: 'i-ep-brush',
+    icon: 'ep:brush',
     color: '#ec4899',
     title: '主题个性化',
     desc: '深色模式 + 6 种主色预设，运行时动态切换，CSS 变量自动生成 9 级色阶',
   },
   {
-    icon: 'i-ep-download',
+    icon: 'ep:download',
     color: '#f59e0b',
     title: '导出拖拽排序',
     desc: '导出弹窗支持拖拽排列字段顺序、勾选导出列，所见即所得',
@@ -105,7 +106,7 @@ const techStack = [
     <div class="feature-grid cols-3">
       <div v-for="item in coreFeatures" :key="item.title" class="feature-card">
         <div class="feature-icon" :style="{ background: item.color + '15', color: item.color }">
-          <el-icon :size="20"><component :is="item.icon" /></el-icon>
+          <Icon :icon="item.icon" :size="20" />
         </div>
         <div class="feature-body">
           <h3>{{ item.title }}</h3>
@@ -119,7 +120,7 @@ const techStack = [
     <div class="feature-grid cols-4">
       <div v-for="item in uxHighlights" :key="item.title" class="feature-card">
         <div class="feature-icon" :style="{ background: item.color + '15', color: item.color }">
-          <el-icon :size="20"><component :is="item.icon" /></el-icon>
+          <Icon :icon="item.icon" :size="20" />
         </div>
         <div class="feature-body">
           <h3>{{ item.title }}</h3>

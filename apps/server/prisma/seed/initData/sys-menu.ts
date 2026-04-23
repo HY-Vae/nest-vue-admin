@@ -261,10 +261,10 @@ export async function initMenus(prisma: PrismaClient) {
 
   await prisma.sysMenuMeta.upsert({
     where: { sysMenuId: monitorRoot.id },
-    update: { title: '系统监控', icon: 'ri:monitor-line', closeTab: true },
+    update: { title: '系统监控', icon: 'ri:computer-line', closeTab: true },
     create: {
       title: '系统监控',
-      icon: 'ri:monitor-line',
+      icon: 'ri:computer-line',
       closeTab: true,
       sysMenuId: monitorRoot.id,
     },

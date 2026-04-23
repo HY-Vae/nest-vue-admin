@@ -61,6 +61,23 @@ export function getUserOptionsApi(): Promise<Result<SelectOptionItem[]>> {
   })
 }
 
+// 获取全量用户列表（含部门信息，用于角色分配等场景）
+export function getUserAllWithDeptApi(): Promise<
+  Result<
+    {
+      id: string
+      nickName: string
+      userName: string
+      deptId: string | null
+      dept: { id: string; deptName: string } | null
+    }[]
+  >
+> {
+  return request('/sys/user/all-with-dept', {
+    method: 'GET',
+  })
+}
+
 // 获取当前用户个人信息
 export function getProfileApi(): Promise<Result<UserDetailType>> {
   return request('/sys/user/profile', {

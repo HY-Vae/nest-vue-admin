@@ -94,18 +94,6 @@
           </template>
         </el-table>
       </div>
-      <el-row justify="end">
-        <el-pagination
-          class="table-pagination"
-          v-model:current-page="searchMenuForm.current"
-          v-model:page-size="searchMenuForm.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </el-row>
     </el-card>
     <menu-dialog
       :action="action"
@@ -157,8 +145,6 @@ const searchSpan = ref({
 const initialSearchForm = {
   name: undefined,
   status: undefined,
-  current: 1,
-  pageSize: 20,
 }
 
 const searchMenuForm = reactive({ ...initialSearchForm })
@@ -177,7 +163,6 @@ const onMenuReset = () => {
 }
 
 const tableData = ref<MenuListType[]>([])
-const total = ref(0)
 
 const { loading: queryLoading, run: runGetMenu } = useRequest(
   () => {
@@ -190,7 +175,6 @@ const { loading: queryLoading, run: runGetMenu } = useRequest(
     loadingKeep: 500,
     onSuccess: (res) => {
       tableData.value = res.data.list
-      total.value = res.data.total
     },
   },
 )
@@ -213,14 +197,6 @@ const parentMenuTree = computed(() => {
     ...treeList,
   ]
 })
-
-const handleSizeChange = () => {
-  runGetMenu()
-}
-
-const handleCurrentChange = () => {
-  runGetMenu()
-}
 
 const visible = ref<boolean>(false)
 const action = ref<ActionEnum>(ActionEnum.Add)

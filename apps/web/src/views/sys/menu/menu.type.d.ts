@@ -1,9 +1,6 @@
 export interface QueryMenuType {
   name?: string
-  key?: string
   status?: string
-  page?: number
-  size?: number
 }
 
 export interface MenuListType {

@@ -274,6 +274,27 @@ export class SysUserService {
     }));
   }
 
+  /* 获取全量用户列表（含部门信息，用于角色分配等场景） */
+  async listAllWithDept() {
+    return this.prisma.sysUser.findMany({
+      where: {
+        status: '0',
+      },
+      select: {
+        id: true,
+        nickName: true,
+        userName: true,
+        deptId: true,
+        dept: {
+          select: { id: true, deptName: true },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
   async remove(id: string, currentUserId: string) {
     const result = await this.prisma.$transaction(async (tx) => {
       // 不能删除自己

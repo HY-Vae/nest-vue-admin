@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { getDeptOptionsApi } from '@/views/sys/dept/service.ts'
-import { getUserApi } from '@/views/sys/user/service.ts'
-import type { UserListType } from '@/views/sys/user/user.type'
+import { getUserAllWithDeptApi } from '@/views/sys/user/service.ts'
 import { getRoleUsersApi, updateRoleUsersApi } from './service.ts'
 import type { ElTree } from 'element-plus'
 import { nextTick, ref, watch } from 'vue'
@@ -61,7 +60,10 @@ const buildDeptNodes = (
 }
 
 /** 将用户按 deptId 分组挂到部门节点下 */
-const buildTree = (depts: any[], users: UserListType[]): TreeNode[] => {
+const buildTree = (
+  depts: { value: string; label: string; children?: any[] }[],
+  users: { id: string; nickName: string; userName: string; deptId: string | null }[],
+): TreeNode[] => {
   const deptMap = new Map<string, TreeNode>()
   const result = buildDeptNodes(depts, deptMap)
 
@@ -76,7 +78,6 @@ const buildTree = (depts: any[], users: UserListType[]): TreeNode[] => {
       id: user.id,
       label: `${user.nickName} (${user.userName})`,
       isUser: true,
-      disabled: user.status === '1',
     }
     if (user.deptId && deptMap.has(user.deptId)) {
       deptMap.get(user.deptId)!.children!.push(node)
@@ -147,11 +148,11 @@ const initDialog = async () => {
 
   const [deptRes, userRes, roleUsersRes] = await Promise.all([
     getDeptOptionsApi(),
-    getUserApi({ current: 1, pageSize: 9999 }),
+    getUserAllWithDeptApi(),
     getRoleUsersApi(props.roleId),
   ])
 
-  treeData.value = buildTree(deptRes.data || [], userRes.data?.list || [])
+  treeData.value = buildTree(deptRes.data || [], userRes.data || [])
   assignedUserIds.value = roleUsersRes.data?.userIds || []
 
   await nextTick()

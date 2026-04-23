@@ -188,7 +188,7 @@ import type { ColumnConfig, SelectOptionItem } from '@/types/global.ts'
 import { getSysDeptApi } from '@/views/sys/dept/service'
 import type { SysDeptListType } from '@/views/sys/dept/sysDept.type'
 import type { SysPostListType } from '@/views/sys/post/post.type'
-import { getSysPostApi } from '@/views/sys/post/service'
+import { getSysPostOptionsApi } from '@/views/sys/post/service'
 import { nextTick, onMounted, ref, watch } from 'vue'
 import { useRequest } from 'vue-request'
 import { useRouter } from 'vue-router'
@@ -316,14 +316,11 @@ const loadDeptTree = async () => {
 
 // 加载岗位选项
 const loadPostOptions = async () => {
-  const { deptId, includeChildren } = searchForm.value
-  const res = await getSysPostApi({
-    pageSize: 1000,
-    ...(deptId && { deptId, includeChildren }),
-  })
-  postOptions.value = res.data.list.map((item: SysPostListType) => ({
-    value: item.id,
-    label: item.name,
+  const { deptId } = searchForm.value
+  const res = await getSysPostOptionsApi(deptId || undefined)
+  postOptions.value = res.data.map((item) => ({
+    value: item.value,
+    label: item.label,
   }))
 }
 

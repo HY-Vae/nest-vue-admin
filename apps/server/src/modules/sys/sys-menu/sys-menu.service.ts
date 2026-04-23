@@ -43,7 +43,6 @@ export class SysMenuService {
   }
 
   async findAll(query: GetSysMenuListDto) {
-    const { skip, take } = query;
     const where: Prisma.SysMenuWhereInput = {};
 
     if (query.name) {
@@ -58,8 +57,6 @@ export class SysMenuService {
     }
     const listPromise = this.prisma.sysMenu.findMany({
       where,
-      skip,
-      take,
       include: {
         meta: true,
       },
@@ -68,10 +65,7 @@ export class SysMenuService {
       },
     });
     const totalPromise = this.prisma.sysMenu.count({
-      where: {
-        ...where,
-        // parentId: null,
-      },
+      where,
     });
     const [list, total] = await Promise.all([listPromise, totalPromise]);
     const treeList = list.map((item) => {

@@ -81,6 +81,14 @@ export class SysUserController {
   }
 
   @ApiOperation({
+    summary: '获取全量用户列表（含部门）',
+  })
+  @Get('all-with-dept')
+  listAllWithDept() {
+    return this.sysUserService.listAllWithDept();
+  }
+
+  @ApiOperation({
     summary: '获取当前用户个人信息',
   })
   @Get('profile')

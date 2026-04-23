@@ -104,7 +104,7 @@
 
           <el-table-column label="执行信息" align="center" prop="jobMessage" min-width="120" show-overflow-tooltip />
 
-          <el-table-column label="异常信息" align="center" type="expand">
+          <el-table-column label="异常信息" align="center" type="expand" width="100">
             <template #default="{ row }">
               <div class="exception-info" v-if="row.exceptionInfo">
                 <pre>{{ row.exceptionInfo }}</pre>
