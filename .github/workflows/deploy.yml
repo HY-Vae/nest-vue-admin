@@ -42,7 +42,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy frontend
-        run: rsync -avz --delete apps/web/dist/ root@${{ secrets.SERVER_HOST }}:/www/nva/web/
+        run: rsync -avz --delete apps/web/dist/ root@${{ secrets.SERVER_HOST }}:/www/nva/web/dist/
 
       - name: Deploy backend
         run: |
