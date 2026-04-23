@@ -8,6 +8,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from 'nestjs-prisma';
 import { AuthService } from './auth.service';
+import { SysLoginLogService } from '@/modules/sys/sys-login-log/sys-login-log.service';
 
 jest.mock('bcryptjs', () => ({
   compare: jest.fn(),
@@ -91,6 +92,10 @@ describe('AuthService', () => {
             }),
             verify: jest.fn(),
           },
+        },
+        {
+          provide: SysLoginLogService,
+          useValue: { recordLogout: jest.fn() },
         },
       ],
     }).compile();

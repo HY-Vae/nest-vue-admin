@@ -1,12 +1,16 @@
-import { getIpLocation, getRequestIp } from '@/utils/util';
+import { getIpLocation, getRequestIp, generateRedisKey } from '@/utils/util';
 import type { ExportColumn } from '@/common/class/export.class';
 import { ExcelExportService } from '@/common/class/export.class';
-import { Injectable, Logger } from '@nestjs/common';
+import { REDIS_KEYS } from '@/common/constants/redisKey.constant';
+import type { JwtConfigType } from '@/common/types/config.type';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma } from '@prisma/client';
 import type { Request, Response } from 'express';
 import { PrismaService } from 'nestjs-prisma';
 import { UAParser } from 'ua-parser-js';
-import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
+import { GetSysLoginLogListDto, GetOnlineUserListDto } from './dto/req-sys-login-log.dto';
 
 @Injectable()
 export class SysLoginLogService {
@@ -15,12 +19,16 @@ export class SysLoginLogService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly excelExportService: ExcelExportService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly configService: ConfigService,
   ) {}
 
   /* 记录登录成功日志 */
   async recordSuccess(request: Request, userId: string) {
     const { userName } = request.body as { userName?: string };
     const logData = this.parseRequest(request);
+    const jwtConfig = this.configService.get<JwtConfigType>('jwt')!;
+    const expireTime = new Date(Date.now() + jwtConfig.refreshTokenExpiresIn * 1000);
 
     return this.prisma.sysLoginLog
       .create({
@@ -29,6 +37,7 @@ export class SysLoginLogService {
           userId,
           ...logData,
           status: '0',
+          expireTime,
         },
       })
       .catch((e) => {
@@ -165,5 +174,55 @@ export class SysLoginLogService {
   /* 清空日志 */
   async clear() {
     return this.prisma.sysLoginLog.deleteMany();
+  }
+
+  /* 查询在线用户列表 */
+  async findOnlineUsers(query: GetOnlineUserListDto) {
+    const { skip, take } = query;
+    const where: Prisma.SysLoginLogWhereInput = {
+      status: '0',
+      logoutTime: null,
+      expireTime: { gte: new Date() },
+    };
+
+    if (query.userName) {
+      where.userName = { contains: query.userName };
+    }
+
+    const [list, total] = await Promise.all([
+      this.prisma.sysLoginLog.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.sysLoginLog.count({ where }),
+    ]);
+
+    return { list, total };
+  }
+
+  /* 更新活跃记录的登出时间 */
+  async recordLogout(userId: string) {
+    await this.prisma.sysLoginLog.updateMany({
+      where: {
+        userId,
+        status: '0',
+        logoutTime: null,
+      },
+      data: {
+        logoutTime: new Date(),
+      },
+    });
+  }
+
+  /* 强制下线：清除 Redis token + 更新 DB 登出时间 */
+  async forceLogout(userId: string) {
+    await Promise.all([
+      this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_INFO, userId)),
+      this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_TOKEN, userId)),
+      this.cacheManager.del(generateRedisKey(REDIS_KEYS.USER_REFRESH, userId)),
+      this.recordLogout(userId),
+    ]);
   }
 }

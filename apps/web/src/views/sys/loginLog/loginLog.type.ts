@@ -10,6 +10,8 @@ export interface SysLoginLogListType {
   status: string
   message: string | null
   createdAt: string
+  logoutTime: string | null
+  expireTime: string | null
 }
 
 /* 查询参数 */

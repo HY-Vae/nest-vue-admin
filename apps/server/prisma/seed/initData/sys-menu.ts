@@ -213,6 +213,8 @@ export async function initMenus(prisma: PrismaClient) {
       { name: '删除登录日志', auth: 'sys:login-log:remove' },
       { name: '清空登录日志', auth: 'sys:login-log:clear' },
       { name: '导出登录日志', auth: 'sys:login-log:export' },
+      { name: '查询在线用户', auth: 'sys:login-log:online' },
+      { name: '强制下线', auth: 'sys:login-log:force-logout' },
     ],
   });
 
@@ -232,6 +234,78 @@ export async function initMenus(prisma: PrismaClient) {
       { name: '编辑通知公告', auth: 'sys:notice:update' },
       { name: '查询通知公告列表', auth: 'sys:notice:list' },
       { name: '查询通知公告详情', auth: 'sys:notice:detail' },
+    ],
+  });
+
+  // ========== 系统监控 ==========
+
+  // 系统监控根菜单
+  const monitorRoot = await prisma.sysMenu.upsert({
+    where: { name: 'monitor' },
+    update: {
+      path: '/monitor',
+      auth: 'monitor',
+      component: 'views/layout/basic.vue',
+      sort: 4,
+      status: '0',
+    },
+    create: {
+      path: '/monitor',
+      name: 'monitor',
+      auth: 'monitor',
+      component: 'views/layout/basic.vue',
+      sort: 4,
+      status: '0',
+    },
+  });
+
+  await prisma.sysMenuMeta.upsert({
+    where: { sysMenuId: monitorRoot.id },
+    update: { title: '系统监控', icon: 'ri:monitor-line', closeTab: true },
+    create: {
+      title: '系统监控',
+      icon: 'ri:monitor-line',
+      closeTab: true,
+      sysMenuId: monitorRoot.id,
+    },
+  });
+
+  // 任务管理
+  await upsertMenu(prisma, {
+    name: 'monitor-job',
+    parentId: monitorRoot.id,
+    path: '/monitor/job',
+    auth: 'monitor:job',
+    component: 'views/monitor/job/job.vue',
+    sort: 0,
+    status: '0',
+    meta: { title: '任务管理', icon: 'ri:timer-line', closeTab: true },
+    btns: [
+      { name: '查询任务列表', auth: 'monitor:job:list' },
+      { name: '查询任务详情', auth: 'monitor:job:detail' },
+      { name: '新增任务', auth: 'monitor:job:create' },
+      { name: '编辑任务', auth: 'monitor:job:update' },
+      { name: '删除任务', auth: 'monitor:job:remove' },
+      { name: '修改任务状态', auth: 'monitor:job:status' },
+      { name: '执行一次', auth: 'monitor:job:run' },
+    ],
+  });
+
+  // 任务日志
+  await upsertMenu(prisma, {
+    name: 'monitor-job-log',
+    parentId: monitorRoot.id,
+    path: '/monitor/job-log',
+    auth: 'monitor:job-log',
+    component: 'views/monitor/job/jobLog.vue',
+    sort: 1,
+    status: '0',
+    meta: { title: '任务日志', icon: 'ri:file-list-3-line', closeTab: true },
+    btns: [
+      { name: '查询任务日志列表', auth: 'monitor:job-log:list' },
+      { name: '查询任务日志详情', auth: 'monitor:job-log:detail' },
+      { name: '删除任务日志', auth: 'monitor:job-log:remove' },
+      { name: '清空任务日志', auth: 'monitor:job-log:clear' },
     ],
   });
 

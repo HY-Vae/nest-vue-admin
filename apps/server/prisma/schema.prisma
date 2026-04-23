@@ -324,9 +324,14 @@ model SysLoginLog {
   /// 失败原因
   message   String?  @db.VarChar(255)
   /// 登录时间
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  /// 登出时间
+  logoutTime DateTime? @map("logout_at")
+  /// 令牌过期时间
+  expireTime DateTime? @map("expire_at")
 
   @@index([userName, createdAt])
+  @@index([userId, status, logoutTime])
   @@map("sys_login_log")
 }
 
@@ -478,4 +483,63 @@ model SysPasswordHistory {
 
   @@index([userId, createdAt])
   @@map("sys_password_history")
+}
+
+/// 定时任务
+model SysJob {
+  /// id
+  id        String    @id @db.VarChar(36)
+  /// 任务名称
+  jobName   String    @map("job_name") @db.VarChar(64)
+  /// 任务组名
+  jobGroup  String    @map("job_group") @db.VarChar(64)
+  /// 调用目标 (格式: service.method(args))
+  invokeTarget String @map("invoke_target") @db.VarChar(255)
+  /// cron表达式
+  cronExpression String @map("cron_expression") @db.VarChar(50)
+  /// 执行策略 (1立即执行 2执行一次 3放弃执行)
+  misfirePolicy String @default("1") @map("misfire_policy") @db.Char(1)
+  /// 是否并发执行 (0允许 1禁止)
+  concurrent String @default("1") @db.Char(1)
+  /// 状态 (0正常 1暂停)
+  status    String    @default("0") @db.Char(1)
+  /// 备注
+  remark    String?   @db.VarChar(255)
+  /// 创建人
+  createBy  String?   @map("create_by") @db.VarChar(64)
+  /// 创建时间
+  createdAt DateTime  @default(now()) @map("created_at")
+  /// 修改人
+  updateBy  String?   @map("update_by") @db.VarChar(64)
+  /// 修改时间
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("sys_job")
+}
+
+/// 定时任务执行日志
+model SysJobLog {
+  /// id
+  id            Int       @id @default(autoincrement())
+  /// 任务名称
+  jobName       String    @map("job_name") @db.VarChar(64)
+  /// 任务组名
+  jobGroup      String    @map("job_group") @db.VarChar(64)
+  /// 调用目标
+  invokeTarget  String    @map("invoke_target") @db.VarChar(255)
+  /// 日志状态 (0成功 1失败)
+  status        String    @default("0") @db.Char(1)
+  /// 执行结果信息
+  jobMessage    String?   @map("job_message") @db.VarChar(255)
+  /// 异常信息
+  exceptionInfo String?   @map("exception_info") @db.Text
+  /// 开始时间
+  startTime     DateTime? @map("start_time")
+  /// 结束时间
+  endTime       DateTime? @map("end_time")
+  /// 创建时间
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([jobName, createdAt])
+  @@map("sys_job_log")
 }

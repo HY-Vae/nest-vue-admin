@@ -41,38 +41,40 @@
             </el-form-item>
           </el-col>
 
-          <el-col v-bind="searchSpan">
-            <el-form-item label="状态" prop="status">
-              <el-select
-                v-model="searchForm.status"
-                placeholder="请选择状态"
-                clearable
-                style="width: 200px"
-              >
-                <el-option
-                  v-for="dict in loginStatusOptions"
-                  :key="dict.value"
-                  :label="dict.label"
-                  :value="dict.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
+          <template v-if="!onlineMode">
+            <el-col v-bind="searchSpan">
+              <el-form-item label="状态" prop="status">
+                <el-select
+                  v-model="searchForm.status"
+                  placeholder="请选择状态"
+                  clearable
+                  style="width: 200px"
+                >
+                  <el-option
+                    v-for="dict in loginStatusOptions"
+                    :key="dict.value"
+                    :label="dict.label"
+                    :value="dict.value"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
 
-          <el-col v-bind="searchSpan">
-            <el-form-item label="登录时间" prop="timeRange">
-              <el-date-picker
-                v-model="timeRange"
-                type="datetimerange"
-                range-separator="至"
-                start-placeholder="开始时间"
-                end-placeholder="结束时间"
-                value-format="YYYY-MM-DD HH:mm:ss"
-                style="width: 360px"
-                @change="handleTimeChange"
-              />
-            </el-form-item>
-          </el-col>
+            <el-col v-bind="searchSpan">
+              <el-form-item label="登录时间" prop="timeRange">
+                <el-date-picker
+                  v-model="timeRange"
+                  type="datetimerange"
+                  range-separator="至"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  value-format="YYYY-MM-DD HH:mm:ss"
+                  style="width: 360px"
+                  @change="handleTimeChange"
+                />
+              </el-form-item>
+            </el-col>
+          </template>
 
           <el-col v-bind="searchSpan">
             <el-form-item>
@@ -86,13 +88,20 @@
 
     <el-card class="table-container">
       <el-row class="table-bar">
-        <el-button type="danger" plain v-auth="'sys:login-log:remove'" @click="handleBatchDelete">
-          批量删除
-        </el-button>
-        <el-button type="danger" plain v-auth="'sys:login-log:clear'" @click="handleClear">
-          清空日志
-        </el-button>
-        <el-button v-auth="'sys:login-log:export'" @click="exportVisible = true">导出</el-button>
+        <el-switch
+          v-model="onlineMode"
+          active-text="仅看在线"
+          @change="handleOnlineModeChange"
+        />
+        <template v-if="!onlineMode">
+          <el-button type="danger" plain v-auth="'sys:login-log:remove'" @click="handleBatchDelete">
+            批量删除
+          </el-button>
+          <el-button type="danger" plain v-auth="'sys:login-log:clear'" @click="handleClear">
+            清空日志
+          </el-button>
+          <el-button v-auth="'sys:login-log:export'" @click="exportVisible = true">导出</el-button>
+        </template>
       </el-row>
       <div class="table-main" v-loading="queryLoading">
         <el-table
@@ -101,7 +110,7 @@
           row-key="id"
           @selection-change="handleSelectionChange"
         >
-          <el-table-column type="selection" width="55" />
+          <el-table-column v-if="!onlineMode" type="selection" width="55" />
 
           <el-table-column label="用户名" align="center" prop="userName" width="120" />
 
@@ -125,7 +134,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="状态" align="center" width="80">
+          <el-table-column v-if="!onlineMode" label="状态" align="center" width="80">
             <template #default="{ row }">
               <el-tag :type="row.status === '0' ? 'success' : 'danger'" size="small">
                 {{ getDictLabel(loginStatusOptions, row.status) }}
@@ -133,7 +142,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="失败原因" align="center" prop="message" show-overflow-tooltip>
+          <el-table-column v-if="!onlineMode" label="失败原因" align="center" prop="message" show-overflow-tooltip>
             <template #default="{ row }">
               {{ row.message || '-' }}
             </template>
@@ -142,6 +151,25 @@
           <el-table-column label="登录时间" align="center" width="180">
             <template #default="{ row }">
               {{ transTime(row.createdAt) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column v-if="onlineMode" label="过期时间" align="center" width="180">
+            <template #default="{ row }">
+              {{ transTime(row.expireTime) }}
+            </template>
+          </el-table-column>
+
+          <el-table-column v-if="onlineMode" label="操作" align="center" width="100" fixed="right">
+            <template #default="{ row }">
+              <el-button
+                type="danger"
+                link
+                v-auth="'sys:login-log:force-logout'"
+                @click="handleForceLogout(row)"
+              >
+                强制下线
+              </el-button>
             </template>
           </el-table-column>
 
@@ -165,6 +193,7 @@
     </el-card>
 
     <ExportDialog
+      v-if="!onlineMode"
       v-model:visible="exportVisible"
       :columns="columns"
       export-url="/sys/login-log/export"
@@ -180,7 +209,13 @@ import { reactive, ref } from 'vue'
 import { useRequest } from 'vue-request'
 import ExportDialog from '@/components/export/ExportDialog.vue'
 import type { ColumnConfig } from '@/types/global.ts'
-import { getLoginLogApi, batchDeleteLoginLogApi, clearLoginLogApi } from './service'
+import {
+  getLoginLogApi,
+  getOnlineUserApi,
+  batchDeleteLoginLogApi,
+  clearLoginLogApi,
+  forceLogoutApi,
+} from './service'
 import type { SysLoginLogListType } from './loginLog.type'
 import { useDict } from '@/hooks/dict.hook.ts'
 import type { SelectOptionItem } from '@/types/global.ts'
@@ -192,6 +227,13 @@ const loginStatusOptions = ref<SelectOptionItem[]>([])
 getDictOptions('loginStatus').then((res) => {
   loginStatusOptions.value = res
 })
+
+// 在线模式切换
+const onlineMode = ref(false)
+
+const handleOnlineModeChange = () => {
+  onReset()
+}
 
 // 导出
 const exportVisible = ref(false)
@@ -259,7 +301,13 @@ const tableData = ref<SysLoginLogListType[]>([])
 const total = ref(0)
 
 const { loading: queryLoading, run: runQuery } = useRequest(
-  () => getLoginLogApi({ ...searchForm }),
+  () => {
+    const params = { ...searchForm }
+    if (onlineMode.value) {
+      return getOnlineUserApi({ current: params.current, pageSize: params.pageSize, userName: params.userName })
+    }
+    return getLoginLogApi(params)
+  },
   {
     manual: false,
     loadingKeep: 500,
@@ -311,6 +359,19 @@ const handleClear = () => {
   }).then(async () => {
     await runClear()
     ElMessage.success('清空成功')
+    runQuery()
+  })
+}
+
+// 强制下线
+const { runAsync: runForceLogout } = useRequest(forceLogoutApi, { manual: true })
+
+const handleForceLogout = (row: SysLoginLogListType) => {
+  ElMessageBox.confirm(`确定强制用户「${row.userName}」下线吗？`, '提示', {
+    type: 'warning',
+  }).then(async () => {
+    await runForceLogout(row.userId!)
+    ElMessage.success('已强制下线')
     runQuery()
   })
 }

@@ -79,6 +79,51 @@ const dicts: Dict[] = [
       { label: '仅本人', value: 'SELF', sort: 4, status: '0', createBy: 'nva' },
     ],
   },
+  {
+    name: '任务状态',
+    code: 'jobStatus',
+    sort: 6,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '正常', value: '0', sort: 0, status: '0', createBy: 'nva' },
+      { label: '暂停', value: '1', sort: 1, status: '0', createBy: 'nva' },
+    ],
+  },
+  {
+    name: '执行策略',
+    code: 'jobMisfirePolicy',
+    sort: 7,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '立即执行', value: '1', sort: 0, status: '0', createBy: 'nva' },
+      { label: '执行一次', value: '2', sort: 1, status: '0', createBy: 'nva' },
+      { label: '放弃执行', value: '3', sort: 2, status: '0', createBy: 'nva' },
+    ],
+  },
+  {
+    name: '是否并发执行',
+    code: 'jobConcurrent',
+    sort: 8,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '允许', value: '0', sort: 0, status: '0', createBy: 'nva' },
+      { label: '禁止', value: '1', sort: 1, status: '0', createBy: 'nva' },
+    ],
+  },
+  {
+    name: '任务日志状态',
+    code: 'jobLogStatus',
+    sort: 9,
+    status: '0',
+    createBy: 'nva',
+    details: [
+      { label: '成功', value: '0', sort: 0, status: '0', createBy: 'nva' },
+      { label: '失败', value: '1', sort: 1, status: '0', createBy: 'nva' },
+    ],
+  },
 ];
 
 export async function initDicts(prisma: PrismaClient) {

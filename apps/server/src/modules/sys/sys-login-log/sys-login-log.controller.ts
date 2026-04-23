@@ -1,6 +1,8 @@
 import { Permission } from '@/common/decorators/permission.decorator';
 import type { ExportColumn } from '@/common/class/export.class';
 import { DelCommonNumbersDto } from '@/common/dtos/common.dto';
+import { Action } from '@/common/decorators/action.decorator';
+import { ActionEnum } from '@/common/enums/action.enum';
 import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -9,7 +11,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
+import { GetOnlineUserListDto, GetSysLoginLogListDto } from './dto/req-sys-login-log.dto';
 import { SysLoginLogService } from './sys-login-log.service';
 
 @ApiTags('登录日志')
@@ -17,6 +19,24 @@ import { SysLoginLogService } from './sys-login-log.service';
 @Controller('sys/login-log')
 export class SysLoginLogController {
   constructor(private readonly sysLoginLogService: SysLoginLogService) {}
+
+  /* 在线用户列表 */
+  @Get('online')
+  @ApiOperation({ summary: '查询在线用户列表' })
+  @Permission('sys:login-log:online')
+  findOnlineUsers(@Query() query: GetOnlineUserListDto) {
+    return this.sysLoginLogService.findOnlineUsers(query);
+  }
+
+  /* 强制下线 */
+  @Delete('online/:userId')
+  @ApiOperation({ summary: '强制下线' })
+  @ApiParam({ name: 'userId', description: '用户ID' })
+  @Permission('sys:login-log:force-logout')
+  @Action({ action: ActionEnum.REMOVE, title: '在线用户' })
+  forceLogout(@Param('userId') userId: string) {
+    return this.sysLoginLogService.forceLogout(userId);
+  }
 
   /* 列表查询 */
   @Get()

@@ -76,3 +76,11 @@ export class CreateSysLoginLogDto {
   @IsOptional()
   message?: string;
 }
+
+/* 在线用户分页查询 */
+export class GetOnlineUserListDto extends PaginationDto {
+  @ApiPropertyOptional({ description: '用户名' })
+  @IsString()
+  @IsOptional()
+  userName?: string;
+}

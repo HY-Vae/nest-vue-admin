@@ -31,3 +31,18 @@ export function clearLoginLogApi(): Promise<Result> {
     method: 'DELETE',
   })
 }
+
+/* 查询在线用户列表 */
+export function getOnlineUserApi(params: QuerySysLoginLogType): Promise<ListResult<SysLoginLogListType>> {
+  return request('/sys/login-log/online', {
+    method: 'GET',
+    params,
+  })
+}
+
+/* 强制下线 */
+export function forceLogoutApi(userId: string): Promise<Result> {
+  return request(`/sys/login-log/online/${userId}`, {
+    method: 'DELETE',
+  })
+}

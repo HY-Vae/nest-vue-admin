@@ -15,6 +15,7 @@ import { EnableStatusEnum } from '@/common/enums/common.enum';
 import { DataScopeEnum } from '@/common/enums/dataScope.enum';
 import { NoAuthException } from '@/common/exceptions/noAuth.exception';
 import { JwtConfigType } from '@/common/types/config.type';
+import { SysLoginLogService } from '@/modules/sys/sys-login-log/sys-login-log.service';
 import { simplifyMenuTree } from '@/utils/menu.util';
 import {
   buildMenuTree,
@@ -31,6 +32,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly loginLogService: SysLoginLogService,
   ) {}
   async login(user: CurrentUserType & { mustChangePassword?: boolean }) {
     // 密码过期，不发放 token
@@ -495,6 +497,8 @@ export class AuthService {
     await this.cacheManager.del(
       generateRedisKey(REDIS_KEYS.USER_REFRESH, userId),
     );
+    // 更新登录日志的登出时间
+    await this.loginLogService.recordLogout(userId);
   }
 
   /** 过期/强制改密用户修改密码（无需 JWT） */

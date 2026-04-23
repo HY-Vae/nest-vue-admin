@@ -23,6 +23,7 @@ import {
   APP_INTERCEPTOR,
   APP_PIPE,
 } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import {
   ThrottlerGuard,
   ThrottlerModule,
@@ -39,6 +40,8 @@ const logger = new Logger('CacheModule');
 @Global()
 @Module({
   imports: [
+    // 定时任务模块
+    ScheduleModule.forRoot(),
     // 配置模块
     ConfigModule.forRoot({
       isGlobal: true,
