@@ -28,9 +28,9 @@ model SysUser {
   deptId    String?   @map("dept_id") @db.VarChar(36)
   postId    String?   @map("post_id") @db.VarChar(36)
   remark    String?   @db.VarChar(255)
-  createBy  String?   @map("create_by") @db.VarChar(64)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   createdAt DateTime  @default(now()) @map("created_at")
-  updateBy  String?   @map("update_by") @db.VarChar(64)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   updatedAt DateTime  @updatedAt @map("updated_at")
   roles       SysRole[]
   dept        SysDept?  @relation(fields: [deptId], references: [id], onDelete: SetNull, onUpdate: NoAction)
@@ -61,9 +61,9 @@ model SysRole {
   /// 数据权限范围 (ALL/CUSTOM/DEPT/DEPT_AND_CHILD/SELF)
   dataScope String       @default("SELF") @map("data_scope") @db.VarChar(20)
   remark    String?      @db.VarChar(255)
-  createBy  String?      @map("create_by") @db.VarChar(64)
+  createBy  String?      @map("create_by") @db.VarChar(30)
   createdAt DateTime     @default(now()) @map("created_at")
-  updateBy  String?      @map("update_by") @db.VarChar(64)
+  updateBy  String?      @map("update_by") @db.VarChar(30)
   updatedAt DateTime     @updatedAt @map("updated_at")
   users     SysUser[]
   menus     SysMenu[]
@@ -87,9 +87,9 @@ model SysMenu {
   sort      Int     @default(0)
   remark    String? @db.VarChar(255)
 
-  createBy   String?            @map("create_by") @db.VarChar(64)
+  createBy   String?            @map("create_by") @db.VarChar(30)
   createdAt  DateTime           @default(now()) @map("created_at")
-  updateBy   String?            @map("update_by") @db.VarChar(64)
+  updateBy   String?            @map("update_by") @db.VarChar(30)
   updatedAt  DateTime           @updatedAt @map("updated_at")
   // Meta字段直接展开
   meta       SysMenuMeta?
@@ -151,9 +151,9 @@ model SysDict {
   sort      Int
   status    String          @db.Char(1)
   remark    String?         @db.VarChar(255)
-  createBy  String?         @map("create_by") @db.VarChar(64)
+  createBy  String?         @map("create_by") @db.VarChar(30)
   createdAt DateTime        @default(now()) @map("created_at")
-  updateBy  String?         @map("update_by") @db.VarChar(64)
+  updateBy  String?         @map("update_by") @db.VarChar(30)
   updatedAt DateTime        @updatedAt @map("updated_at")
   details   SysDictDetail[]
 
@@ -169,9 +169,9 @@ model SysDictDetail {
   remark      String?  @db.VarChar(255)
   sysDictCode String   @map("sys_dict_code") @db.VarChar(30)
   sysDict     SysDict? @relation(fields: [sysDictCode], references: [code], onDelete: Cascade)
-  createBy    String?  @map("create_by") @db.VarChar(64)
+  createBy    String?  @map("create_by") @db.VarChar(30)
   createdAt   DateTime @default(now()) @map("created_at")
-  updateBy    String?  @map("update_by") @db.VarChar(64)
+  updateBy    String?  @map("update_by") @db.VarChar(30)
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@unique([value, sysDictCode])
@@ -184,9 +184,9 @@ model Temp {
   code      String    @unique @map("code") @db.VarChar(20)
   tempPath  String    @map("temp_path") @db.VarChar(30)
   createBy  String?   @map("create_by") @db.VarChar(30)
-  createdAt DateTime? @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
   updateBy  String?   @map("update_by") @db.VarChar(30)
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@map("temp")
 }
@@ -215,11 +215,11 @@ model SysDept {
   /// 创建人
   createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createdAt DateTime? @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
   /// 修改人
   updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   /// 父级部门
   parent    SysDept?  @relation("DeptTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -254,11 +254,11 @@ model SysPost {
   /// 备注
   remark    String?   @db.VarChar(255)
   /// 创建人
-  createBy  String?   @map("create_by") @db.VarChar(64)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
   createdAt DateTime  @default(now()) @map("created_at")
   /// 修改人
-  updateBy  String?   @map("update_by") @db.VarChar(64)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
   updatedAt DateTime  @updatedAt @map("updated_at")
 
@@ -298,7 +298,7 @@ model SysActionLog {
   /// 状态
   status    String?   @db.VarChar(1)
   /// 创建时间
-  createdAt DateTime? @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   @@index([userId, createdAt])
   @@map("sys_action_log")
@@ -355,11 +355,11 @@ model AutoCode {
   /// 创建人
   createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createdAt DateTime? @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
   /// 修改人
   updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@map("auto_code")
 }
@@ -382,11 +382,11 @@ model FileUpload {
   /// 创建人
   createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
-  createdAt DateTime? @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
   /// 修改人
   updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
-  updatedAt DateTime? @updatedAt @map("updated_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@map("file_upload")
 }
@@ -403,11 +403,11 @@ model SysNotice {
   /// 状态 (0正常 1关闭)
   status    String           @default("0") @db.Char(1)
   /// 创建人
-  createBy  String?          @map("create_by") @db.VarChar(64)
+  createBy  String?          @map("create_by") @db.VarChar(30)
   /// 创建时间
   createdAt DateTime         @default(now()) @map("created_at")
   /// 修改人
-  updateBy  String?          @map("update_by") @db.VarChar(64)
+  updateBy  String?          @map("update_by") @db.VarChar(30)
   /// 修改时间
   updatedAt DateTime         @updatedAt @map("updated_at")
   /// 阅读记录
@@ -454,7 +454,7 @@ model SysTodo {
   /// 目标用户ID
   userId      String    @map("user_id") @db.VarChar(36)
   /// 创建人
-  createBy    String?   @map("create_by") @db.VarChar(64)
+  createBy    String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
   createdAt   DateTime  @default(now()) @map("created_at")
   /// 完成人
@@ -506,11 +506,11 @@ model SysJob {
   /// 备注
   remark    String?   @db.VarChar(255)
   /// 创建人
-  createBy  String?   @map("create_by") @db.VarChar(64)
+  createBy  String?   @map("create_by") @db.VarChar(30)
   /// 创建时间
   createdAt DateTime  @default(now()) @map("created_at")
   /// 修改人
-  updateBy  String?   @map("update_by") @db.VarChar(64)
+  updateBy  String?   @map("update_by") @db.VarChar(30)
   /// 修改时间
   updatedAt DateTime  @updatedAt @map("updated_at")
 

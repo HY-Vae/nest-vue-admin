@@ -20,7 +20,7 @@ export class CreateDtoPipe implements PipeTransform {
   ): T {
     const user = this.request.user;
     if (user) {
-      value.createBy = user.nickName;
+      value.createBy = user.userName;
     }
     return value;
   }

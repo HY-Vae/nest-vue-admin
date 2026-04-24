@@ -20,7 +20,7 @@ export class UpdateDtoPipe implements PipeTransform {
   ): T {
     const user = this.request.user;
     if (user) {
-      value.updateBy = user.nickName;
+      value.updateBy = user.userName;
     }
     return value;
   }

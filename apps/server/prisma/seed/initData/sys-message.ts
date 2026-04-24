@@ -5,7 +5,7 @@ export async function initMessages(prisma: PrismaClient) {
 
   // 获取用户列表
   const users = await prisma.sysUser.findMany({
-    select: { id: true },
+    select: { id: true, userName: true },
     take: 5,
   });
 
@@ -23,7 +23,7 @@ export async function initMessages(prisma: PrismaClient) {
         '尊敬的用户：\n\n系统将于本周六凌晨2:00-6:00进行版本升级，届时系统将暂停服务。请各位提前做好相关工作安排，感谢您的理解与支持！\n\n如有疑问，请联系技术支持。',
       type: 'notice',
       status: '0',
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
     {
       id: 'notice-seed-002',
@@ -32,7 +32,7 @@ export async function initMessages(prisma: PrismaClient) {
         '尊敬的用户：\n\n近期发现有不法分子冒充系统管理员进行诈骗，请注意：\n1. 系统管理员不会主动要求您提供密码\n2. 不要点击来历不明的链接\n3. 如遇可疑情况请及时举报\n\n安全无小事，请各位务必重视！',
       type: 'warning',
       status: '0',
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
     {
       id: 'notice-seed-003',
@@ -41,7 +41,7 @@ export async function initMessages(prisma: PrismaClient) {
         '各位同事：\n\n五一劳动节将至，根据国家法定节假日安排，公司将于5月1日至5月5日放假，共5天。\n\n放假期间请做好工作交接，紧急事务请联系值班人员。\n\n祝大家节日快乐！',
       type: 'notice',
       status: '0',
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
     {
       id: 'notice-seed-004',
@@ -50,7 +50,7 @@ export async function initMessages(prisma: PrismaClient) {
         '尊敬的用户：\n\n系统已更新上线以下新功能：\n\n1. 消息中心模块\n2. 待办事项管理\n3. 个人中心优化\n\n欢迎各位体验并反馈意见！',
       type: 'system',
       status: '0',
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
     {
       id: 'notice-seed-005',
@@ -59,7 +59,7 @@ export async function initMessages(prisma: PrismaClient) {
         '紧急通知：\n\n系统检测到异常流量，将于今晚23:00-24:00进行紧急维护。\n届时部分功能可能无法正常使用，敬请谅解。\n\n如有紧急需求，请联系值班电话：400-xxx-xxxx',
       type: 'urgent',
       status: '0',
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
   ];
 
@@ -87,7 +87,7 @@ export async function initMessages(prisma: PrismaClient) {
       priority: 'urgent',
       status: 'pending',
       userId: users[0].id,
-      createBy: users[0].id,
+      createBy: users[0].userName,
       link: '/approval/2024-001',
       bizId: '2024-001',
     },
@@ -100,7 +100,7 @@ export async function initMessages(prisma: PrismaClient) {
       priority: 'high',
       status: 'pending',
       userId: users[0].id,
-      createBy: users[0].id,
+      createBy: users[0].userName,
       link: '/project/PRJ-2024-123',
       bizId: 'PRJ-2024-123',
     },
@@ -113,7 +113,7 @@ export async function initMessages(prisma: PrismaClient) {
       priority: 'normal',
       status: 'pending',
       userId: users[1]?.id || users[0].id,
-      createBy: users[0].id,
+      createBy: users[0].userName,
     },
     {
       id: 'todo-seed-004',
@@ -124,7 +124,7 @@ export async function initMessages(prisma: PrismaClient) {
       priority: 'normal',
       status: 'pending',
       userId: users[2]?.id || users[0].id,
-      createBy: users[1]?.id || users[0].id,
+      createBy: users[1]?.userName || users[0].userName,
     },
     {
       id: 'todo-seed-005',
@@ -135,7 +135,7 @@ export async function initMessages(prisma: PrismaClient) {
       priority: 'high',
       status: 'pending',
       userId: users[0].id,
-      createBy: users[0].id,
+      createBy: users[0].userName,
       link: '/contract/CT-2024-089',
       bizId: 'CT-2024-089',
     },
