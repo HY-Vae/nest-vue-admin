@@ -11,17 +11,19 @@ const { currentUser } = storeToRefs(userStore)
 
 const password = ref('')
 const loading = ref(false)
+const errorMsg = ref('')
 
 const avatarStr = currentUser.value?.nickName?.charAt(0).toUpperCase() || 'N'
 
 const handleUnlock = async () => {
   if (!password.value) return
   loading.value = true
+  errorMsg.value = ''
   try {
     await verifyPasswordApi(password.value)
     lockStore.unlock()
-  } catch {
-    // 错误已由拦截器提示
+  } catch (err: any) {
+    errorMsg.value = err?.message || '密码错误'
   } finally {
     loading.value = false
     password.value = ''
@@ -57,6 +59,7 @@ const handleLogout = async () => {
             <el-icon><Lock /></el-icon>
           </template>
         </el-input>
+        <p v-if="errorMsg" class="lock-error">{{ errorMsg }}</p>
         <el-button
           type="primary"
           size="large"
@@ -129,6 +132,12 @@ export default { components: { Lock } }
 
 .lock-footer {
   margin-top: 16px;
+}
+
+.lock-error {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--el-color-danger);
 }
 
 .lock-fade-enter-active,
