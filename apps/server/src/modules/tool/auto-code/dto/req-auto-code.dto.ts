@@ -15,6 +15,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   ValidateNested,
 } from 'class-validator';
 
@@ -110,18 +111,22 @@ export class FieldDto {
 export class CreateAutoCodeDto extends CommonBaseDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   name: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   nameZh: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   modelName: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   webPath: string;
 
   @IsString()
@@ -130,6 +135,7 @@ export class CreateAutoCodeDto extends CommonBaseDto {
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   routePath: string;
 
   @IsArray()

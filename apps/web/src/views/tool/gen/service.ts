@@ -1,19 +1,9 @@
 import request from '@/utils/request'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function insertCode(data: any) {
-  return request({
-    url: '/tool/auto-code',
-    method: 'post',
-    data,
-  })
+export function insertCode(data: Record<string, unknown>) {
+  return request('/tool/auto-code', { method: 'POST', data })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function insertCodeWeb(data: any) {
-  return request({
-    url: '/tool/auto-code/web',
-    method: 'post',
-    data,
-  })
+export function insertCodeWeb(data: Record<string, unknown>) {
+  return request('/tool/auto-code/web', { method: 'POST', data })
 }

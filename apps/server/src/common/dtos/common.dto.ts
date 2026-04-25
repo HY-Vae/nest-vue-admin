@@ -5,16 +5,19 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  MaxLength,
   Min,
 } from 'class-validator';
 
 export class CommonBaseDto {
   @IsOptional()
   @IsString()
+  @MaxLength(30)
   createBy?: string;
 
   @IsOptional()
   @IsString()
+  @MaxLength(30)
   updateBy?: string;
 }
 

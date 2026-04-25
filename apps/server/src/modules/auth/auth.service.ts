@@ -337,6 +337,7 @@ export class AuthService {
     // 解析数据权限
     const dataScope = await this.resolveDataScope(
       id,
+      user.userName,
       user.deptId,
       roleIds,
       isSuper,
@@ -363,13 +364,14 @@ export class AuthService {
    */
   private async resolveDataScope(
     userId: string,
+    userName: string,
     userDeptId: string | null,
     roleIds: string[],
     isSuper: boolean,
   ): Promise<DataScopeWhere> {
     if (isSuper) return {};
 
-    if (!roleIds.length) return { createBy: userId };
+    if (!roleIds.length) return { createBy: userName };
 
     const roles = await this.prisma.sysRole.findMany({
       where: { id: { in: roleIds } },
@@ -404,12 +406,12 @@ export class AuthService {
           .filter((r) => r.dataScope === DataScopeEnum.CUSTOM)
           .flatMap((r) => r.depts.map((d) => d.id));
         const uniqueDeptIds = [...new Set(allCustomRoleDeptIds)];
-        if (!uniqueDeptIds.length) return { createBy: userId };
+        if (!uniqueDeptIds.length) return { createBy: userName };
         return { deptId: { in: uniqueDeptIds } };
       }
 
       case DataScopeEnum.DEPT_AND_CHILD: {
-        if (!userDeptId) return { createBy: userId };
+        if (!userDeptId) return { createBy: userName };
         // 利用 ancestors 字段一次性查出所有子部门
         const childDepts = await this.prisma.sysDept.findMany({
           where: {
@@ -424,18 +426,18 @@ export class AuthService {
           select: { id: true },
         });
         const deptIds = childDepts.map((d) => d.id);
-        if (!deptIds.length) return { createBy: userId };
+        if (!deptIds.length) return { createBy: userName };
         return { deptId: { in: deptIds } };
       }
 
       case DataScopeEnum.DEPT: {
-        if (!userDeptId) return { createBy: userId };
+        if (!userDeptId) return { createBy: userName };
         return { deptId: { in: [userDeptId] } };
       }
 
       case DataScopeEnum.SELF:
       default:
-        return { createBy: userId };
+        return { createBy: userName };
     }
   }
 

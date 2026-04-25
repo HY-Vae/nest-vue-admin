@@ -1,7 +1,7 @@
 import { PaginationDto } from '@/common/dtos/pagination.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class GetSysNoticeListDto extends PaginationDto {
   @ApiProperty({ description: '标题', required: false })
@@ -35,6 +35,7 @@ export class GetUserNoticeListDto extends PaginationDto {
 export class CreateSysNoticeDto {
   @ApiProperty({ description: '标题' })
   @IsString()
+  @MaxLength(100)
   title: string;
 
   @ApiProperty({ description: '内容' })
@@ -44,6 +45,7 @@ export class CreateSysNoticeDto {
   @ApiProperty({ description: '类型', required: false, default: 'notice' })
   @IsOptional()
   @IsString()
+  @MaxLength(10)
   type?: string;
 
   @ApiProperty({ description: '状态', required: false, default: '0' })
@@ -56,6 +58,7 @@ export class UpdateSysNoticeDto {
   @ApiProperty({ description: '标题', required: false })
   @IsOptional()
   @IsString()
+  @MaxLength(100)
   title?: string;
 
   @ApiProperty({ description: '内容', required: false })
@@ -66,6 +69,7 @@ export class UpdateSysNoticeDto {
   @ApiProperty({ description: '类型', required: false })
   @IsOptional()
   @IsString()
+  @MaxLength(10)
   type?: string;
 
   @ApiProperty({ description: '状态', required: false })

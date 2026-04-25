@@ -104,16 +104,19 @@ export class CreateSysMenuDto extends CommonBaseDto {
   @ApiProperty({ description: '路由名称', required: true })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(30)
   name: string;
 
   @ApiProperty({ description: '菜单路径', required: true })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   path: string;
 
   @ApiProperty({ description: '菜单权限值', required: true })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(30)
   auth: string;
 
   @ApiProperty({ description: '是否隐藏', required: true })
@@ -123,6 +126,7 @@ export class CreateSysMenuDto extends CommonBaseDto {
   @ApiProperty({ description: '组件', required: true })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   component: string;
 
   @ApiProperty({ description: '菜单状态', required: true })
@@ -138,6 +142,7 @@ export class CreateSysMenuDto extends CommonBaseDto {
   @ApiProperty({ description: '菜单描述', required: false })
   @IsString()
   @IsOptional()
+  @MaxLength(255)
   remark?: string;
 
   @ApiProperty({ description: '菜单信息', required: true })

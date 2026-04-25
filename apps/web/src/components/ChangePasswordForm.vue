@@ -35,10 +35,10 @@ const rules: FormRules = {
   oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
   newPassword: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度为6-20位', trigger: 'change' },
+    { min: 8, max: 20, message: '密码长度为8-20位', trigger: 'change' },
     {
-      pattern: /^(?=.*[A-Za-z])(?=.*\d).+$/,
-      message: '密码必须包含字母和数字',
+      pattern: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]).+$/,
+      message: '密码必须包含字母、数字和特殊字符',
       trigger: 'change',
     },
   ],
@@ -61,19 +61,20 @@ const rules: FormRules = {
 const passwordChecks = computed(() => {
   const pwd = form.newPassword
   return [
-    { label: '至少6个字符', passed: pwd.length >= 6 },
+    { label: '至少8个字符', passed: pwd.length >= 8 },
     { label: '包含字母', passed: /[A-Za-z]/.test(pwd) },
     { label: '包含数字', passed: /\d/.test(pwd) },
     { label: '包含特殊字符', passed: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]/.test(pwd) },
   ]
 })
 
+const allPassed = computed(() => passwordChecks.value.every((c) => c.passed))
+
 const passwordStrength = computed(() => {
-  const passedCount = passwordChecks.value.filter((c) => c.passed).length
-  if (passedCount <= 1) return { level: 0, text: '弱', color: '#F56C6C' }
-  if (passedCount === 2) return { level: 1, text: '较弱', color: '#E6A23C' }
-  if (passedCount === 3) return { level: 2, text: '中等', color: '#409EFF' }
-  return { level: 3, text: '强', color: '#67C23A' }
+  if (!form.newPassword) return { level: 0, text: '', color: '' }
+  return allPassed.value
+    ? { level: 3, text: '合规', color: '#67C23A' }
+    : { level: 0, text: '不合规', color: '#F56C6C' }
 })
 
 /** 校验表单，成功返回表单数据 */
@@ -127,7 +128,7 @@ defineExpose({ validate, resetFields })
           <el-input
             v-model="form.newPassword"
             type="password"
-            placeholder="6-20位，需包含字母和数字"
+            placeholder="8-20位，需包含字母、数字和特殊字符"
             show-password
             clearable
           >
@@ -136,13 +137,13 @@ defineExpose({ validate, resetFields })
             </template>
           </el-input>
         </template>
-        <div class="password-strength">
+        <div v-if="form.newPassword" class="password-strength">
           <div class="strength-bar">
             <div
               v-for="i in 4"
               :key="i"
               class="strength-segment"
-              :style="{ backgroundColor: i <= passwordStrength.level + 1 ? passwordStrength.color : '' }"
+              :style="{ backgroundColor: allPassed ? '#67C23A' : '#F56C6C' }"
             />
           </div>
           <span class="strength-text" :style="{ color: passwordStrength.color }">

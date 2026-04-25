@@ -154,8 +154,7 @@ describe('SysMenuService', () => {
       expect(prisma.sysMenu.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: {},
-          skip: 0,
-          take: 10,
+          include: { meta: true },
           orderBy: { sort: 'asc' },
         }),
       );

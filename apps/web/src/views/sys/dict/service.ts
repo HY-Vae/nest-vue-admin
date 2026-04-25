@@ -28,7 +28,7 @@ export function getDictOneApi(code: string): Promise<Result<DictListType>> {
 
 export function getDictsApi(codes: string[]): Promise<Result<DictListType>> {
   return request(`/sys/dict/options`, {
-    method: 'post',
+    method: 'POST',
     data: {
       codes,
     },
