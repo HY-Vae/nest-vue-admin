@@ -27,6 +27,11 @@ const handleUnlock = async () => {
     password.value = ''
   }
 }
+
+const handleLogout = async () => {
+  await userStore.logout()
+  window.location.reload()
+}
 </script>
 
 <template>
@@ -61,6 +66,9 @@ const handleUnlock = async () => {
         >
           解锁
         </el-button>
+        <div class="lock-footer">
+          <el-button type="info" link @click="handleLogout">退出登录</el-button>
+        </div>
       </div>
     </div>
   </transition>
@@ -117,6 +125,10 @@ export default { components: { Lock } }
 .lock-btn {
   margin-top: 16px;
   width: 100%;
+}
+
+.lock-footer {
+  margin-top: 16px;
 }
 
 .lock-fade-enter-active,

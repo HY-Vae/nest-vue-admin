@@ -1,6 +1,7 @@
 import { getRoutesApi, getUserInfoApi, logoutApi } from '@/api/auth.ts'
 import { clearTokens } from '@/utils/auth.ts'
 import router from '@/router'
+import { useLockStore } from '@/stores/modules/lock'
 import { useSearchParamsStore } from '@/stores/modules/searchParams'
 import { useTabsStore } from '@/stores/modules/tabs'
 import type { CurrentUserType } from '@/types/user.ts'
@@ -74,6 +75,9 @@ export const useUserStore = defineStore('user', () => {
     // 清除状态
     currentUser.value = undefined
     menus.value = []
+    // 清除锁屏状态
+    const lockStore = useLockStore()
+    lockStore.unlock()
     // 清除 tabs
     const tabsStore = useTabsStore()
     tabsStore.tabs = []
