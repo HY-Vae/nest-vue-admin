@@ -7,6 +7,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { debounce } from 'lodash-es'
 import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/stores/modules/user'
 
 const ruleFormRef = ref<FormInstance>()
 const changePasswordRef = ref<InstanceType<typeof ChangePasswordForm>>()
@@ -54,8 +55,16 @@ const submitForm = (formEl: FormInstance | undefined) => {
       }
       const redirect = route.query.redirect
       if (redirect) {
-        router.push(redirect as string)
-        return
+        const userStore = useUserStore()
+        await userStore.getCurrentUser()
+        const hasRoutes = await userStore.renderRoutes()
+        if (hasRoutes) {
+          const resolved = router.resolve(redirect as string)
+          if (resolved.name !== 'NotFound') {
+            router.push(redirect as string)
+            return
+          }
+        }
       }
       router.push(res.data.home)
     } catch {
@@ -84,8 +93,16 @@ const submitChangePassword = async () => {
     ElMessage.success('密码修改成功')
     const redirect = route.query.redirect
     if (redirect) {
-      router.push(redirect as string)
-      return
+      const userStore = useUserStore()
+      await userStore.getCurrentUser()
+      const hasRoutes = await userStore.renderRoutes()
+      if (hasRoutes) {
+        const resolved = router.resolve(redirect as string)
+        if (resolved.name !== 'NotFound') {
+          router.push(redirect as string)
+          return
+        }
+      }
     }
     router.push(res.data.home)
   } catch {
