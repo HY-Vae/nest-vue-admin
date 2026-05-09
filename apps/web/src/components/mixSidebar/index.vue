@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Icon from '@/components/icon/icon.vue'
 import SideMenu from '@/components/sideMenu/index.vue'
+import router from '@/router'
 import { useThemeStore } from '@/stores/modules/theme'
 import { useUserStore } from '@/stores/modules/user'
 import { storeToRefs } from 'pinia'
@@ -26,7 +27,23 @@ const activeChildren = computed(() => {
 })
 
 const handleClick = (name: string) => {
-  themeStore.setActiveTopMenuName(name)
+  const topMenu = userStore.menus.find((m) => m.name === name)
+  if (topMenu?.children?.length) {
+    const firstVisible = topMenu.children.find((c) => !c.hidden)
+    if (firstVisible) {
+      if (firstVisible.path.startsWith('http')) {
+        window.open(firstVisible.path)
+        return
+      }
+      router.push({ name: firstVisible.name })
+    }
+  } else {
+    if (topMenu?.path?.startsWith('http')) {
+      window.open(topMenu.path)
+      return
+    }
+    router.push({ name })
+  }
 }
 </script>
 
