@@ -242,8 +242,10 @@ watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
   display: flex;
   align-items: center;
   padding: 6px 8px;
-  background: var(--el-bg-color);
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   gap: 4px;
 
   .action-btn {
@@ -253,12 +255,13 @@ watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
     width: 28px;
     height: 28px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     color: var(--el-text-color-regular);
     flex-shrink: 0;
+    transition: all 0.25s;
 
     &:hover {
-      background: var(--el-fill-color-light);
+      background: rgba(0, 0, 0, 0.05);
       color: var(--el-color-primary);
     }
   }
@@ -290,25 +293,27 @@ watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: var(--el-fill-color);
-    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 6px;
     cursor: pointer;
     white-space: nowrap;
     font-size: 13px;
     color: var(--el-text-color-regular);
-    border: 1px solid var(--el-border-color-lighter);
-    transition: all 0.2s;
+    border: 1px solid transparent;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
 
     &:hover {
       color: var(--el-color-primary);
-      border-color: var(--el-color-primary-light-5);
+      background: rgba(64, 158, 255, 0.06);
+      border-color: rgba(64, 158, 255, 0.15);
     }
 
     &.active {
       color: #fff;
       background: var(--el-color-primary);
       border-color: var(--el-color-primary);
+      box-shadow: 0 2px 6px rgba(64, 158, 255, 0.25);
     }
 
     .tab-title {
@@ -353,12 +358,13 @@ watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
     width: 28px;
     height: 28px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     color: var(--el-text-color-regular);
     flex-shrink: 0;
+    transition: all 0.25s;
 
     &:hover {
-      background: var(--el-fill-color-light);
+      background: rgba(0, 0, 0, 0.05);
       color: var(--el-color-primary);
     }
   }
@@ -367,8 +373,8 @@ watch(() => tabsStore.activeTab, scrollToActiveTab, { flush: 'post' })
 .context-menu {
   position: fixed;
   background: var(--el-bg-color);
-  border-radius: 4px;
-  box-shadow: var(--el-box-shadow-light);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   padding: 4px 0;
   z-index: 3000;
   min-width: 100px;

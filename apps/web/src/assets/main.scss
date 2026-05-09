@@ -61,7 +61,9 @@ body {
   flex-direction: column;
   .el-card {
     border: none;
-    --el-card-border-radius: 10px;
+    --el-card-border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.3s ease;
   }
   .search-bar {
     margin-bottom: 10px;

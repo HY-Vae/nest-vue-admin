@@ -4,3 +4,35 @@
 .el-tooltip__trigger {
   outline: unset;
 }
+
+// 全局按钮过渡优化
+.el-button {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// 全局卡片过渡优化
+.el-card {
+  transition: box-shadow 0.3s ease;
+}
+
+// 全局下拉菜单圆角
+.el-dropdown-menu {
+  border-radius: 10px !important;
+  padding: 6px 0 !important;
+}
+
+// 全局对话框圆角
+.el-dialog {
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+// 全局抽屉圆角
+.el-drawer {
+  border-radius: 14px 0 0 14px !important;
+}
+
+// 全局消息弹出层圆角
+.el-message-box {
+  border-radius: 12px !important;
+}

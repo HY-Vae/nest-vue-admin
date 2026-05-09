@@ -256,6 +256,7 @@ getCaptcha()
 .login-page {
   height: 100%;
   display: flex;
+  background: linear-gradient(135deg, #f0f2f5 0%, #e8ecf1 100%);
 }
 
 /* ===== 左侧装饰 ===== */
@@ -282,6 +283,7 @@ getCaptcha()
     letter-spacing: 8px;
     margin: 0;
     line-height: 1;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   }
 
   .banner-desc {
@@ -365,7 +367,7 @@ getCaptcha()
 
 .login-card {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
 }
 
 .form-title {
@@ -383,8 +385,18 @@ getCaptcha()
 
 .login-form {
   :deep(.el-input__wrapper) {
-    border-radius: 8px;
-    padding: 4px 12px;
+    border-radius: 10px;
+    padding: 4px 14px;
+    box-shadow: 0 0 0 1px var(--el-border-color) inset;
+    transition: all 0.3s;
+
+    &:hover {
+      box-shadow: 0 0 0 1px var(--el-border-color-hover) inset;
+    }
+
+    &.is-focus {
+      box-shadow: 0 0 0 1px var(--el-color-primary) inset, 0 0 0 3px var(--el-color-primary-light-8);
+    }
   }
 
   .el-form-item {
@@ -411,14 +423,15 @@ getCaptcha()
   height: 40px;
   flex-shrink: 0;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--el-border-color);
-  transition: all 0.2s;
+  transition: all 0.3s;
 
   &:hover {
     border-color: var(--el-color-primary);
-    box-shadow: 0 0 0 2px var(--el-color-primary-light-8);
+    box-shadow: 0 0 0 3px var(--el-color-primary-light-8);
+    transform: scale(1.02);
   }
 
   > div {
@@ -432,10 +445,23 @@ getCaptcha()
 
 .login-btn {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 16px;
-  height: 44px;
+  height: 46px;
   letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--el-color-primary) 0%, var(--el-color-primary-dark-2) 100%);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(64, 158, 255, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
 }
 
 /* ===== 响应式 ===== */

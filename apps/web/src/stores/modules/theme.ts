@@ -16,12 +16,16 @@ export const presetColors: ThemeColor[] = [
   { name: '青瓷色', color: '#14b8a6' },
 ]
 
+export type LayoutMode = 'vertical' | 'horizontal' | 'mix' | 'column'
+
 export const useThemeStore = defineStore(
   'theme',
   () => {
     const isDark = ref(false)
     const primaryColor = ref('#409eff')
     const isCollapse = ref(false)
+    const layoutMode = ref<LayoutMode>('vertical')
+    const activeTopMenuName = ref('')
 
     const toggleDark = () => {
       isDark.value = !isDark.value
@@ -33,6 +37,14 @@ export const useThemeStore = defineStore(
 
     const toggleCollapse = () => {
       isCollapse.value = !isCollapse.value
+    }
+
+    const setLayoutMode = (mode: LayoutMode) => {
+      layoutMode.value = mode
+    }
+
+    const setActiveTopMenuName = (name: string) => {
+      activeTopMenuName.value = name
     }
 
     const applyTheme = () => {
@@ -88,17 +100,21 @@ export const useThemeStore = defineStore(
       isDark,
       primaryColor,
       isCollapse,
+      layoutMode,
+      activeTopMenuName,
       presetColors,
       toggleDark,
       setPrimaryColor,
       toggleCollapse,
+      setLayoutMode,
+      setActiveTopMenuName,
       applyTheme,
     }
   },
   {
     persist: {
       key: 'admin-theme',
-      pick: ['isDark', 'primaryColor', 'isCollapse'],
+      pick: ['isDark', 'primaryColor', 'isCollapse', 'layoutMode', 'activeTopMenuName'],
     },
   },
 )

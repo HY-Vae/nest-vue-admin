@@ -64,7 +64,9 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     ExportDialog: typeof import('./src/components/export/ExportDialog.vue')['default']
     Icon: typeof import('./src/components/icon/icon.vue')['default']
+    LayoutSwitcher: typeof import('./src/components/header/LayoutSwitcher.vue')['default']
     LockScreen: typeof import('./src/components/LockScreen.vue')['default']
+    MixSidebar: typeof import('./src/components/mixSidebar/index.vue')['default']
     NoticeIcon: typeof import('./src/components/header/NoticeIcon.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -72,6 +74,9 @@ declare module 'vue' {
     SideMenuItem: typeof import('./src/components/sideMenu/sideMenuItem.vue')['default']
     TabsView: typeof import('./src/components/tabs/TabsView.vue')['default']
     TheHeader: typeof import('./src/components/header/TheHeader.vue')['default']
+    TheHeaderActions: typeof import('./src/components/header/TheHeaderActions.vue')['default']
+    TopMenu: typeof import('./src/components/topMenu/index.vue')['default']
+    TopMenuItem: typeof import('./src/components/topMenu/topMenuItem.vue')['default']
   }
   export interface GlobalDirectives {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
@@ -132,7 +137,9 @@ declare global {
   const ElUpload: typeof import('element-plus/es')['ElUpload']
   const ExportDialog: typeof import('./src/components/export/ExportDialog.vue')['default']
   const Icon: typeof import('./src/components/icon/icon.vue')['default']
+  const LayoutSwitcher: typeof import('./src/components/header/LayoutSwitcher.vue')['default']
   const LockScreen: typeof import('./src/components/LockScreen.vue')['default']
+  const MixSidebar: typeof import('./src/components/mixSidebar/index.vue')['default']
   const NoticeIcon: typeof import('./src/components/header/NoticeIcon.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
@@ -140,4 +147,7 @@ declare global {
   const SideMenuItem: typeof import('./src/components/sideMenu/sideMenuItem.vue')['default']
   const TabsView: typeof import('./src/components/tabs/TabsView.vue')['default']
   const TheHeader: typeof import('./src/components/header/TheHeader.vue')['default']
+  const TheHeaderActions: typeof import('./src/components/header/TheHeaderActions.vue')['default']
+  const TopMenu: typeof import('./src/components/topMenu/index.vue')['default']
+  const TopMenuItem: typeof import('./src/components/topMenu/topMenuItem.vue')['default']
 }

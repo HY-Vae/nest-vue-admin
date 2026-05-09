@@ -150,19 +150,21 @@ const techStack = [
 
 <style lang="scss" scoped>
 .welcome-page {
-  padding: 28px;
+  padding: 32px;
   background: var(--el-bg-color);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .greeting-section {
-  margin-bottom: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  margin-bottom: 32px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--el-color-primary-light-9) 0%, var(--el-color-primary-light-8) 100%);
+  border-radius: 12px;
+  border-left: 4px solid var(--el-color-primary);
 
   h1 {
     font-size: 22px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--el-text-color-primary);
     margin: 0 0 6px;
   }
@@ -178,13 +180,15 @@ const techStack = [
   font-size: 15px;
   font-weight: 600;
   color: var(--el-text-color-primary);
-  margin: 0 0 14px;
+  margin: 0 0 16px;
+  padding-left: 10px;
+  border-left: 3px solid var(--el-color-primary);
 }
 
 .feature-grid {
   display: grid;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 14px;
+  margin-bottom: 28px;
 
   &.cols-3 {
     grid-template-columns: repeat(3, 1fr);
@@ -196,30 +200,38 @@ const techStack = [
 }
 
 .feature-card {
-  padding: 16px;
-  background: var(--el-fill-color-lighter);
-  border-radius: 8px;
-  transition: background 0.2s, box-shadow 0.2s;
+  padding: 20px;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: transparent;
   }
 
   .feature-icon {
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    margin-bottom: 12px;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover .feature-icon {
+    transform: scale(1.08);
   }
 
   .feature-body {
     h3 {
       font-size: 14px;
       font-weight: 600;
-      margin: 0 0 6px;
+      margin: 0 0 8px;
       color: var(--el-text-color-primary);
     }
 
@@ -242,6 +254,13 @@ const techStack = [
   .tech-tag {
     border: none;
     font-size: 13px;
+    padding: 6px 16px;
+    transition: all 0.25s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
   }
 }
 

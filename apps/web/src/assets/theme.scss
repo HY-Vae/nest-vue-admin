@@ -41,16 +41,47 @@ html.dark {
   --el-box-shadow-lighter: 0px 0px 6px rgba(0, 0, 0, 0.72);
   --el-box-shadow-dark: 0px 16px 48px 16px rgba(0, 0, 0, 0.72), 0px 12px 32px rgba(0, 0, 0, 0.72), 0px 8px 16px -8px rgba(0, 0, 0, 0.72);
 
-  /* 自定义布局样式 */
+  /* 自定义布局样式 - 暗黑模式侧边栏 */
   .nva-container {
     .aside {
-      background: #1d1d1d;
+      background: linear-gradient(180deg, #191b22 0%, #14161c 100%);
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .mix-aside,
+    .column-aside {
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 暗黑模式顶部导航栏 */
+    .top-header {
+      background: linear-gradient(180deg, #191b22 0%, #14161c 100%);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 暗黑模式横向菜单弹出面板 */
+    .el-menu--popup {
+      background: #191b22;
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  /* 双列模式侧边栏暗黑 */
+  .column-sidebar {
+    &__primary {
+      background: #121318;
+    }
+
+    &__sub {
+      background: #191b22;
     }
   }
 
   /* Tabs 组件暗黑模式 */
   .tabs-container {
-    background: #1d1d1d;
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border-bottom-color: #363637;
 
     .el-tag {
@@ -64,7 +95,11 @@ html.dark {
 
   /* Header 暗黑模式 */
   .header {
-    background: #1d1d1d;
+    background: rgba(20, 20, 20, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   }
 
   /* 卡片暗黑模式 */
@@ -208,12 +243,9 @@ html.dark {
 html:not(.dark) {
   /* Tabs 组件浅色模式 */
   .tabs-container {
-    background: #fff;
-    border-bottom-color: #e4e7ed;
-  }
-
-  /* Header 浅色模式 */
-  .header {
-    background: #fff;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom-color: rgba(0, 0, 0, 0.06);
   }
 }
