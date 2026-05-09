@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Icon from '@/components/icon/icon.vue'
+import router from '@/router'
 
 defineProps({
   menu: {
@@ -7,8 +8,6 @@ defineProps({
     default: () => ({}),
   },
 })
-
-const router = useRouter()
 
 const selectOne = (name: string) => {
   if (name.startsWith('http')) {
